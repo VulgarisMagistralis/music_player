@@ -1,20 +1,22 @@
 import 'dart:io';
-import 'package:flutter/widgets.dart';
+import 'package:music_player/data/song.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/utilities/audio_session_manager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'providers.g.dart';
 
 @riverpod
 Stream readFiles(Ref ref, Directory musicDirectory) => musicDirectory.list(followLinks: false, recursive: false);
 
-class SongTitle extends Notifier<String> {
+@Riverpod(keepAlive: true)
+class SongsPageScrollOffset extends _$SongsPageScrollOffset {
   @override
-  String build() => '';
-
-  void updateTitle(String newTitle) => state = newTitle;
+  double build() => state = 0.0;
+  double get value => state;
+  void updateOffset(double newOffset) => state = newOffset;
 }
 
-final getSongTitle = NotifierProvider<SongTitle, String>(SongTitle.new);
+final audioSessionManagerProvider = AsyncNotifierProvider<AudioSessionManager, AudioSessionState>(() => AudioSessionManager());
 
 @riverpod
 Future<List<FileSystemEntity>> readSongFileList(Ref ref, List<String> musicDirectoryList) async {

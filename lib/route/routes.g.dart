@@ -10,7 +10,7 @@ part of 'routes.dart';
 const playerRouteProvider = PlayerRouteProvider._();
 
 final class PlayerRouteProvider
-    extends $NotifierProvider<PlayerRoute, PlayerRouteEnum> {
+    extends $NotifierProvider<PlayerRoute, PlayerPageEnum> {
   const PlayerRouteProvider._()
       : super(
           from: null,
@@ -30,26 +30,26 @@ final class PlayerRouteProvider
   PlayerRoute create() => PlayerRoute();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(PlayerRouteEnum value) {
+  Override overrideWithValue(PlayerPageEnum value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<PlayerRouteEnum>(value),
+      providerOverride: $SyncValueProvider<PlayerPageEnum>(value),
     );
   }
 }
 
-String _$playerRouteHash() => r'4d548feac13547231cea51eecc083cf9783af8e3';
+String _$playerRouteHash() => r'fc4589896f47965e89af52548fc89dc86d4ef15b';
 
-abstract class _$PlayerRoute extends $Notifier<PlayerRouteEnum> {
-  PlayerRouteEnum build();
+abstract class _$PlayerRoute extends $Notifier<PlayerPageEnum> {
+  PlayerPageEnum build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<PlayerRouteEnum, PlayerRouteEnum>;
+    final ref = this.ref as $Ref<PlayerPageEnum, PlayerPageEnum>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<PlayerRouteEnum, PlayerRouteEnum>,
-        PlayerRouteEnum,
+        AnyNotifier<PlayerPageEnum, PlayerPageEnum>,
+        PlayerPageEnum,
         Object?,
         Object?>;
     element.handleValue(ref, created);

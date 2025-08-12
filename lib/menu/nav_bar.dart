@@ -18,27 +18,27 @@ class _NavigationBarState extends ConsumerState<PlayerNavigationBar> {
               child: Row(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
         IconButton(
             onPressed: () {
-              ref.read(playerRouteProvider.notifier).updateRoute(PlayerRouteEnum.songs);
+              ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.songs);
             },
             icon: const Icon(Icons.music_note_outlined)),
         IconButton(
             onPressed: () {
-              ref.read(playerRouteProvider.notifier).updateRoute(PlayerRouteEnum.favourites);
+              ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.favourites);
             },
             icon: const Icon(Icons.favorite_outline_sharp)), //....
         IconButton(
             onPressed: () {
-              ref.read(playerRouteProvider.notifier).updateRoute(PlayerRouteEnum.playlists);
+              ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.playlists);
             },
             icon: const Icon(Icons.featured_play_list_outlined)),
         IconButton(
             onPressed: () {
-              ref.read(playerRouteProvider.notifier).updateRoute(PlayerRouteEnum.search);
+              ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.search);
             },
             icon: const Icon(Icons.search)),
         IconButton(
             onPressed: () {
-              ref.read(playerRouteProvider.notifier).updateRoute(PlayerRouteEnum.settings);
+              ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.settings);
             },
             icon: const Icon(Icons.settings_outlined)),
       ])));

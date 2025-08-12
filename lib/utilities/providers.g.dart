@@ -79,6 +79,54 @@ final class ReadFilesFamily extends $Family
   String toString() => r'readFilesProvider';
 }
 
+@ProviderFor(SongsPageScrollOffset)
+const songsPageScrollOffsetProvider = SongsPageScrollOffsetProvider._();
+
+final class SongsPageScrollOffsetProvider
+    extends $NotifierProvider<SongsPageScrollOffset, double> {
+  const SongsPageScrollOffsetProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'songsPageScrollOffsetProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$songsPageScrollOffsetHash();
+
+  @$internal
+  @override
+  SongsPageScrollOffset create() => SongsPageScrollOffset();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
+  }
+}
+
+String _$songsPageScrollOffsetHash() =>
+    r'c4d41b61da4253f04b37a55819f3d822c264717a';
+
+abstract class _$SongsPageScrollOffset extends $Notifier<double> {
+  double build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<double, double>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<double, double>, double, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
 @ProviderFor(readSongFileList)
 const readSongFileListProvider = ReadSongFileListFamily._();
 

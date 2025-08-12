@@ -23,7 +23,7 @@ class _AfterSplashState extends ConsumerState<AfterSplash> {
       future: init(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const CircularProgressIndicator();
-        if (snapshot.hasError) ref.read(playerRouteProvider.notifier).updateRoute(PlayerRouteEnum.error);
+        if (snapshot.hasError) ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.error);
         return const MusicPlayer();
       },
     );

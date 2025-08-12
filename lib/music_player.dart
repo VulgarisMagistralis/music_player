@@ -19,15 +19,14 @@ class MusicPlayer extends ConsumerStatefulWidget {
 class _MusicPlayerState extends ConsumerState<MusicPlayer> {
   @override
   Widget build(BuildContext context) => MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: playerThemeData,
       builder: (context, child) => switch (ref.watch(playerRouteProvider)) {
-            PlayerRouteEnum.songs => const SongsPage(),
-            PlayerRouteEnum.error => const ErrorPage(),
-            PlayerRouteEnum.search => const SearchPage(),
-            PlayerRouteEnum.settings => const SettingsPage(),
-            PlayerRouteEnum.playlists => const PlaylistPage(),
-            PlayerRouteEnum.favourites => const FavouritesPage(),
-            //TODO
-            PlayerRouteEnum.permissions => const SongsPage()
+            PlayerPageEnum.songs => const SongsPage(),
+            PlayerPageEnum.error => const ErrorPage(),
+            PlayerPageEnum.search => const SearchPage(),
+            PlayerPageEnum.settings => const SettingsPage(),
+            PlayerPageEnum.playlists => const PlaylistPage(),
+            PlayerPageEnum.favourites => const FavouritesPage()
           });
 }

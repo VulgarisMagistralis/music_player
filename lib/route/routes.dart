@@ -1,43 +1,37 @@
 import 'dart:async' show StreamController;
 import 'package:music_player/utilities/string_extension.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'routes.g.dart';
 
-/// add loading?
-enum PlayerRouteEnum {
+enum PlayerPageEnum {
   songs,
   error,
   search,
-  // startup,
   settings,
   playlists,
-  favourites,
-  permissions;
+  favourites;
 
   String toTitle() => name.capitalize();
   String get path => switch (this) {
-        PlayerRouteEnum.songs => '/$name',
-        PlayerRouteEnum.error => '/$name',
-        PlayerRouteEnum.search => '/$name',
-        // PlayerRouteEnum.startup => '/$name',
-        PlayerRouteEnum.settings => '/$name',
-        PlayerRouteEnum.playlists => '/$name',
-        PlayerRouteEnum.favourites => '/$name',
-        PlayerRouteEnum.permissions => '/$name'
+        PlayerPageEnum.songs => '/$name',
+        PlayerPageEnum.error => '/$name',
+        PlayerPageEnum.search => '/$name',
+        PlayerPageEnum.settings => '/$name',
+        PlayerPageEnum.playlists => '/$name',
+        PlayerPageEnum.favourites => '/$name',
       };
 }
 
 @Riverpod(keepAlive: true)
 class PlayerRoute extends _$PlayerRoute {
-  final _controller = StreamController<PlayerRouteEnum>.broadcast();
-  Stream<PlayerRouteEnum> get stream => _controller.stream;
-  void resetRoute() => state = PlayerRouteEnum.songs;
-  void updateRoute(PlayerRouteEnum newRoute) {
+  final _controller = StreamController<PlayerPageEnum>.broadcast();
+  Stream<PlayerPageEnum> get stream => _controller.stream;
+  void resetRoute() => state = PlayerPageEnum.songs;
+  void updateRoute(PlayerPageEnum newRoute) {
     state = newRoute;
     _controller.add(newRoute);
   }
 
   @override
-  PlayerRouteEnum build() => PlayerRouteEnum.songs;
+  PlayerPageEnum build() => PlayerPageEnum.songs;
 }
