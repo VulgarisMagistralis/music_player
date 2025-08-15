@@ -1,5 +1,7 @@
-import 'dart:io' show FileSystemEntity;
+import 'dart:io' show FileSystemEntity, File;
 import 'dart:async' show StreamSubscription;
+import 'dart:typed_data';
+import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 import 'package:flutter/material.dart' show WidgetsBinding, WidgetsBindingObserver, AppLifecycleState;
 import 'package:music_player/data/song.dart';
 import 'package:rxdart/rxdart.dart' show Rx;
@@ -109,7 +111,15 @@ class AudioSessionManager extends AsyncNotifier<AudioSessionState> with WidgetsB
 
   Future<void> setAudioSource({required String title, required FileSystemEntity file}) async {
     await clearAudioSources();
-    state = AsyncValue.data(state.value!.copyWith(title: title, file: file, isReady: await file.exists()));
+    Uint8List? pictureByteList;
+    AudioMetadata metaData = readMetadata(File(file.path), getImage: true);
+    List<Picture> pictures = metaData.pictures;
+    print('________________${metaData.title}');
+    if (pictures.isNotEmpty) {
+      print('________________' + pictures.toString());
+      pictureByteList = pictures.first.bytes;
+    }
+    state = AsyncValue.data(state.value!.copyWith(title: title, file: file, isReady: await file.exists(), albumArt: pictureByteList));
     await _player.setAudioSource(AudioSource.file(file.path, tag: MediaItem(title: title, id: title)));
   }
 

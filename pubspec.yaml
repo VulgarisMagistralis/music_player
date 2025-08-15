@@ -19,7 +19,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   shared_preferences: ^2.5.3
   permission_handler: ^11.3.4
+  isar_community: ^3.2.0-dev.2
   flutter_native_splash: ^2.4.6
+  audio_metadata_reader: ^1.4.2
   flutter_launcher_icons: ^0.14.4
   flutter_riverpod: ^3.0.0-dev.16
   riverpod_generator: ^3.0.0-dev.16
