@@ -33,6 +33,7 @@ flutter_launcher_icons:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mocktail: ^1.0.4
   custom_lint: ^0.7.6
   flutter_lints: ^2.0.0
   riverpod_lint: ^3.0.0-dev.16

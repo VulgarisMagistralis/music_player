@@ -74,3 +74,6 @@ app.*.symbols
 
 # FVM Version Cache
 .fvm/
+
+# Remove generated 
+**/*.g.dart

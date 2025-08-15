@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: fvm flutter pub get
 
+      - name: Generate code
+        run: fvm flutter pub run build_runner build --delete-conflicting-outputs
+
       - name: Run tests
         run: fvm flutter test
 

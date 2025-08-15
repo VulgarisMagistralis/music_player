@@ -1,21 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:music_player/music_player.dart';
+import 'package:music_player/menu/nav_bar.dart';
+import 'package:music_player/route/routes.dart';
 
 void main() {
-  testWidgets('Nav bar Test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MusicPlayer());
+  testWidgets('Nav bar tests', (tester) async {
+    late PlayerPageEnum lastState;
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    final testProvider = PlayerRoute();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.pumpWidget(ProviderScope(overrides: [
+      playerRouteProvider.overrideWith(() => testProvider),
+    ], child: const MaterialApp(home: Scaffold(body: PlayerNavigationBar()))));
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    final buttonsToRoutes = {
+      Icons.search: PlayerPageEnum.search,
+      Icons.music_note_outlined: PlayerPageEnum.songs,
+      Icons.settings_outlined: PlayerPageEnum.settings,
+      Icons.favorite_outline_sharp: PlayerPageEnum.favourites,
+      Icons.featured_play_list_outlined: PlayerPageEnum.playlists
+    };
+
+    for (final entry in buttonsToRoutes.entries) {
+      testProvider.stream.listen((state) => lastState = state);
+      await tester.tap(find.widgetWithIcon(IconButton, entry.key));
+      await tester.pump();
+      expect(lastState, entry.value);
+    }
   });
 }
