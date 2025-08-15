@@ -12,24 +12,29 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Install FVM
+        run: |
+          curl -fsSL https://fvm.app/install.sh | bash
+          echo "$HOME/fvm/default/bin" >> $GITHUB_PATH
 
-      - name: Setup Flutter Version Management CLI
-        uses: flutter-actions/setup-fvm@v1
-        
-      - name: Install Flutter SDK
-        run: echo yes | fvm use stable
+      - name: Install Flutter SDK via FVM
+        run: |
+          VERSION=$(jq -r '.flutterSdkVersion' .fvm/fvm_config.json)
+          echo "Installing Flutter $VERSION via FVM"
+          fvm install $VERSION
+          fvm use $VERSION --force
 
       - name: Print Flutter SDK version
         run: fvm flutter --version
 
       - name: Install dependencies
-        run: flutter pub get
+        run: fvm flutter pub get
 
       - name: Run tests
-        run: flutter test
+        run: fvm flutter test
 
       - name: Build Android App Bundle
-        run: flutter build appbundle --release
+        run: fvm flutter build appbundle --release
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
