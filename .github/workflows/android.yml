@@ -19,7 +19,7 @@ jobs:
 
       - name: Install Flutter SDK via FVM
         run: |
-          VERSION=$(jq -r '.flutterSdkVersion' .fvm/fvm_config.json)
+          VERSION=$(jq -r '.flutter' .fvmrc)
           echo "Installing Flutter $VERSION via FVM"
           fvm install $VERSION
           fvm use $VERSION --force
