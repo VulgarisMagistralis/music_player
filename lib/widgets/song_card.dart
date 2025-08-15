@@ -6,7 +6,6 @@ import 'package:music_player/utilities/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/common/animated_card.dart';
 import 'package:music_player/common/control_buttons.dart';
-import 'package:music_player/utilities/audio_session_manager.dart';
 
 class SongCard extends ConsumerStatefulWidget {
   const SongCard({super.key});
@@ -25,7 +24,12 @@ class _SongCardState extends ConsumerState<SongCard> {
         if (!audioState.isReady) return const SizedBox.shrink();
         return Column(
           children: [
-            AnimatedOverflowText(text: manager.songName),
+            Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              if (audioState.albumArt?.isNotEmpty ?? false) SizedBox(width: 35, height: 35, child: Image.memory(audioState.albumArt!, fit: BoxFit.cover)),
+              const SizedBox(width: 8), // spacing between image and text
+              Expanded(child: AnimatedOverflowText(text: manager.songName))
+            ]),
+            // AnimatedOverflowText(text: manager.songName),
             const ControlButtons(),
             Padding(
                 padding: const EdgeInsets.all(5),

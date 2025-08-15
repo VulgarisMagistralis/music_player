@@ -24,8 +24,8 @@ jobs:
           fvm install $VERSION
           fvm use $VERSION --force
 
-      - name: Print Flutter SDK version
-        run: fvm flutter --version
+      - name: FVM Flutter Doctor
+        run: fvm flutter doctor
 
       - name: Install dependencies
         run: fvm flutter pub get

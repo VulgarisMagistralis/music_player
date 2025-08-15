@@ -26,6 +26,10 @@ Favourites?
 open source library fetch?
 locale?
 
+Android auto test:
+https://developer.android.com/training/cars/testing/dhu#connection-aoap
+~/Android/Sdk/extras/google/auto  ./desktop-head-unit --usb
+
 Song card:
     - start/stop, prev/next , fav,icon, seek bar, delete?
 
