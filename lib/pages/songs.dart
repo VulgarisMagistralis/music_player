@@ -20,7 +20,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
   final List<String> _directories = SharedPreferenceWithCacheHandler.instance.getMusicFolderList();
   late final ScrollController scrollController;
   bool hasRestoredScroll = false;
-
+  bool playlistSet = false;
   @override
   void initState() {
     super.initState();
@@ -79,6 +79,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                     child: ref.watch(readSongFileListProvider(_directories)).when(
                         data: (musicFileList) {
                           final songs = musicFileList.map((file) => {'file': file, 'title': file.uri.pathSegments.last.replaceAll('.mp3', '')}).toList();
+
                           return ListView.builder(
                               shrinkWrap: true,
                               cacheExtent: 100.0,
@@ -90,12 +91,15 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                                         child: AnimatedOverflowText(text: songs[index]['title'].toString()),
                                         onTap: () async {
                                           final manager = ref.read(audioSessionManagerProvider.notifier);
-                                          await manager.setAudioSource(file: songs[index]['file'] as FileSystemEntity, title: songs[index]['title'] as String);
-                                          await manager.play();
+                                          if (playlistSet) {
+                                            await manager.playSongAtIndex(index);
+                                          } else {
+                                            await manager.setPlaylist(index: index, songs.map((_) => _['file'] as FileSystemEntity).toList(), songs.map((_) => _['title'] as String).toList());
+                                          }
                                         })
                                   ]));
                         },
-                        error: (error, stackTrace) => const Text('a'),
+                        error: (error, stackTrace) => const Text('error '),
                         loading: () => const Center(child: CircularProgressIndicator()))),
                 const SongCard()
               ]))));

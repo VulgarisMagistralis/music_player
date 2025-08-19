@@ -3,6 +3,7 @@ import 'dart:async' show StreamSubscription;
 import 'dart:typed_data';
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 import 'package:flutter/material.dart' show WidgetsBinding, WidgetsBindingObserver, AppLifecycleState;
+import 'package:music_player/common/toast.dart';
 import 'package:music_player/data/song.dart';
 import 'package:rxdart/rxdart.dart' show Rx;
 import 'package:just_audio/just_audio.dart';
@@ -47,6 +48,7 @@ class AudioSessionManager extends AsyncNotifier<AudioSessionState> with WidgetsB
         if (pauseOnBackground) await pause();
         break;
       case AppLifecycleState.resumed:
+        await ensureActive();
         print('_____________' + state.name);
         if (!_player.playing) await play();
         break;
@@ -64,8 +66,11 @@ class AudioSessionManager extends AsyncNotifier<AudioSessionState> with WidgetsB
   bool get hasPrevious => _player.hasPrevious;
   bool get hasNext => _player.hasNext;
 
-  Future<void> seekToPrevious() => _player.seekToPrevious();
-  Future<void> seekToNext() => _player.seekToNext();
+  Future<void> seekToPrevious() async => await _player.seekToPrevious();
+  Future<void> seekToNext() async {
+    await _player.seekToNext();
+  }
+
   Future<void> init() async {
     final session = await _session;
     await session.setActive(true);
@@ -76,28 +81,71 @@ class AudioSessionManager extends AsyncNotifier<AudioSessionState> with WidgetsB
     _interruptionSubscription = session.interruptionEventStream.listen((event) async {
       if (event.begin) {
         if (_player.playing) _wasPlayingBeforeInterruption = true;
-        await _player.pause();
+        await pause();
       } else {
         if (_wasPlayingBeforeInterruption) {
-          await _player.play();
+          await play();
           _wasPlayingBeforeInterruption = false;
         }
       }
     });
+    _player.currentIndexStream.listen((index) async {
+      if (index == null) return;
+
+      final sequence = _player.sequence;
+      if (index < sequence.length) {
+        final tag = sequence[index].tag as MediaItem;
+        final file = File(tag.id);
+        state = AsyncValue.data(
+          state.value!.copyWith(
+            title: tag.title,
+            file: file,
+            isReady: await file.exists(),
+          ),
+        );
+      }
+    });
     _playerStateStream = _player.playerStateStream;
-    _noisySubscription = session.becomingNoisyEventStream.listen((_) async => resumeOnDisconnect ? null : await _player.pause());
-    _volumeSubscription = _player.volumeStream.listen((volumeValue) async => volumeValue < 0 && pauseOnMuted ? await _player.pause() : null);
-    _devicesChangedEventSubscription = session.devicesChangedEventStream.listen((event) async => event.devicesAdded.isNotEmpty
-        ? resumeOnConnection
-            ? await play()
-            : await pause()
-        : await pause());
+    _noisySubscription = session.becomingNoisyEventStream.listen((_) async => resumeOnDisconnect ? null : await pause());
+    _volumeSubscription = _player.volumeStream.listen((volumeValue) async => volumeValue < 0 && pauseOnMuted ? await pause() : null);
+    _devicesChangedEventSubscription = session.devicesChangedEventStream.listen((event) async {
+      if (event.devicesAdded.isNotEmpty) {
+        await ensureActive();
+        if (resumeOnConnection) await play();
+      } else {
+        await pause();
+      }
+    });
   }
 
-  Future<void> setPlaylist(List<FileSystemEntity> files, List<String> titles) async {
-    final sources = List<AudioSource>.generate(files.length, (index) => AudioSource.file(files[index].path, tag: MediaItem(id: index.toString(), title: titles[index])));
+  Future<void> setPlaylist(List<FileSystemEntity> files, List<String> titles, {int index = 0}) async {
+    final sources = List<AudioSource>.generate(
+      files.length,
+      (index) => AudioSource.uri(
+        Uri.file(files[index].path),
+        tag: MediaItem(
+          id: files[index].path, // store the path so we can rebuild state later
+          title: titles[index],
+        ),
+      ),
+    );
     state = AsyncValue.data(AudioSessionState(title: titles.isNotEmpty ? titles[0] : '', file: files.isNotEmpty ? files[0] : null, isReady: files.isNotEmpty ? await files[0].exists() : false));
-    await _player.setAudioSources(sources, initialIndex: 0);
+    Uint8List? pictureByteList;
+    FileSystemEntity file = files[index];
+
+    AudioMetadata metaData = readMetadata(File(file.path), getImage: true);
+    List<Picture> pictures = metaData.pictures;
+    print('________________${metaData.title}');
+    print('________________${metaData.artist}');
+    print('________________${metaData.album}');
+    if (pictures.isNotEmpty) {
+      print('________________' + pictures.toString());
+      pictureByteList = pictures.first.bytes;
+    }
+
+    state = AsyncValue.data(state.value!.copyWith(title: titles[index], file: file, isReady: await file.exists(), albumArt: pictureByteList));
+    await _player.setAudioSources(sources, initialIndex: index);
+    ToastManager().showToast((await _player.nextIndex).toString());
     await play();
   }
 
@@ -110,11 +158,12 @@ class AudioSessionManager extends AsyncNotifier<AudioSessionState> with WidgetsB
   }
 
   Future<void> setAudioSource({required String title, required FileSystemEntity file}) async {
-    await clearAudioSources();
     Uint8List? pictureByteList;
     AudioMetadata metaData = readMetadata(File(file.path), getImage: true);
     List<Picture> pictures = metaData.pictures;
     print('________________${metaData.title}');
+    print('________________${metaData.artist}');
+    print('________________${metaData.album}');
     if (pictures.isNotEmpty) {
       print('________________' + pictures.toString());
       pictureByteList = pictures.first.bytes;
@@ -130,7 +179,7 @@ class AudioSessionManager extends AsyncNotifier<AudioSessionState> with WidgetsB
 
   Future<void> play() async {
     ///error?
-    await ensureActive() ? await _player.play() : null;
+    await ensureActive() ? await _player.play() : ToastManager().showToast('Failed to open file');
   }
 
   Future<void> pause() async {
@@ -168,7 +217,6 @@ class AudioSessionManager extends AsyncNotifier<AudioSessionState> with WidgetsB
   Future<AudioSessionState> build() async {
     _player = AudioPlayer();
     await init();
-
     return AudioSessionState.initial();
   }
 }

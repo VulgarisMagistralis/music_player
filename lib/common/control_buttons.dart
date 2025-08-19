@@ -14,19 +14,9 @@ class _ControlButtonState extends ConsumerState<ControlButtons> {
   @override
   Widget build(BuildContext context) {
     final player = ref.watch(audioSessionManagerProvider.notifier);
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Previous button
-        IconButton(
-          icon: const Icon(Icons.skip_previous),
-          iconSize: 32,
-          onPressed: player.hasPrevious ? player.seekToPrevious : null,
-        ),
-
-        // Play/Pause/Loading/Replay button with state
-        StreamBuilder<PlayerState>(
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      IconButton(icon: const Icon(Icons.skip_previous), iconSize: 32, onPressed: () async => player.hasPrevious ? await player.seekToPrevious() : null),
+      StreamBuilder<PlayerState>(
           stream: player.playerStateStream,
           builder: (_, snapshot) {
             final playerState = snapshot.data;
@@ -34,49 +24,17 @@ class _ControlButtonState extends ConsumerState<ControlButtons> {
             final playing = playerState?.playing;
 
             if (processingState == ProcessingState.loading || processingState == ProcessingState.buffering) {
-              return Container(
-                margin: const EdgeInsets.all(8.0),
-                width: 32,
-                height: 32,
-                child: const CircularProgressIndicator(),
-              );
+              return Container(margin: const EdgeInsets.all(8.0), width: 32, height: 32, child: const CircularProgressIndicator());
             } else if (playing != true) {
-              return IconButton(
-                icon: const Icon(Icons.play_arrow),
-                iconSize: 32,
-                onPressed: player.play,
-              );
+              return IconButton(icon: const Icon(Icons.play_arrow), iconSize: 32, onPressed: () async => await player.play());
             } else if (processingState != ProcessingState.completed) {
-              return IconButton(
-                icon: const Icon(Icons.pause),
-                iconSize: 32,
-                onPressed: player.pause,
-              );
+              return IconButton(icon: const Icon(Icons.pause), iconSize: 32, onPressed: () async => await player.pause());
             } else {
-              // Playback completed, show replay button
-              return IconButton(
-                icon: const Icon(Icons.replay),
-                iconSize: 32,
-                onPressed: () => player.seek(Duration.zero),
-              );
+              return IconButton(icon: const Icon(Icons.replay), iconSize: 32, onPressed: () async => await player.seek(Duration.zero));
             }
-          },
-        ),
-
-        // Stop button
-        IconButton(
-          icon: const Icon(Icons.stop),
-          iconSize: 32,
-          onPressed: player.stop,
-        ),
-
-        // Next button
-        IconButton(
-          icon: const Icon(Icons.skip_next),
-          iconSize: 32,
-          onPressed: player.hasNext ? player.seekToNext : null,
-        ),
-      ],
-    );
+          }),
+      IconButton(icon: const Icon(Icons.stop), iconSize: 32, onPressed: () async => await player.stop()),
+      IconButton(icon: const Icon(Icons.skip_next), iconSize: 32, onPressed: () async => player.hasNext ? await player.seekToNext() : null)
+    ]);
   }
 }
