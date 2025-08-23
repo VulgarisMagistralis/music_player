@@ -43,25 +43,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           child: Padding(
               padding: const EdgeInsets.all(30),
               child: Column(children: [
-                Row(
-                  children: [
-                    const PlayerHeader(),
-                    IconButton(
-                      icon: const Icon(Icons.file_download),
-                      onPressed: () {
-                        _pickDirectory(context);
-                      },
-                    ),
-                  ],
-                ),
-                Text('FOLDERS'),
-                Column(
-                  children: libraryPathList
-                      .map((e) => Text(
-                            e.beautifyFolderPath(),
-                            style: TextStyle(color: Colors.black),
-                          ))
-                      .toList(),
-                )
+                Row(children: [const PlayerHeader(), IconButton(icon: const Icon(Icons.file_download), onPressed: () => _pickDirectory(context))]),
+                const Text('FOLDERS'),
+                Column(children: libraryPathList.map((e) => Text(e.beautifyFolderPath(), style: const TextStyle(color: Colors.black))).toList())
               ]))));
 }

@@ -1,32 +1,35 @@
 name: music_player
-description: Basic mp3 player.
+description: Basic mp3 player
 publish_to: 'none'
 
-version: 0.0.2
+version: 0.0.4
 
 environment:
-  sdk: '>=3.0.5 <4.0.0'
-     
+  sdk: ">=3.6.0 <4.0.0"
+riverpod_version: &riverpod_version ^3.0.0-dev.17
 dependencies:
   flutter:
     sdk: flutter
+  freezed: ^3.2.0
   rxdart: ^0.28.0
   just_audio: ^0.10.4
   file_picker: ^10.2.1
-  build_runner: ^2.5.4
+  fluttertoast: ^8.2.12
   audio_session: ^0.2.2
+  path_provider: ^2.1.5
   skeletonizer: ^2.1.0+1
+  freezed_annotation: ^3.1.0
   cupertino_icons: ^1.0.2
+  audio_service: ^0.18.18
+  json_annotation: ^4.9.0
   shared_preferences: ^2.5.3
   permission_handler: ^11.3.4
-  isar_community: ^3.2.0-dev.2
   flutter_native_splash: ^2.4.6
   audio_metadata_reader: ^1.4.2
   flutter_launcher_icons: ^0.14.4
-  flutter_riverpod: ^3.0.0-dev.16
-  riverpod_generator: ^3.0.0-dev.16
-  riverpod_annotation: ^3.0.0-dev.16
-  just_audio_background: ^0.0.1-beta.17
+  flutter_riverpod: *riverpod_version
+  riverpod_generator: *riverpod_version
+  riverpod_annotation: *riverpod_version
 
 flutter_launcher_icons:
   image_path_android: "assets/icons/note_2.png"
@@ -36,9 +39,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.4
-  custom_lint: ^0.7.6
+  build_runner: any
+  custom_lint: ^0.8.0
   flutter_lints: ^2.0.0
-  riverpod_lint: ^3.0.0-dev.16
+  json_serializable: ^6.10.0
+  riverpod_lint: *riverpod_version
 
 flutter:
   uses-material-design: true
