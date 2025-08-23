@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:music_player/data/song.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/utilities/audio_session_manager.dart';
+import 'package:music_player/utilities/audio_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:music_player/utilities/audio_session_manager.dart';
 part 'providers.g.dart';
 
 @riverpod
@@ -16,26 +17,21 @@ class SongsPageScrollOffset extends _$SongsPageScrollOffset {
   void updateOffset(double newOffset) => state = newOffset;
 }
 
-final audioSessionManagerProvider = AsyncNotifierProvider<AudioSessionManager, AudioSessionState>(() => AudioSessionManager());
-
+final AsyncNotifierProvider<AudioSessionManager, AudioSessionState?> audioSessionManagerProvider = AsyncNotifierProvider<AudioSessionManager, AudioSessionState?>(() => AudioSessionManager());
+final Provider<PlayerAudioHandler> audioHandlerProvider = Provider<PlayerAudioHandler>((ref) => PlayerAudioHandler());
 @riverpod
 Future<List<FileSystemEntity>> readSongFileList(Ref ref, List<String> musicDirectoryList) async {
   List<FileSystemEntity> songs = [];
-  try {
-    int i = 0;
-    while (i < musicDirectoryList.length) {
-      Directory dir = Directory(musicDirectoryList[i++]);
-      List<FileSystemEntity> files = dir.listSync(recursive: false, followLinks: false);
-      for (FileSystemEntity entity in files) {
-        String path = entity.path;
+  int i = 0;
+  while (i < musicDirectoryList.length) {
+    Directory dir = Directory(musicDirectoryList[i++]);
+    List<FileSystemEntity> files = dir.listSync(recursive: false, followLinks: false);
+    for (FileSystemEntity entity in files) {
+      String path = entity.path;
 
-        ///more extensions?
-        if (path.endsWith('.mp3')) songs.add(entity);
-      }
-      print(songs.length);
+      ///more extensions?
+      if (path.endsWith('.mp3')) songs.add(entity);
     }
-  } catch (e) {
-    print(e.toString());
   }
   return songs;
 }

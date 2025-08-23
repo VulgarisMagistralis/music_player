@@ -77,3 +77,4 @@ app.*.symbols
 
 # Remove generated 
 **/*.g.dart
+**/*.freezed.dart
