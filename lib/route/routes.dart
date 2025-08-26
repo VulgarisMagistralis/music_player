@@ -3,10 +3,12 @@ import 'package:music_player/utilities/string_extension.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'routes.g.dart';
 
+/// Extend playlist id per playlist created
 enum PlayerPageEnum {
   songs,
   error,
   search,
+  loading,
   settings,
   playlists,
   favourites;
@@ -16,9 +18,16 @@ enum PlayerPageEnum {
         PlayerPageEnum.songs => '/$name',
         PlayerPageEnum.error => '/$name',
         PlayerPageEnum.search => '/$name',
+        PlayerPageEnum.loading => '/$name',
         PlayerPageEnum.settings => '/$name',
         PlayerPageEnum.playlists => '/$name',
         PlayerPageEnum.favourites => '/$name',
+      };
+  String get playlistId => switch (this) {
+        PlayerPageEnum.songs => name,
+        PlayerPageEnum.playlists => '/$name',
+        PlayerPageEnum.favourites => '/$name',
+        _ => PlayerPageEnum.songs.name,
       };
 }
 

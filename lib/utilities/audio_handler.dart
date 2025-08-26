@@ -33,12 +33,12 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   Stream<PlayerState> get playerStateStream => _player.playerStateStream;
 
   AudioProcessingState _mapProcessingState(ProcessingState processingState) => switch (processingState) {
-    ProcessingState.idle => AudioProcessingState.idle,
-    ProcessingState.ready => AudioProcessingState.ready,
-    ProcessingState.loading => AudioProcessingState.loading,
-    ProcessingState.buffering => AudioProcessingState.buffering,
-    ProcessingState.completed => AudioProcessingState.completed,
-  };
+        ProcessingState.idle => AudioProcessingState.idle,
+        ProcessingState.ready => AudioProcessingState.ready,
+        ProcessingState.loading => AudioProcessingState.loading,
+        ProcessingState.buffering => AudioProcessingState.buffering,
+        ProcessingState.completed => AudioProcessingState.completed
+      };
 
   Future<void> init() async {
     _player.playerStateStream.listen((playerState) {
@@ -177,7 +177,7 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
 
   @override
   Future<void> play() async {
-    await ensureActive() ? await _player.play() : ToastManager().showToast('Failed to open file');
+    await ensureActive() ? await _player.play() : ToastManager().showErrorToast('Failed to open file');
   }
 
   Future<void> playSongAtIndex(int index) async {
@@ -190,11 +190,11 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   }
 
   Stream<PositionData> get positionDataStream => Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
-    _player.positionStream,
-    _player.bufferedPositionStream,
-    _player.durationStream,
-    (position, bufferedPosition, duration) => PositionData(position, bufferedPosition, duration ?? Duration.zero),
-  );
+        _player.positionStream,
+        _player.bufferedPositionStream,
+        _player.durationStream,
+        (position, bufferedPosition, duration) => PositionData(position, bufferedPosition, duration ?? Duration.zero),
+      );
 
   @override
   Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {

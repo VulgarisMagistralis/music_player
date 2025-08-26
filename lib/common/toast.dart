@@ -13,4 +13,31 @@ class ToastManager {
         textColor: Colors.white,
         fontSize: 16.0,
       );
+  Future<void> showInfoToast(String msg) async => Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: const Color.fromARGB(255, 54, 193, 244),
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+  Future<void> showWarningToast(String msg) async => Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: const Color.fromARGB(255, 244, 228, 54),
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+  Future<void> showErrorToast(String msg) async => Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
 }

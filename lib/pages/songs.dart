@@ -1,14 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:music_player/common/toast.dart';
 import 'package:music_player/menu/nav_bar.dart';
 import 'package:music_player/widgets/header.dart';
-import 'package:music_player/pages/error_page.dart';
 import 'package:music_player/widgets/song_card.dart';
 import 'package:music_player/utilities/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/common/animated_card.dart';
 import 'package:music_player/utilities/audio_handler.dart';
 import 'package:music_player/utilities/settings_data.dart';
+import 'package:music_player/pages/error_pages/generic_error_page.dart';
 
 class SongsPage extends ConsumerStatefulWidget {
   const SongsPage({super.key});
@@ -52,6 +53,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                     flex: 8,
                     child: ref.watch(readSongFileListProvider(_directories)).when(
                         data: (List<FileSystemEntity> musicFileList) {
+                          if (musicFileList.length > 0) ToastManager().showInfoToast('Loaded ${musicFileList.length} files');
                           final songs = musicFileList.map((file) => {'file': file, 'title': file.uri.pathSegments.last.replaceAll('.mp3', '')}).toList();
                           return ListView.builder(
                               shrinkWrap: true,
@@ -72,7 +74,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                                         })
                                   ]));
                         },
-                        error: (error, _) => const ErrorPage(),
+                        error: (error, _) => GenericErrorPage(message: 'Failed to load music files'),
                         loading: () => const Center(child: CircularProgressIndicator()))),
                 const SongCard()
               ]))));

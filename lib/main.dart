@@ -33,7 +33,7 @@ void main() async {
     );
     await handler.init();
   } catch (e) {
-    ToastManager().showToast('Failed to start audio services');
+    ToastManager().showErrorToast('Failed to start audio services');
     debugPrint('Background init error: $e');
     await Future.delayed(const Duration(seconds: 3));
     SystemChannels.platform.invokeMethod('SystemNavigator.pop');

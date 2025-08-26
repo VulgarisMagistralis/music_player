@@ -17,8 +17,10 @@ abstract class AudioSessionState with _$AudioSessionState {
     @Default(0) int songIndexInPlaylist,
     @Default(false) bool isPlaying,
     @Default(false) bool isReady,
+    @Default(0.0) double playlistScrollOffset,
     @Uint8ListBase64Converter() Uint8List? albumArt,
     @MediaItemConverter() MediaItem? asMediaItem,
+    int? favouritePlaylistIndexOrNull,
   ]) = _AudioSessionState;
   factory AudioSessionState.initial() => const AudioSessionState();
   factory AudioSessionState.fromJson(Map<String, dynamic> json) => _$AudioSessionStateFromJson(json);

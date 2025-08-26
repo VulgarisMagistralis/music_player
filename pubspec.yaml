@@ -2,7 +2,7 @@ name: music_player
 description: Basic mp3 player
 publish_to: 'none'
 
-version: 0.0.4
+version: 0.0.5
 
 environment:
   sdk: ">=3.6.0 <4.0.0"
@@ -18,11 +18,14 @@ dependencies:
   audio_session: ^0.2.2
   path_provider: ^2.1.5
   skeletonizer: ^2.1.0+1
-  freezed_annotation: ^3.1.0
   cupertino_icons: ^1.0.2
   audio_service: ^0.18.18
   json_annotation: ^4.9.0
+  new_version_plus: ^0.1.1
+  package_info_plus: ^8.3.1
+  flex_color_picker: ^3.7.1
   shared_preferences: ^2.5.3
+  freezed_annotation: ^3.1.0
   permission_handler: ^11.3.4
   flutter_native_splash: ^2.4.6
   audio_metadata_reader: ^1.4.2
@@ -47,3 +50,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/icons/note_2.png

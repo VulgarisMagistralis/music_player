@@ -19,7 +19,7 @@ class SongsPageScrollOffset extends _$SongsPageScrollOffset {
 
 final AsyncNotifierProvider<AudioSessionManager, AudioSessionState?> audioSessionManagerProvider = AsyncNotifierProvider<AudioSessionManager, AudioSessionState?>(() => AudioSessionManager());
 final Provider<PlayerAudioHandler> audioHandlerProvider = Provider<PlayerAudioHandler>((ref) => PlayerAudioHandler());
-@riverpod
+@Riverpod(keepAlive: true)
 Future<List<FileSystemEntity>> readSongFileList(Ref ref, List<String> musicDirectoryList) async {
   List<FileSystemEntity> songs = [];
   int i = 0;
@@ -34,4 +34,14 @@ Future<List<FileSystemEntity>> readSongFileList(Ref ref, List<String> musicDirec
     }
   }
   return songs;
+}
+
+//todo
+@Riverpod(keepAlive: true)
+class FavouriteSongList extends _$FavouriteSongList {
+  @override
+  List build() => state = [];
+  List get value => state;
+  void addSong(var newSong) => state.add(newSong);
+  void removeSong(var songToRemove) => state.remove(songToRemove);
 }

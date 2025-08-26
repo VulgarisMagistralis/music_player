@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:music_player/data/song.dart';
+import 'package:music_player/common/toast.dart';
 import 'package:music_player/data/position.dart';
-import 'package:music_player/pages/error_page.dart';
 import 'package:music_player/widgets/seek_bar.dart';
 import 'package:music_player/utilities/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,6 +42,9 @@ class _SongCardState extends ConsumerState<SongCard> {
           ]);
         },
         loading: () => const CircularProgressIndicator(),
-        error: (err, stack) => ErrorPage(message: err.toString()));
+        error: (err, stack) {
+          ToastManager().showErrorToast('Failed to play the song');
+          return SizedBox.shrink();
+        });
   }
 }
