@@ -8,4 +8,11 @@ extension StringExtension on String {
     }
     return this;
   }
+
+  String get camelCaseToSpaced {
+    final withSpaces = toString().split('.').last.replaceAllMapped(RegExp(r'([A-Z])'), (match) => ' ${match.group(0)}');
+    return withSpaces[0].toLowerCase() + withSpaces.substring(1).toLowerCase();
+  }
+
+  String get reverseWordOrder => trim().split(RegExp(r'\s+')).reversed.join(' ');
 }

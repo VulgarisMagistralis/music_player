@@ -10,11 +10,11 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:music_player/utilities/providers.dart' show audioHandlerProvider;
 
 void main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await SharedPreferenceWithCacheHandler.instance.init();
   final ProviderContainer providerContainer = ProviderContainer();
-  PlayerAudioHandler handler = providerContainer.read(audioHandlerProvider);
+  final PlayerAudioHandler handler = providerContainer.read(audioHandlerProvider);
   try {
     await AudioService.init(
       config: const AudioServiceConfig(
@@ -25,15 +25,15 @@ void main() async {
         // to settings
         rewindInterval: Duration(seconds: 3),
         fastForwardInterval: Duration(seconds: 3),
-        androidResumeOnClick: true,
+        notificationColor: Colors.amber,
+        androidBrowsableRootExtras: {},
         androidStopForegroundOnPause: false,
-        androidNotificationClickStartsActivity: true,
       ),
       builder: () => handler,
     );
     await handler.init();
   } catch (e) {
-    ToastManager().showToast('Failed to start audio services');
+    ToastManager().showErrorToast('Failed to start audio services');
     debugPrint('Background init error: $e');
     await Future.delayed(const Duration(seconds: 3));
     SystemChannels.platform.invokeMethod('SystemNavigator.pop');

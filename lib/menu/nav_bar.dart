@@ -15,7 +15,7 @@ class _NavigationBarState extends ConsumerState<PlayerNavigationBar> {
   @override
   Widget build(BuildContext context) => SafeArea(
           child: SizedBox(
-              child: Row(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+              child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
         IconButton(
             onPressed: () {
               ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.songs);

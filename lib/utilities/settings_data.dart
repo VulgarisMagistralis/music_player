@@ -1,6 +1,7 @@
 import 'dart:convert';
+import 'dart:ui' show Color;
+import 'package:music_player/data/audio_session_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:music_player/data/song.dart' show AudioSessionState;
 
 /// ________ Keys  ________
 const _libraryFolderListKey = 'library.folder.list';
@@ -13,7 +14,7 @@ class SharedPreferenceWithCacheHandler {
   static final SharedPreferenceWithCacheHandler _instance = SharedPreferenceWithCacheHandler._internal();
 
   /// Call this once at app startup
-  Future<void> init() async => _sharedPreferences = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions(allowList: {_libraryFolderListKey, _lastSongStateKey}));
+  Future<void> init() async => _sharedPreferences = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
 
   Future<void> saveMusicFolderList(List<String> updatedLibraryList) async => await _sharedPreferences.setStringList(_libraryFolderListKey, updatedLibraryList);
 
@@ -24,5 +25,13 @@ class SharedPreferenceWithCacheHandler {
   Future<AudioSessionState?> loadSongState() async {
     final String? storedStateSerialized = _sharedPreferences.getString(_lastSongStateKey);
     return storedStateSerialized == null ? null : AudioSessionState.fromJson(jsonDecode(storedStateSerialized));
+  }
+
+  // ____________ THEME ____________
+  /// Color read/write
+  Future<void> saveColor(String storageKey, int color32Bit) async => await _sharedPreferences.setInt(storageKey, color32Bit);
+  Color? loadColor(String storageKey) {
+    final int? storedColor = _sharedPreferences.getInt(storageKey);
+    return storedColor == null ? null : Color(storedColor);
   }
 }
