@@ -17,29 +17,25 @@ class AfterSplash extends ConsumerStatefulWidget {
 class _AfterSplashState extends ConsumerState<AfterSplash> {
   Future<PermissionStatus> init() async {
     await ref.read(playerThemeProvider.notifier).loadStoredThemeData();
-    if (!(await Permission.audio.isGranted))
+    if (!(await Permission.audio.isGranted)) {
       ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.error);
-    else
-
+    } else {
       ///todo update from saved session state
       ///todo check if there are any favs
       ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.songs);
+    }
     return Permission.audio.request();
   }
 
   /// without app starting-> connecting to Android auto stuck at loading?
   /// lost seekbar on notification status screen
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
+  Widget build(BuildContext context) => FutureBuilder(
       future: init(),
       builder: (context, snapshot) {
-        print(snapshot.connectionState);
         if (!snapshot.hasData) return const LoadingPage();
         if (!(snapshot.data?.isGranted ?? false)) return PermissionErrorPage();
         if (snapshot.hasError) ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.error);
         return const MusicPlayer();
-      },
-    );
-  }
+      });
 }

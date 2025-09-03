@@ -1,5 +1,5 @@
 import 'package:just_audio/just_audio.dart';
-import 'package:music_player/data/song.dart';
+import 'package:music_player/data/audio_session_state.dart';
 import 'package:music_player/data/position.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:music_player/utilities/providers.dart';
@@ -16,7 +16,7 @@ class AudioSessionManager extends AsyncNotifier<AudioSessionState?> with Widgets
   String get songName => state.value?.title ?? '';
 
   Future<void> updateState() async {
-    AudioSessionState? newState = AsyncData(state).value.value;
+    final AudioSessionState? newState = AsyncData(state).value.value;
     if (newState == null) return;
     await SharedPreferenceWithCacheHandler.instance.saveSongState(newState);
   }

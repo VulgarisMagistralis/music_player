@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:typed_data';
-import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart' show debugPrint;
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:music_player/common/toast.dart';
+import 'package:music_player/data/audio_session_state.dart';
 import 'package:music_player/data/position.dart';
 import 'package:music_player/data/song.dart';
 import 'package:rxdart/rxdart.dart';
@@ -74,8 +72,7 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     await session.configure(
       const AudioSessionConfiguration(
         androidWillPauseWhenDucked: true,
-        androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-        androidAudioAttributes: AndroidAudioAttributes(contentType: AndroidAudioContentType.music, flags: AndroidAudioFlags.none),
+        androidAudioAttributes: AndroidAudioAttributes(contentType: AndroidAudioContentType.music),
       ),
     );
     _interruptionSubscription = session.interruptionEventStream.listen((event) async {
@@ -126,35 +123,43 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     }
   }
 
-  Future<void> setPlaylist(String playlistId, List<FileSystemEntity> files, List<String> titles, {int index = 0}) async {
-    if (files.isEmpty || titles.isEmpty || files.length != titles.length) return;
+  Future<void> setPlaylist(String playlistId, List<Song> songList, {int index = 0}) async {
+    final List<AudioSessionState> sources = [];
+    // Uint8List? pictureByteList;
 
-    List<AudioSessionState> sources = [];
-    Uint8List? pictureByteList;
-
-    // Prepare the queue
-    for (int i = 0; i < files.length; i++) {
-      try {
-        final metaData = readMetadata(File(files[i].path), getImage: true);
-        if (metaData.pictures.isNotEmpty) pictureByteList = metaData.pictures.first.bytes;
-      } catch (e) {
-        debugPrint('Failed to read metadata for ${files[i].path}: $e');
+    for (Song song in songList) {
+      if (song.file == null) {
+        ToastManager().showErrorToast('Skipped ${song.title}\nCannot find the file');
+        continue;
       }
+      // try {
+      //   // move image to class
+      //   final metaData = readMetadata(File(song.file!.path), getImage: true);
+      //   if (metaData.pictures.isNotEmpty) pictureByteList = metaData.pictures.first.bytes;
+      // } catch (e) {
+      //   ToastManager().showErrorToast('Failed to read metadata for ${song.file!.path}: $e');
+      // }
 
-      final mediaItem = MediaItem(
-        id: files[i].path, // Use full path as id for uniqueness
-        title: titles[i],
-        playable: true,
-      );
-
-      sources.add(const AudioSessionState().copyWith(playlistId: playlistId, file: files[i], title: titles[i], albumArt: pictureByteList, songIndexInPlaylist: i, asMediaItem: mediaItem));
+      sources.add(const AudioSessionState().copyWith(
+        playlistId: playlistId,
+        file: song.file,
+        title: song.title,
+        // albumArt: pictureByteList,
+        songIndexInPlaylist: songList.indexOf(song),
+        asMediaItem: MediaItem(id: song.id, title: song.title ?? 'N/A'),
+      ));
     }
 
     // Update AudioService queue
-    final queueItems = sources.map((s) => s.asMediaItem!).toList();
-
+    final List<MediaItem> queueItems = sources.map((s) => s.asMediaItem!).toList();
     // Set audio sources for Just Audio
-    await _player.setAudioSources(queueItems.map((item) => AudioSource.uri(Uri.file(item.id), tag: item)).toList(), initialIndex: index);
+    ///!XX
+    int i = 0;
+    await _player.setAudioSources(
+        queueItems.map((item) {
+          return AudioSource.uri(songList[i++].file!.uri, tag: item);
+        }).toList(),
+        initialIndex: index);
     await updateQueue(queueItems);
 
     // Start playback at the selected song

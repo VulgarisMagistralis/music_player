@@ -24,11 +24,11 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
       debugShowCheckedModeBanner: false,
       home: switch (ref.watch(playerRouteProvider)) {
         PlayerPageEnum.songs => const SongsPage(),
-        PlayerPageEnum.error => GenericErrorPage(),
         PlayerPageEnum.search => const SearchPage(),
         PlayerPageEnum.loading => const LoadingPage(),
         PlayerPageEnum.settings => const SettingsPage(),
         PlayerPageEnum.playlists => const PlaylistPage(),
+        PlayerPageEnum.error => const GenericErrorPage(),
         PlayerPageEnum.favourites => const FavouritesPage()
       });
 }

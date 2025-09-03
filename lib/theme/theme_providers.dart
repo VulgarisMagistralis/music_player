@@ -8,11 +8,17 @@ part 'theme_providers.g.dart';
 
 @Riverpod(keepAlive: true)
 class PlayerTheme extends _$PlayerTheme {
+  Color _accentColor(Color baseColor) {
+    final brightness = ThemeData.estimateBrightnessForColor(baseColor);
+    return brightness == Brightness.dark ? Colors.amber : Colors.blueAccent;
+  }
+
   @override
-  ThemeData build() => CustomAppTheme(
-        primaryTextColor: ref.watch(basicColorProvider(ThemeKeys.primaryTextColor)),
-        mainBackgroundColor: ref.watch(basicColorProvider(ThemeKeys.mainBackgroundColor)),
-      ).materialTheme;
+  ThemeData build() {
+    final Color primaryTextColor = ref.watch(basicColorProvider(ThemeKeys.primaryTextColor));
+    final Color mainBackgroundColor = ref.watch(basicColorProvider(ThemeKeys.mainBackgroundColor));
+    return CustomAppTheme(primaryTextColor: primaryTextColor, mainBackgroundColor: mainBackgroundColor, accentColor: _accentColor(mainBackgroundColor)).materialTheme;
+  }
 
   Future<void> loadStoredThemeData() async {
     await ref.read(basicColorProvider(ThemeKeys.mainBackgroundColor).notifier).loadFromStorage();
@@ -21,7 +27,7 @@ class PlayerTheme extends _$PlayerTheme {
     await ref.read(basicColorProvider(ThemeKeys.primaryTextColor).notifier).loadFromStorage();
     final Color primaryTextColor = ref.watch(basicColorProvider(ThemeKeys.primaryTextColor));
     state = CustomAppTheme(
-      primaryTextColor: primaryTextColor,
+      primaryTextColor: primaryTextColor == backgroundColor ? Colors.white : primaryTextColor,
       mainBackgroundColor: backgroundColor,
     ).materialTheme;
   }

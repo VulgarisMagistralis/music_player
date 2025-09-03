@@ -1,27 +1,41 @@
 import 'dart:io';
-import 'dart:typed_data' show Uint8List;
+import 'package:uuid/uuid.dart' show Uuid;
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:audio_service/audio_service.dart' show MediaItem;
-import 'package:music_player/utilities/media_item_converter.dart';
-import 'package:music_player/utilities/uint8_list_base64_converter.dart';
+import 'package:path/path.dart' show basenameWithoutExtension;
+import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 import 'package:music_player/utilities/file_system_entity_converter.dart';
 part 'song.freezed.dart';
 part 'song.g.dart';
 
+// TODO persist
 @freezed
-abstract class AudioSessionState with _$AudioSessionState {
-  const factory AudioSessionState([
-    @Default('songs') String playlistId,
-    @FileSystemEntityConverter() FileSystemEntity? file,
+abstract class Song with _$Song {
+  const factory Song({
+    /// UUID
+    ///
+    /// Automatically to v4
+    required String id,
+
+    /// Title for the song, can be pulled from metadata as well
     String? title,
-    @Default(0) int songIndexInPlaylist,
-    @Default(false) bool isPlaying,
-    @Default(false) bool isReady,
-    @Default(0.0) double playlistScrollOffset,
-    @Uint8ListBase64Converter() Uint8List? albumArt,
-    @MediaItemConverter() MediaItem? asMediaItem,
-    int? favouritePlaylistIndexOrNull,
-  ]) = _AudioSessionState;
-  factory AudioSessionState.initial() => const AudioSessionState();
-  factory AudioSessionState.fromJson(Map<String, dynamic> json) => _$AudioSessionStateFromJson(json);
+    String? album,
+    String? artist,
+    DateTime? modified,
+    int? durationInMilliseconds,
+    @Default(false) bool isInFavourites,
+    @FileSystemEntityConverter() FileSystemEntity? file,
+  }) = _Song;
+
+  factory Song.create({@FileSystemEntityConverter() required File file, String? title, int? durationInMilliseconds, DateTime? modified}) =>
+      Song(id: const Uuid().v4(), file: file, title: basenameWithoutExtension(file.path));
+
+  factory Song.fromJson(Map<String, dynamic> json) => _$SongFromJson(json);
+
+  factory Song.toggleFavourite(Song oldSong) => oldSong.copyWith(isInFavourites: !oldSong.isInFavourites);
+
+  // TODO with isolate
+  static Future<Song> fillMetadataFromFile(File file) async {
+    final AudioMetadata audioMetadata = readMetadata(file);
+    return Song(id: const Uuid().v4(), file: file, album: audioMetadata.album, artist: audioMetadata.artist, modified: file.lastModifiedSync(), durationInMilliseconds: audioMetadata.duration?.inMilliseconds);
+  }
 }

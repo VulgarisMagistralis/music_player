@@ -9,6 +9,7 @@ class AnimatedOverflowText extends StatefulWidget {
   State<AnimatedOverflowText> createState() => _AnimatedOverflowTextState();
 }
 
+///reload messes scroll
 class _AnimatedOverflowTextState extends State<AnimatedOverflowText> with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
 
@@ -22,8 +23,7 @@ class _AnimatedOverflowTextState extends State<AnimatedOverflowText> with Single
     while (mounted && _scrollController.hasClients && !scrolling) {
       scrolling = true;
       _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: scrollDuration, curve: Curves.linear).then(
-          (_) => Future.delayed(pauseDuration)
-              .then((_) => _scrollController.animateTo(0, duration: scrollDuration, curve: Curves.linear).then((_) => _startLoopScroll(), onError: (_) => null), onError: (_) => null),
+          (_) => Future.delayed(pauseDuration).then((_) => _scrollController.animateTo(0, duration: scrollDuration, curve: Curves.linear).then((_) => _startLoopScroll(), onError: (_) => null), onError: (_) => null),
           onError: (_) => null);
     }
   }
@@ -39,7 +39,7 @@ class _AnimatedOverflowTextState extends State<AnimatedOverflowText> with Single
       clipBehavior: Clip.hardEdge,
       child: LayoutBuilder(builder: (_, constraints) {
         final String cleanedText = widget.text.trim();
-        TextStyle textStyle = const TextStyle(fontSize: 20);
+        const TextStyle textStyle = TextStyle(fontSize: 20);
         final TextPainter textPainter = TextPainter(text: TextSpan(text: cleanedText, style: textStyle), maxLines: 1, textDirection: TextDirection.ltr)..layout();
         final Text textWidget = Text(cleanedText, maxLines: 1, softWrap: false, textAlign: TextAlign.left, style: textStyle);
         final bool willOverflow = textPainter.width > constraints.maxWidth;

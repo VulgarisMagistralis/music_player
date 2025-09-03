@@ -14,17 +14,16 @@ class FavouritesPage extends ConsumerStatefulWidget {
 
 class _FavouritesPageState extends ConsumerState<FavouritesPage> {
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => const Scaffold(
+      bottomNavigationBar: PlayerNavigationBar(),
       resizeToAvoidBottomInset: true,
-      bottomNavigationBar: const PlayerNavigationBar(),
-      body: Center(
-          child: Container(
-              padding: const EdgeInsets.all(30),
-              child: const Column(children: [
-                Row(
-                  children: [
-                    PlayerHeader(),
-                  ],
-                ),
-              ]))));
+      body: SafeArea(
+          child: Padding(
+        padding: EdgeInsets.fromLTRB(15, 15, 10, 0),
+        child: Column(
+          children: [
+            PlayerHeader(),
+          ],
+        ),
+      )));
 }

@@ -6,7 +6,7 @@ import 'package:flex_color_picker/flex_color_picker.dart';
 class ColorSelector extends ConsumerStatefulWidget {
   final String title;
   final BasicColorProvider provider;
-  ColorSelector({required this.provider, required this.title});
+  const ColorSelector({super.key, required this.provider, required this.title});
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _SelectorState();
 }
@@ -16,14 +16,14 @@ class _SelectorState extends ConsumerState<ColorSelector> {
 
   @override
   Widget build(BuildContext context) {
-    Color selectedColor = ref.watch(widget.provider);
+    final Color selectedColor = ref.watch(widget.provider);
     return ListTile(
         title: Text(widget.title),
         onTap: () => ColorPicker(
-                pickersEnabled: {ColorPickerType.wheel: true, ColorPickerType.accent: false, ColorPickerType.primary: false},
+                pickersEnabled: const {ColorPickerType.wheel: true, ColorPickerType.accent: false, ColorPickerType.primary: false},
                 onColorChanged: (Color color) => ref.read(widget.provider.notifier).update(color),
                 heading: Text(widget.title),
-                actionButtons: ColorPickerActionButtons(dialogActionButtons: false),
+                actionButtons: const ColorPickerActionButtons(dialogActionButtons: false),
                 borderColor: invert(selectedColor),
                 color: selectedColor,
                 wheelHasBorder: true,

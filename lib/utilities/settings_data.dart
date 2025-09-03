@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:ui' show Color;
+import 'package:music_player/data/audio_session_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:music_player/data/song.dart' show AudioSessionState;
 
 /// ________ Keys  ________
 const _libraryFolderListKey = 'library.folder.list';
@@ -30,8 +30,8 @@ class SharedPreferenceWithCacheHandler {
   // ____________ THEME ____________
   /// Color read/write
   Future<void> saveColor(String storageKey, int color32Bit) async => await _sharedPreferences.setInt(storageKey, color32Bit);
-  Future<Color?> loadColor(String storageKey) async {
-    int? storedColor = await _sharedPreferences.getInt(storageKey);
+  Color? loadColor(String storageKey) {
+    final int? storedColor = _sharedPreferences.getInt(storageKey);
     return storedColor == null ? null : Color(storedColor);
   }
 }

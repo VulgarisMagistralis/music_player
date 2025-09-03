@@ -8,9 +8,14 @@ import 'package:flutter/material.dart';
 ///
 class CustomAppTheme {
   final Color? primaryTextColor;
+  final Color? accentColor;
   final Color? mainBackgroundColor;
-  CustomAppTheme({this.mainBackgroundColor, this.primaryTextColor});
+  CustomAppTheme({this.mainBackgroundColor, this.primaryTextColor, this.accentColor});
   ThemeData get materialTheme => ThemeData(
+        colorScheme: primaryTextColor == null ? null : ColorScheme.fromSeed(seedColor: primaryTextColor!, secondary: accentColor),
+        highlightColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        hoverColor: Colors.transparent,
         textTheme: TextTheme(
           bodyMedium: TextStyle(
             color: primaryTextColor,
@@ -20,12 +25,21 @@ class CustomAppTheme {
             color: primaryTextColor,
             fontSize: 20,
           ),
-          displayMedium: TextStyle(color: primaryTextColor),
-          titleMedium: TextStyle(color: Colors.lime),
-          titleLarge: TextStyle(color: Colors.lime),
-          titleSmall: TextStyle(color: Colors.lime),
+          headlineMedium: TextStyle(color: primaryTextColor, fontWeight: FontWeight.w700),
+          displayMedium: TextStyle(color: primaryTextColor, fontWeight: FontWeight.w700),
+          titleMedium: const TextStyle(color: Colors.lime),
+          titleLarge: const TextStyle(color: Colors.lime),
+          titleSmall: const TextStyle(color: Colors.lime),
         ),
         scaffoldBackgroundColor: mainBackgroundColor,
+        expansionTileTheme: ExpansionTileThemeData(
+          iconColor: primaryTextColor,
+          textColor: primaryTextColor,
+          collapsedTextColor: primaryTextColor,
+          collapsedIconColor: primaryTextColor,
+          childrenPadding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
+        ),
+        dividerColor: Colors.transparent,
         listTileTheme: ListTileThemeData(
           iconColor: primaryTextColor,
           style: ListTileStyle.list,
@@ -36,15 +50,12 @@ class CustomAppTheme {
         ),
         navigationBarTheme: NavigationBarThemeData(
           backgroundColor: primaryTextColor,
-          iconTheme: WidgetStateProperty.all(IconThemeData(color: primaryTextColor, size: 20, shadows: [
-            Shadow(blurRadius: 2, color: Colors.black),
+          iconTheme: WidgetStateProperty.all(IconThemeData(color: primaryTextColor, size: 20, shadows: const [
+            Shadow(blurRadius: 2),
           ])),
         ),
-        iconButtonTheme: IconButtonThemeData(
-            style: ButtonStyle(
-          iconColor: WidgetStateProperty.all(primaryTextColor),
-        )),
-        extensions: [_CustomAppThemeExtension()],
+        iconTheme: IconThemeData(color: primaryTextColor, size: 27),
+        extensions: const [_CustomAppThemeExtension()],
       );
 }
 
@@ -54,12 +65,12 @@ class _CustomAppThemeExtension extends ThemeExtension<_CustomAppThemeExtension> 
 
   @override
   _CustomAppThemeExtension copyWith() {
-    return _CustomAppThemeExtension();
+    return const _CustomAppThemeExtension();
   }
 
   @override
   _CustomAppThemeExtension lerp(ThemeExtension<_CustomAppThemeExtension>? other, double t) {
     if (other is! _CustomAppThemeExtension) return this;
-    return _CustomAppThemeExtension();
+    return const _CustomAppThemeExtension();
   }
 }

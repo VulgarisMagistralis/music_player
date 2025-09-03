@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:music_player/data/song.dart';
+import 'package:music_player/common/loading/loading_song.dart';
+import 'package:music_player/data/audio_session_state.dart';
 import 'package:music_player/common/toast.dart';
 import 'package:music_player/data/position.dart';
 import 'package:music_player/widgets/seek_bar.dart';
 import 'package:music_player/utilities/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/common/animated_card.dart';
+import 'package:music_player/common/animated_overflow_text.dart';
 import 'package:music_player/common/control_buttons.dart';
 
 class SongCard extends ConsumerStatefulWidget {
@@ -24,7 +25,7 @@ class _SongCardState extends ConsumerState<SongCard> {
         data: (AudioSessionState? audioState) {
           if (audioState == null || !audioState.isReady) return const SizedBox.shrink();
           return Column(children: [
-            Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            Row(children: [
               if (audioState.albumArt?.isNotEmpty ?? false) SizedBox(width: 35, height: 35, child: Image.memory(audioState.albumArt!, fit: BoxFit.cover)),
               const SizedBox(width: 8),
               Expanded(child: AnimatedOverflowText(text: audioState.title ?? ''))
@@ -41,10 +42,10 @@ class _SongCardState extends ConsumerState<SongCard> {
                         bufferedPosition: snapshot.data?.bufferedPosition ?? Duration.zero)))
           ]);
         },
-        loading: () => const CircularProgressIndicator(),
+        loading: () => const SongSkeleton(),
         error: (err, stack) {
           ToastManager().showErrorToast('Failed to play the song');
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
         });
   }
 }
