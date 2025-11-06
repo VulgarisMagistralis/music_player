@@ -5,7 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:music_player/pages/error_pages/basic_error_page.dart';
 
 class PermissionErrorPage extends BasicErrorPage {
-  PermissionErrorPage()
+  PermissionErrorPage({super.key})
       : super(
             message: 'Permission required to continue',
             actionWidget: ElevatedButton.icon(

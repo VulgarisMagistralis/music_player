@@ -10,9 +10,13 @@ class CustomAppTheme {
   final Color? primaryTextColor;
   final Color? accentColor;
   final Color? mainBackgroundColor;
-  CustomAppTheme({this.mainBackgroundColor, this.primaryTextColor, this.accentColor});
+  CustomAppTheme(
+      {this.mainBackgroundColor, this.primaryTextColor, this.accentColor});
   ThemeData get materialTheme => ThemeData(
-        colorScheme: primaryTextColor == null ? null : ColorScheme.fromSeed(seedColor: primaryTextColor!, secondary: accentColor),
+        colorScheme: primaryTextColor == null
+            ? null
+            : ColorScheme.fromSeed(
+                seedColor: primaryTextColor!, secondary: accentColor),
         highlightColor: Colors.transparent,
         splashColor: Colors.transparent,
         hoverColor: Colors.transparent,
@@ -25,8 +29,10 @@ class CustomAppTheme {
             color: primaryTextColor,
             fontSize: 20,
           ),
-          headlineMedium: TextStyle(color: primaryTextColor, fontWeight: FontWeight.w700),
-          displayMedium: TextStyle(color: primaryTextColor, fontWeight: FontWeight.w700),
+          headlineMedium:
+              TextStyle(color: primaryTextColor, fontWeight: FontWeight.w700),
+          displayMedium:
+              TextStyle(color: primaryTextColor, fontWeight: FontWeight.w700),
           titleMedium: const TextStyle(color: Colors.lime),
           titleLarge: const TextStyle(color: Colors.lime),
           titleSmall: const TextStyle(color: Colors.lime),
@@ -50,7 +56,8 @@ class CustomAppTheme {
         ),
         navigationBarTheme: NavigationBarThemeData(
           backgroundColor: primaryTextColor,
-          iconTheme: WidgetStateProperty.all(IconThemeData(color: primaryTextColor, size: 20, shadows: const [
+          iconTheme: WidgetStateProperty.all(
+              IconThemeData(color: primaryTextColor, size: 20, shadows: const [
             Shadow(blurRadius: 2),
           ])),
         ),
@@ -60,7 +67,8 @@ class CustomAppTheme {
 }
 
 @immutable
-class _CustomAppThemeExtension extends ThemeExtension<_CustomAppThemeExtension> {
+class _CustomAppThemeExtension
+    extends ThemeExtension<_CustomAppThemeExtension> {
   const _CustomAppThemeExtension();
 
   @override
@@ -69,7 +77,8 @@ class _CustomAppThemeExtension extends ThemeExtension<_CustomAppThemeExtension> 
   }
 
   @override
-  _CustomAppThemeExtension lerp(ThemeExtension<_CustomAppThemeExtension>? other, double t) {
+  _CustomAppThemeExtension lerp(
+      ThemeExtension<_CustomAppThemeExtension>? other, double t) {
     if (other is! _CustomAppThemeExtension) return this;
     return const _CustomAppThemeExtension();
   }

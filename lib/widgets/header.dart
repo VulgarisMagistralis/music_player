@@ -27,13 +27,20 @@ class _PlayerHeaderState extends ConsumerState<PlayerHeader> {
     final SortBy sortBy = ref.watch(playlistSortedByProvider);
     return Column(mainAxisSize: MainAxisSize.min, children: [
       Row(children: [
-        Text(ref.watch(playerRouteProvider).toTitle(), style: Theme.of(context).textTheme.headlineMedium),
+        Text(ref.watch(playerRouteProvider).toTitle(),
+            style: Theme.of(context).textTheme.headlineMedium),
         const Spacer(),
         if (widget.showExtraButtons)
           Row(children: [
             // GestureDetector(onTap: () => ref.invalidate(readSongFileListProvider), child: const Icon(Icons.replay_circle_filled)),
             const SizedBox(width: 10),
-            Transform(alignment: Alignment.center, transform: Matrix4.rotationY(pi), child: GestureDetector(onTap: () => setState(() => showFilterView = !showFilterView), child: const Icon(Icons.sort)))
+            Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.rotationY(pi),
+                child: GestureDetector(
+                    onTap: () =>
+                        setState(() => showFilterView = !showFilterView),
+                    child: const Icon(Icons.sort)))
           ])
       ]),
       ClipRect(
@@ -43,9 +50,15 @@ class _PlayerHeaderState extends ConsumerState<PlayerHeader> {
               child: showFilterView
                   ? Row(children: [
                       const Spacer(),
-                      IconButton(icon: const Icon(Icons.timelapse), onPressed: () => _iconButtonToggle(sortBy)),
-                      IconButton(icon: const Icon(Icons.sort_by_alpha), onPressed: () => _iconButtonToggle(sortBy)),
-                      IconButton(icon: const Icon(Icons.date_range_outlined), onPressed: () => _iconButtonToggle(sortBy))
+                      IconButton(
+                          icon: const Icon(Icons.timelapse),
+                          onPressed: () => _iconButtonToggle(sortBy)),
+                      IconButton(
+                          icon: const Icon(Icons.sort_by_alpha),
+                          onPressed: () => _iconButtonToggle(sortBy)),
+                      IconButton(
+                          icon: const Icon(Icons.date_range_outlined),
+                          onPressed: () => _iconButtonToggle(sortBy))
                     ])
                   : const SizedBox.shrink()))
     ]);

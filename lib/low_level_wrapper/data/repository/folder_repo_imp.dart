@@ -1,0 +1,18 @@
+import 'package:music_player/low_level_wrapper/data/datasource/music_folder.dart';
+import 'package:music_player/low_level_wrapper/domain/repository/music_folder_imp.dart';
+
+class LowLevelRepositoryImplementation implements FolderRepository {
+  final LowLevelFolderDataSource dataSource = LowLevelFolderDataSource();
+  LowLevelRepositoryImplementation();
+
+  @override
+  void setDirectory({required String applicationDirectory}) =>
+      dataSource.setDirectory(path: applicationDirectory);
+
+  @override
+  List<String> loadFolderList() => dataSource.loadFolders();
+
+  @override
+  void saveFolderList({required List<String> folderList}) =>
+      dataSource.saveFolders(folderList: folderList);
+}

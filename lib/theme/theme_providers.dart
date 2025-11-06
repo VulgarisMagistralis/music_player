@@ -15,19 +15,32 @@ class PlayerTheme extends _$PlayerTheme {
 
   @override
   ThemeData build() {
-    final Color primaryTextColor = ref.watch(basicColorProvider(ThemeKeys.primaryTextColor));
-    final Color mainBackgroundColor = ref.watch(basicColorProvider(ThemeKeys.mainBackgroundColor));
-    return CustomAppTheme(primaryTextColor: primaryTextColor, mainBackgroundColor: mainBackgroundColor, accentColor: _accentColor(mainBackgroundColor)).materialTheme;
+    final Color primaryTextColor =
+        ref.watch(basicColorProvider(ThemeKeys.primaryTextColor));
+    final Color mainBackgroundColor =
+        ref.watch(basicColorProvider(ThemeKeys.mainBackgroundColor));
+    return CustomAppTheme(
+            primaryTextColor: primaryTextColor,
+            mainBackgroundColor: mainBackgroundColor,
+            accentColor: _accentColor(mainBackgroundColor))
+        .materialTheme;
   }
 
   Future<void> loadStoredThemeData() async {
-    await ref.read(basicColorProvider(ThemeKeys.mainBackgroundColor).notifier).loadFromStorage();
-    final Color backgroundColor = ref.watch(basicColorProvider(ThemeKeys.mainBackgroundColor));
+    await ref
+        .read(basicColorProvider(ThemeKeys.mainBackgroundColor).notifier)
+        .loadFromStorage();
+    final Color backgroundColor =
+        ref.watch(basicColorProvider(ThemeKeys.mainBackgroundColor));
 
-    await ref.read(basicColorProvider(ThemeKeys.primaryTextColor).notifier).loadFromStorage();
-    final Color primaryTextColor = ref.watch(basicColorProvider(ThemeKeys.primaryTextColor));
+    await ref
+        .read(basicColorProvider(ThemeKeys.primaryTextColor).notifier)
+        .loadFromStorage();
+    final Color primaryTextColor =
+        ref.watch(basicColorProvider(ThemeKeys.primaryTextColor));
     state = CustomAppTheme(
-      primaryTextColor: primaryTextColor == backgroundColor ? Colors.white : primaryTextColor,
+      primaryTextColor:
+          primaryTextColor == backgroundColor ? Colors.white : primaryTextColor,
       mainBackgroundColor: backgroundColor,
     ).materialTheme;
   }
@@ -35,6 +48,7 @@ class PlayerTheme extends _$PlayerTheme {
 
 @Riverpod(keepAlive: true)
 class BasicColor extends _$BasicColor {
+  @override
   late String storageKey;
   @override
   Color build(String storageKey) {
@@ -45,9 +59,12 @@ class BasicColor extends _$BasicColor {
 
   Future<void> update(Color? color) async {
     if (color == null) return;
-    await SharedPreferenceWithCacheHandler.instance.saveColor(storageKey, color.value32bit);
+    await SharedPreferenceWithCacheHandler.instance
+        .saveColor(storageKey, color.value32bit);
     state = color;
   }
 
-  Future<void> loadFromStorage() async => state = await SharedPreferenceWithCacheHandler.instance.loadColor(storageKey) ?? Colors.black;
+  Future<void> loadFromStorage() async =>
+      state = SharedPreferenceWithCacheHandler.instance.loadColor(storageKey) ??
+          Colors.black;
 }
