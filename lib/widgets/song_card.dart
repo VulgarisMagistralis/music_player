@@ -24,8 +24,8 @@ class _SongCardState extends ConsumerState<SongCard> {
     return ref.watch(audioSessionManagerProvider).when(
         data: (AudioSessionState? audioState) {
           if (audioState == null || !audioState.isReady) return const SizedBox.shrink();
-          return Column(children: [
-            Row(children: [
+          return Column(mainAxisSize: MainAxisSize.min, children: [
+            Row(mainAxisSize: MainAxisSize.min, children: [
               if (audioState.albumArt?.isNotEmpty ?? false) SizedBox(width: 35, height: 35, child: Image.memory(audioState.albumArt!, fit: BoxFit.cover)),
               const SizedBox(width: 8),
               Expanded(child: AnimatedOverflowText(text: audioState.title ?? ''))
@@ -42,7 +42,7 @@ class _SongCardState extends ConsumerState<SongCard> {
                         bufferedPosition: snapshot.data?.bufferedPosition ?? Duration.zero)))
           ]);
         },
-        loading: () => const SongSkeleton(),
+        loading: () => Container(padding: const EdgeInsets.only(top: 1, bottom: 1), child: const SongSkeleton()),
         error: (err, stack) {
           ToastManager().showErrorToast('Failed to play the song');
           return const SizedBox.shrink();

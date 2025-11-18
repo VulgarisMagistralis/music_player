@@ -18,7 +18,8 @@ class PlaylistPage extends ConsumerStatefulWidget {
 class _PlaylistPageState extends ConsumerState<PlaylistPage> {
   @override
   Widget build(BuildContext context) {
-    AudioSessionState? audioSessionState = ref.watch(audioSessionManagerProvider).value;
+    final AudioSessionState? audioSessionState =
+        ref.watch(audioSessionManagerProvider).value;
     return Scaffold(
         bottomNavigationBar: const PlayerNavigationBar(),
         resizeToAvoidBottomInset: true,
@@ -27,8 +28,9 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> {
           padding: const EdgeInsets.fromLTRB(15, 15, 10, 0),
           child: Column(
             children: [
-              PlayerHeader(),
-              if (audioSessionState?.playlistId == null) Text('Playlists:')
+              const PlayerHeader(),
+              if (audioSessionState?.playlistId == null)
+                const Text('Playlists:')
 
               /// if playlist id open it otherwise list all
             ],

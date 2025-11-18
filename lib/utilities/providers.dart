@@ -1,22 +1,13 @@
-import 'dart:io';
-import 'package:music_player/data/playlist.dart';
-import 'package:music_player/data/sort_options.dart';
-import 'package:music_player/data/song.dart' show Song;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/utilities/audio_handler.dart';
 import 'package:music_player/data/audio_session_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:music_player/src/rust/api/data/playlist.dart';
+import 'package:music_player/src/rust/api/utils/sort_modes.dart';
 import 'package:music_player/utilities/audio_session_manager.dart';
-import 'package:music_player/utilities/settings_data.dart' show SharedPreferenceWithCacheHandler;
+import 'package:music_player/src/rust/api/data/song.dart' show Song, SongCollection;
+import 'package:music_player/low_level_wrapper/data/datasource/music_folder.dart';
 part 'providers.g.dart';
-
-@riverpod
-Stream readFiles(Ref ref, Directory musicDirectory) => musicDirectory.list(followLinks: false);
-
-@Riverpod(keepAlive: true, dependencies: [totalSongList])
-AsyncValue<Playlist> allSongsPlaylist(Ref ref) => ref.watch(totalSongListProvider).whenData(
-      (songs) => Playlist(id: 'songs', name: 'All Songs', songIdList: songs.map((Song song) => song.id).toList()),
-    );
 
 @Riverpod(keepAlive: true)
 class SongsPageScrollOffset extends _$SongsPageScrollOffset {
@@ -27,44 +18,45 @@ class SongsPageScrollOffset extends _$SongsPageScrollOffset {
 }
 
 final AsyncNotifierProvider<AudioSessionManager, AudioSessionState?> audioSessionManagerProvider = AsyncNotifierProvider<AudioSessionManager, AudioSessionState?>(() => AudioSessionManager());
+
 final Provider<PlayerAudioHandler> audioHandlerProvider = Provider<PlayerAudioHandler>((ref) => PlayerAudioHandler());
+
 @Riverpod(keepAlive: true)
-List<String> getSavedFolderList(Ref ref) => SharedPreferenceWithCacheHandler.instance.getMusicFolderList();
+Future<List<String>> getSavedFolderList(Ref ref) => LowLevelFolderDataSource().loadFolders();
 
-@Riverpod(keepAlive: true, dependencies: [getSavedFolderList])
+@Riverpod(keepAlive: true)
 Future<List<Song>> totalSongList(Ref ref) async {
-  final List<String> musicDirectoryList = ref.watch(getSavedFolderListProvider);
-  final List<Song> songs = [];
-
-  for (final dirPath in musicDirectoryList) {
-    final Directory dir = Directory(dirPath);
-    if (!dir.existsSync()) continue;
-
-    await for (final FileSystemEntity file in dir.list(recursive: true, followLinks: false)) {
-      final String path = file.path.toLowerCase();
-      //? webm issue?
-      if (file is File && (path.endsWith('.mp3') || path.endsWith('.wav') || path.endsWith('.webm'))) songs.add(Song.create(file: file));
-    }
-  }
-  return songs;
+  final songCollection = ref.watch(songCollectionProvider);
+  return songCollection.getAllSongs();
 }
+
+@Riverpod(keepAlive: true)
+SongCollection songCollection(Ref ref) => SongCollection();
+
+@Riverpod(keepAlive: true)
+PlaylistCollection playlistCollection(Ref ref) => PlaylistCollection();
 
 //todo
-@Riverpod(keepAlive: true)
-class FavouriteSongList extends _$FavouriteSongList {
-  @override
-  List build() => state = [];
-  List get value => state;
-  void addSong(var newSong) => state.add(newSong);
-  void removeSong(var songToRemove) => state.remove(songToRemove);
-}
+// @Riverpod(keepAlive: true)
+// class FavouriteSongList extends _$FavouriteSongList {
+//   @override
+//   List build() => state = [];
+//   List get value => state;
+//   void addSong(var newSong) => state.add(newSong);
+//   void removeSong(var songToRemove) => state.remove(songToRemove);
+// }
 
-//make per playlist
 @Riverpod(keepAlive: true)
 class PlaylistSortedBy extends _$PlaylistSortedBy {
-  String playlistId = 'songs';
   @override
-  SortBy build() => state = SortBy.nameAscending;
+  SortBy build() => state = SortBy.dateModifiedDescending;
   SortBy get value => state;
   void update(SortBy newSortingRule) => state = newSortingRule;
+}
+
+@Riverpod(keepAlive: true)
+Future<List<Song>> sortedSongList(Ref ref) async {
+  final sortBy = ref.watch(playlistSortedByProvider);
+  final songCollection = ref.watch(songCollectionProvider);
+  return songCollection.getAllSorted(sortBy: sortBy);
 }

@@ -8,7 +8,8 @@ import 'package:music_player/utilities/audio_handler.dart';
 import 'package:music_player/utilities/settings_data.dart';
 import 'package:flutter/material.dart' show WidgetsBindingObserver;
 
-class AudioSessionManager extends AsyncNotifier<AudioSessionState?> with WidgetsBindingObserver {
+class AudioSessionManager extends AsyncNotifier<AudioSessionState?>
+    with WidgetsBindingObserver {
   late final PlayerAudioHandler _handler;
   final List<UriAudioSource> _sources = [];
   List<UriAudioSource> get queue => _sources;
@@ -21,19 +22,26 @@ class AudioSessionManager extends AsyncNotifier<AudioSessionState?> with Widgets
     await SharedPreferenceWithCacheHandler.instance.saveSongState(newState);
   }
 
-  Stream<PositionData> get positionStream => ref.read(audioHandlerProvider).positionDataStream;
+  Stream<PositionData> get positionStream =>
+      ref.read(audioHandlerProvider).positionDataStream;
 
   @override
   Future<AudioSessionState> build() async {
-    state = AsyncData(state.value ?? AsyncData(await SharedPreferenceWithCacheHandler.instance.loadSongState()).value ?? AudioSessionState.initial());
+    state = AsyncData(state.value ??
+        AsyncData(
+                await SharedPreferenceWithCacheHandler.instance.loadSongState())
+            .value ??
+        AudioSessionState.initial());
     _handler = ref.read(audioHandlerProvider);
     _handler.mediaItem.listen((MediaItem? newMediaItem) {
       if (newMediaItem == null) return;
-      state = AsyncData(state.value!.copyWith(title: newMediaItem.title, asMediaItem: newMediaItem, isReady: true));
+      state = AsyncData(state.value!.copyWith(
+          title: newMediaItem.title, asMediaItem: newMediaItem, isReady: true));
       SharedPreferenceWithCacheHandler.instance.saveSongState(state.value!);
     });
     _handler.playbackState.listen((PlaybackState playbackState) {
-      state = AsyncData(state.value!.copyWith(isPlaying: playbackState.playing));
+      state =
+          AsyncData(state.value!.copyWith(isPlaying: playbackState.playing));
       SharedPreferenceWithCacheHandler.instance.saveSongState(state.value!);
     });
     return state.value!;

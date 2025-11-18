@@ -8,6 +8,7 @@ import 'package:music_player/utilities/file_system_entity_converter.dart';
 part 'audio_session_state.freezed.dart';
 part 'audio_session_state.g.dart';
 
+// to rust
 @freezed
 abstract class AudioSessionState with _$AudioSessionState {
   const factory AudioSessionState([

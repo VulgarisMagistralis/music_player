@@ -4,7 +4,6 @@ import 'package:music_player/data/audio_session_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// ________ Keys  ________
-const _libraryFolderListKey = 'library.folder.list';
 const _lastSongStateKey = 'last.audio.session';
 
 class SharedPreferenceWithCacheHandler {
@@ -16,10 +15,7 @@ class SharedPreferenceWithCacheHandler {
   /// Call this once at app startup
   Future<void> init() async => _sharedPreferences = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
 
-  Future<void> saveMusicFolderList(List<String> updatedLibraryList) async => await _sharedPreferences.setStringList(_libraryFolderListKey, updatedLibraryList);
-
-  List<String> getMusicFolderList() => _sharedPreferences.getStringList(_libraryFolderListKey) ?? [];
-
+  ///TODO to rust
   Future<void> saveSongState(AudioSessionState state) async => await _sharedPreferences.setString(_lastSongStateKey, jsonEncode(state.toJson()));
 
   Future<AudioSessionState?> loadSongState() async {

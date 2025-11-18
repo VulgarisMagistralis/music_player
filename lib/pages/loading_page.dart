@@ -12,9 +12,10 @@ class _LoadingState extends State<LoadingPage> {
   String? storeVersion;
   Future<PackageInfo> readPackageInfo() async {
     try {
-      final VersionStatus? versionStatus = await NewVersionPlus(androidId: 'com.cenkt.music_player').getVersionStatus();
+      final VersionStatus? versionStatus =
+          await NewVersionPlus(androidId: 'com.cenkt.music_player')
+              .getVersionStatus();
       storeVersion = versionStatus?.storeVersion;
-      print(storeVersion);
     } catch (e) {
       /// optional
     }
@@ -37,9 +38,21 @@ class _LoadingState extends State<LoadingPage> {
             const Spacer(),
             FutureBuilder(
                 future: readPackageInfo(),
-                builder: (context, snapshot) => snapshot.connectionState == ConnectionState.done && snapshot.hasData
-                    ? Text('Version: ${snapshot.data?.version} ${storeVersion != null ? '\n New Version Available: ${storeVersion!}' : ''}',
-                        textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, color: Color.fromARGB(106, 122, 122, 122)))
-                    : const Padding(padding: EdgeInsets.all(10), child: Text('Reading version information', textAlign: TextAlign.center, style: TextStyle(fontSize: 15, color: Color.fromARGB(106, 122, 122, 122)))))
+                builder: (context, snapshot) => snapshot.connectionState ==
+                            ConnectionState.done &&
+                        snapshot.hasData
+                    ? Text(
+                        'Version: ${snapshot.data?.version} ${storeVersion != null ? '\n New Version Available: ${storeVersion!}' : ''}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontSize: 15,
+                            color: Color.fromARGB(106, 122, 122, 122)))
+                    : const Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Text('Reading version information',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 15,
+                                color: Color.fromARGB(106, 122, 122, 122)))))
           ])))));
 }
