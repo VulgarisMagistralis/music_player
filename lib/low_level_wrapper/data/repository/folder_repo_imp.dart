@@ -6,13 +6,11 @@ class LowLevelRepositoryImplementation implements FolderRepository {
   LowLevelRepositoryImplementation();
 
   @override
-  void setDirectory({required String applicationDirectory}) =>
-      dataSource.setDirectory(path: applicationDirectory);
+  void setDirectory({required String applicationDirectory}) => dataSource.setDirectory(path: applicationDirectory);
 
   @override
-  List<String> loadFolderList() => dataSource.loadFolders();
+  Future<List<String>> loadFolderList() async => await dataSource.loadFolders();
 
   @override
-  void saveFolderList({required List<String> folderList}) =>
-      dataSource.saveFolders(folderList: folderList);
+  void saveFolderList({required List<String> folderList}) => dataSource.saveFolders(folderList: folderList);
 }

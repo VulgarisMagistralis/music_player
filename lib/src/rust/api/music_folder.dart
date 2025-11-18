@@ -4,16 +4,18 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import 'package:music_player/src/rust/frb_generated.dart';
+import 'package:music_player/src/rust/api/error/custom_error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `get_app_dir`
-
-void setApplicationDataDirectory({required String path}) => RustLib.instance.api
+Future<void> setApplicationDataDirectory({required String path}) => RustLib
+    .instance
+    .api
     .crateApiMusicFolderSetApplicationDataDirectory(path: path);
 
-void saveMusicFolderList({required List<String> folders}) =>
-    RustLib.instance.api
-        .crateApiMusicFolderSaveMusicFolderList(folders: folders);
+Future<void> saveMusicFolderList({required List<String> folders}) => RustLib
+    .instance
+    .api
+    .crateApiMusicFolderSaveMusicFolderList(folders: folders);
 
-List<String> getMusicFolderList() =>
+Future<List<String>> getMusicFolderList() =>
     RustLib.instance.api.crateApiMusicFolderGetMusicFolderList();

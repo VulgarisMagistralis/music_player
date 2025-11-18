@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart' show debugPrint;
 import 'package:just_audio/just_audio.dart';
@@ -6,7 +7,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:music_player/common/toast.dart';
 import 'package:music_player/data/audio_session_state.dart';
 import 'package:music_player/data/position.dart';
-import 'package:music_player/data/song.dart';
+import 'package:music_player/src/rust/api/data/song.dart';
 import 'package:rxdart/rxdart.dart';
 
 ///TODO user settings
@@ -125,29 +126,18 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
 
   Future<void> setPlaylist(String playlistId, List<Song> songList, {int index = 0}) async {
     final List<AudioSessionState> sources = [];
-    // Uint8List? pictureByteList;
-
     for (Song song in songList) {
-      if (song.file == null) {
+      try {
+        sources.add(const AudioSessionState().copyWith(
+          playlistId: playlistId,
+          file: File(song.path),
+          title: song.title,
+          songIndexInPlaylist: songList.indexOf(song),
+          asMediaItem: MediaItem(id: song.id.toString(), title: song.title),
+        ));
+      } catch (e) {
         ToastManager().showErrorToast('Skipped ${song.title}\nCannot find the file');
-        continue;
       }
-      // try {
-      //   // move image to class
-      //   final metaData = readMetadata(File(song.file!.path), getImage: true);
-      //   if (metaData.pictures.isNotEmpty) pictureByteList = metaData.pictures.first.bytes;
-      // } catch (e) {
-      //   ToastManager().showErrorToast('Failed to read metadata for ${song.file!.path}: $e');
-      // }
-
-      sources.add(const AudioSessionState().copyWith(
-        playlistId: playlistId,
-        file: song.file,
-        title: song.title,
-        // albumArt: pictureByteList,
-        songIndexInPlaylist: songList.indexOf(song),
-        asMediaItem: MediaItem(id: song.id, title: song.title ?? 'N/A'),
-      ));
     }
 
     // Update AudioService queue
@@ -156,8 +146,8 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     ///!XX
     int i = 0;
     await _player.setAudioSources(
-        queueItems.map((item) {
-          return AudioSource.uri(songList[i++].file!.uri, tag: item);
+        queueItems.map((MediaItem item) {
+          return AudioSource.uri(Uri.file(songList[i++].path), tag: item);
         }).toList(),
         initialIndex: index);
     await updateQueue(queueItems);

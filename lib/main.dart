@@ -8,24 +8,17 @@ import 'package:music_player/low_level_wrapper/init.dart';
 import 'package:music_player/utilities/audio_handler.dart';
 import 'package:music_player/utilities/settings_data.dart';
 import 'package:flutter/services.dart' show SystemChannels;
-import 'package:music_player/utilities/providers.dart'
-    show audioHandlerProvider;
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:music_player/low_level_wrapper/data/repository/folder_repo_imp.dart';
+import 'package:music_player/utilities/providers.dart' show audioHandlerProvider;
 
 /// Move out audio services, let rust handle init states,loads
 void main() async {
-  final WidgetsBinding widgetsBinding =
-      WidgetsFlutterBinding.ensureInitialized();
+  final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await SharedPreferenceWithCacheHandler.instance.init();
   final ProviderContainer providerContainer = ProviderContainer();
-  final PlayerAudioHandler handler =
-      providerContainer.read(audioHandlerProvider);
-  await providerContainer
-      .read(playerThemeProvider.notifier)
-      .loadStoredThemeData();
+  final PlayerAudioHandler handler = providerContainer.read(audioHandlerProvider);
+  providerContainer.read(playerThemeProvider.notifier).loadStoredThemeData();
   try {
     await AudioService.init(
       config: const AudioServiceConfig(
@@ -43,16 +36,13 @@ void main() async {
       builder: () => handler,
     );
     await LowLevelInitializer.init();
-    await handler.init();
+    handler.init();
   } catch (e) {
     ToastManager().showErrorToast('Failed to start audio services');
     debugPrint('Background init error: $e');
-    await Future.delayed(const Duration(seconds: 3));
+    // await Future.delayed(const Duration(seconds: 3));
     SystemChannels.platform.invokeMethod('SystemNavigator.pop');
   }
-  LowLevelRepositoryImplementation().setDirectory(
-      applicationDirectory: (await getApplicationSupportDirectory()).path);
   FlutterNativeSplash.remove();
-  runApp(UncontrolledProviderScope(
-      container: providerContainer, child: const AfterSplash()));
+  runApp(UncontrolledProviderScope(container: providerContainer, child: const AfterSplash()));
 }
