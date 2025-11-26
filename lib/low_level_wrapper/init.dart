@@ -7,7 +7,9 @@ class LowLevelInitializer {
   static Future<void> init() async {
     if (_initialized) return;
     await RustLib.init();
-    _initialized = true;
+    // ignore: invalid_use_of_internal_member
+    await RustLib.instance.api.crateApiUtilsLoggerInitRustLogger();
     LowLevelRepositoryImplementation().setDirectory(applicationDirectory: (await getApplicationSupportDirectory()).path);
+    _initialized = true;
   }
 }

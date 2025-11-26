@@ -5,3 +5,7 @@ pub(crate) fn hash_string(string: &str) -> u64 {
     let bytes = string.as_bytes();
     xxh64(bytes, 0)
 }
+
+pub(crate) fn hash_bytes(bytes: &[u8]) -> u64 {
+    xxh64(bytes, 0)
+}
