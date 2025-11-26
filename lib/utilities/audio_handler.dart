@@ -24,7 +24,7 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   final List<UriAudioSource> currentQueue = [];
   final AudioPlayer _player = AudioPlayer();
   AudioPlayer get player => _player;
-  final _session = AudioSession.instance;
+  final Future<AudioSession> _session = AudioSession.instance;
   late StreamSubscription<void>? _noisySubscription;
   late StreamSubscription<double>? _volumeSubscription;
   late StreamSubscription<AudioInterruptionEvent>? _interruptionSubscription;
@@ -40,11 +40,10 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   };
 
   Future<void> init() async {
-    await _player.setAndroidAudioAttributes(const AndroidAudioAttributes(contentType: AndroidAudioContentType.music, usage: AndroidAudioUsage.media, flags: AndroidAudioFlags.audibilityEnforced));
     final session = await _session;
-    // check again
-    await session.configure(const AudioSessionConfiguration(androidWillPauseWhenDucked: false, androidAudioAttributes: AndroidAudioAttributes(contentType: AndroidAudioContentType.music)));
+    await session.configure(const AudioSessionConfiguration.music());
     await session.setActive(true);
+    await _player.setAndroidAudioAttributes(const AndroidAudioAttributes(contentType: AndroidAudioContentType.music, usage: AndroidAudioUsage.media));
     _player.playerStateStream.listen((playerState) {
       playbackState.add(
         playbackState.value.copyWith(
@@ -112,7 +111,6 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
 
   @override
   Future<void> playFromMediaId(String mediaId, [Map<String, dynamic>? extras]) async {
-    debugPrint('called______________');
     final index = queue.value.indexWhere((item) => item.id == mediaId);
     if (index >= 0) {
       await _player.seek(Duration.zero, index: index);
