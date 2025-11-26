@@ -32,14 +32,19 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   Stream<PlayerState> get playerStateStream => _player.playerStateStream;
 
   AudioProcessingState _mapProcessingState(ProcessingState processingState) => switch (processingState) {
-        ProcessingState.idle => AudioProcessingState.idle,
-        ProcessingState.ready => AudioProcessingState.ready,
-        ProcessingState.loading => AudioProcessingState.loading,
-        ProcessingState.buffering => AudioProcessingState.buffering,
-        ProcessingState.completed => AudioProcessingState.completed
-      };
+    ProcessingState.idle => AudioProcessingState.idle,
+    ProcessingState.ready => AudioProcessingState.ready,
+    ProcessingState.loading => AudioProcessingState.loading,
+    ProcessingState.buffering => AudioProcessingState.buffering,
+    ProcessingState.completed => AudioProcessingState.completed,
+  };
 
   Future<void> init() async {
+    await _player.setAndroidAudioAttributes(const AndroidAudioAttributes(contentType: AndroidAudioContentType.music, usage: AndroidAudioUsage.media, flags: AndroidAudioFlags.audibilityEnforced));
+    final session = await _session;
+    // check again
+    await session.configure(const AudioSessionConfiguration(androidWillPauseWhenDucked: false, androidAudioAttributes: AndroidAudioAttributes(contentType: AndroidAudioContentType.music)));
+    await session.setActive(true);
     _player.playerStateStream.listen((playerState) {
       playbackState.add(
         playbackState.value.copyWith(
@@ -64,18 +69,9 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
         ),
       );
     });
-
     _player.currentIndexStream.listen((index) {
       if (index != null && index < _player.sequence.length) mediaItem.add(_player.sequence[index].tag as MediaItem);
     });
-    final session = await _session;
-    await session.setActive(true);
-    await session.configure(
-      const AudioSessionConfiguration(
-        androidWillPauseWhenDucked: true,
-        androidAudioAttributes: AndroidAudioAttributes(contentType: AndroidAudioContentType.music),
-      ),
-    );
     _interruptionSubscription = session.interruptionEventStream.listen((event) async {
       if (event.begin) {
         switch (event.type) {
@@ -128,13 +124,15 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     final List<AudioSessionState> sources = [];
     for (Song song in songList) {
       try {
-        sources.add(const AudioSessionState().copyWith(
-          playlistId: playlistId,
-          file: File(song.path),
-          title: song.title,
-          songIndexInPlaylist: songList.indexOf(song),
-          asMediaItem: MediaItem(id: song.id.toString(), title: song.title),
-        ));
+        sources.add(
+          const AudioSessionState().copyWith(
+            playlistId: playlistId,
+            file: File(song.path),
+            title: song.title,
+            songIndexInPlaylist: songList.indexOf(song),
+            asMediaItem: MediaItem(id: song.id.toString(), title: song.title),
+          ),
+        );
       } catch (e) {
         ToastManager().showErrorToast('Skipped ${song.title}\nCannot find the file');
       }
@@ -146,10 +144,11 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     ///!XX
     int i = 0;
     await _player.setAudioSources(
-        queueItems.map((MediaItem item) {
-          return AudioSource.uri(Uri.file(songList[i++].path), tag: item);
-        }).toList(),
-        initialIndex: index);
+      queueItems.map((MediaItem item) {
+        return AudioSource.uri(Uri.file(songList[i++].path), tag: item);
+      }).toList(),
+      initialIndex: index,
+    );
     await updateQueue(queueItems);
 
     // Start playback at the selected song
@@ -185,11 +184,11 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   }
 
   Stream<PositionData> get positionDataStream => Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
-        _player.positionStream,
-        _player.bufferedPositionStream,
-        _player.durationStream,
-        (position, bufferedPosition, duration) => PositionData(position, bufferedPosition, duration ?? Duration.zero),
-      );
+    _player.positionStream,
+    _player.bufferedPositionStream,
+    _player.durationStream,
+    (position, bufferedPosition, duration) => PositionData(position, bufferedPosition, duration ?? Duration.zero),
+  );
 
   @override
   Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {

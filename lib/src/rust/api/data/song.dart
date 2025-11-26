@@ -10,40 +10,9 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `borrow_decode`, `borrow_decode`, `clone`, `clone`, `decode`, `decode`, `encode`, `encode`, `fmt`, `fmt`
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Song>>
-abstract class Song implements RustOpaqueInterface {
-  String get album;
-
-  String get artist;
-
-  int? get duration;
-
-  BigInt get id;
-
-  PlatformInt64 get lastModifiedAt;
-
-  String get path;
-
-  String get title;
-
-  set album(String album);
-
-  set artist(String artist);
-
-  set duration(int? duration);
-
-  set id(BigInt id);
-
-  set lastModifiedAt(PlatformInt64 lastModifiedAt);
-
-  set path(String path);
-
-  set title(String title);
-}
-
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SongCollection>>
 abstract class SongCollection implements RustOpaqueInterface {
-  Future<void> addSong({required Song song});
+  Future<void> addSong({required Song song, Uint8List? albumArt});
 
   Map<BigInt, Song> get songMap;
 
@@ -53,14 +22,67 @@ abstract class SongCollection implements RustOpaqueInterface {
       RustLib.instance.api
           .crateApiDataSongSongCollectionExtractAlbumArtFromFile(path: path);
 
+  Future<Uint8List?> getAlbumArt({required BigInt songId});
+
   Future<List<Song>> getAllSongs();
 
+  ///! also add to playlist collection
   Future<List<Song>> getAllSorted({required SortBy sortBy});
 
   Future<Song?> getSong({required BigInt id});
 
-  factory SongCollection() =>
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<SongCollection> newInstance() =>
       RustLib.instance.api.crateApiDataSongSongCollectionNew();
 
+  Future<void> removeAllSongs();
+
   Future<void> removeSong({required BigInt id});
+}
+
+class Song {
+  final BigInt id;
+  final String path;
+  final String title;
+  final String artist;
+  final String album;
+  final PlatformInt64 lastModifiedAt;
+  final int? duration;
+  final BigInt? albumArtId;
+
+  const Song({
+    required this.id,
+    required this.path,
+    required this.title,
+    required this.artist,
+    required this.album,
+    required this.lastModifiedAt,
+    this.duration,
+    this.albumArtId,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      path.hashCode ^
+      title.hashCode ^
+      artist.hashCode ^
+      album.hashCode ^
+      lastModifiedAt.hashCode ^
+      duration.hashCode ^
+      albumArtId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Song &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          path == other.path &&
+          title == other.title &&
+          artist == other.artist &&
+          album == other.album &&
+          lastModifiedAt == other.lastModifiedAt &&
+          duration == other.duration &&
+          albumArtId == other.albumArtId;
 }

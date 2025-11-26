@@ -3,12 +3,14 @@ use crate::api::error::custom_error::CustomError;
 use crate::api::utils::hash::hash_string;
 use bincode::config::{standard, Configuration};
 use bincode::{decode_from_slice, encode_to_vec};
+use log::error;
+use log::info;
 use sled::{Db, IVec, Tree};
 use std::{path::PathBuf, sync::OnceLock};
-
 static DB_INSTANCE_DIR: OnceLock<PathBuf> = OnceLock::new();
 static DB_INSTANCE: OnceLock<Db> = OnceLock::new();
 const SONG_TREE: &str = "song";
+const SONG_ART_TREE: &str = "art";
 const PLAYLIST_TREE: &str = "playlist";
 const SETTINGS_TREE: &str = "settings";
 const FOLDER_PREFIX: &str = "folder";
@@ -29,11 +31,23 @@ fn folder_key(id: u64) -> String {
     format!("{FOLDER_PREFIX}::{id}")
 }
 
-pub fn set_db_dir(db_dir: String) -> Result<(), String> {
+pub(crate) fn set_db_dir(db_dir: String) -> Result<(), String> {
     let db_path = PathBuf::from(&db_dir);
-    let _ = DB_INSTANCE_DIR.set(db_path.clone());
-    let db = sled::open(db_path).map_err(|e| format!("Failed to open sled DB: {}", e))?;
-    let _ = DB_INSTANCE.set(db);
+    if let Err(_) = DB_INSTANCE_DIR.set(db_path.clone()) {
+        info!("DB directory already set (ignoring)");
+    }
+    std::fs::create_dir_all(&db_path).map_err(|e| {
+        error!("Failed to create DB dir: {e}");
+        format!("Failed to create DB dir: {e}")
+    })?;
+    let db = sled::open(db_path).map_err(|e| {
+        error!("{}", format!("Failed to open sled DB: {}", e));
+        format!("Failed to open sled DB: {}", e)
+    });
+    if let Err(_) = DB_INSTANCE.set(db?) {
+        info!("DB instance already set (ignoring)");
+    }
+    info!("{}", DB_INSTANCE.get().is_none());
     Ok(())
 }
 
@@ -41,13 +55,16 @@ pub(crate) fn open_or_fetch_tree(new_tree_name: String) -> Result<Tree, String> 
     let db = DB_INSTANCE
         .get()
         .ok_or_else(|| "DB not initialized".to_string())?;
-
     db.open_tree(&new_tree_name)
         .map_err(|e| format!("Failed to open tree '{}': {}", new_tree_name, e))
 }
 
 pub(crate) fn get_song_tree() -> Result<Tree, String> {
     open_or_fetch_tree(SONG_TREE.to_string())
+}
+
+pub(crate) fn get_song_art_tree() -> Result<Tree, String> {
+    open_or_fetch_tree(SONG_ART_TREE.to_string())
 }
 
 pub(crate) fn get_playlist_tree() -> Result<Tree, String> {
@@ -69,6 +86,22 @@ pub(crate) fn save_song_to_db(song: Song) -> Result<(), CustomError> {
     Ok(())
 }
 
+pub(crate) fn save_song_art_to_db(id: u64, data: Vec<u8>) -> Result<(), CustomError> {
+    let tree = get_song_art_tree().map_err(|e| CustomError::TreeError(e.to_string()))?;
+    tree.insert(id.to_be_bytes(), data)
+        .map_err(|e| CustomError::DbError(e.to_string()))?;
+    let _ = tree.flush();
+    Ok(())
+}
+
+pub(crate) fn get_song_art_from_db(id: u64) -> Result<Option<Vec<u8>>, CustomError> {
+    Ok(get_song_art_tree()
+        .map_err(|e| CustomError::TreeError(e.to_string()))?
+        .get(id.to_be_bytes())
+        .map_err(|e| CustomError::DbError(e.to_string()))?
+        .map(|b| b.to_vec()))
+}
+
 pub(crate) fn save_playlist_to_db(playlist: Playlist) -> Result<Option<IVec>, CustomError> {
     Ok(get_playlist_tree()
         .map_err(|e| CustomError::TreeError(e.to_string()))?
@@ -86,7 +119,6 @@ pub(crate) fn get_playlist_from_db(playlist_id: u64) -> Result<Playlist, CustomE
         .get(playlist_key(playlist_id))
         .map_err(|e| CustomError::DbError(e.to_string()))? // DB error
         .ok_or(CustomError::DbError("Not found".to_string()))?;
-
     let (playlist, _): (Playlist, usize) =
         decode_from_slice(&encoded_playlist, ENCODING_CONFIGURATION)
             .map_err(|_| CustomError::DecodeError)?;
@@ -122,10 +154,25 @@ pub(crate) fn get_all_songs_from_db() -> Result<Vec<Song>, CustomError> {
 }
 
 pub(crate) fn save_music_folder_to_db(folder_path: &String) -> Result<Option<IVec>, CustomError> {
-    let res = get_settings_tree()
-        .map_err(|e| CustomError::TreeError(e.to_string()))?
+    let res: Option<IVec> = get_settings_tree()
+        .map_err(|e| {
+            error!("{}", format!("{}", folder_path));
+            CustomError::TreeError(e.to_string())
+        })?
         .insert(folder_key(hash_string(folder_path)), folder_path.as_bytes())
-        .map_err(|e| CustomError::DbError(e.to_string()))?;
+        .map_err(|e| {
+            error!("{}", format!("{}", folder_path));
+            CustomError::DbError(e.to_string())
+        })?;
+    let _ = get_settings_tree()
+        .map_err(|e| {
+            error!("{}", format!("{}", folder_path));
+            CustomError::TreeError(e.to_string())
+        })?
+        .flush();
+    DB_INSTANCE.get().unwrap().flush().unwrap();
+    info!("DB FLUSHED");
+    info!("SAVED: {}", format!("{}", folder_path));
     Ok(res)
 }
 
@@ -138,25 +185,30 @@ pub(crate) fn get_music_folders_from_db() -> Result<Vec<String>, CustomError> {
         let (_, value) = item.map_err(|e| CustomError::DbError(e.to_string()))?;
         folder_list.push(String::from_utf8(value.to_vec()).map_err(|_| CustomError::Utf8Error)?);
     }
+    info!("FETCHING: {}", format!("{:?}", folder_list.first()));
+
     Ok(folder_list)
 }
 
-pub(crate) fn remove_music_folder_from_db(folder_path: &str) -> Result<(), CustomError> {
+pub(crate) fn remove_music_folder_from_db(folder_path: String) -> Result<(), CustomError> {
     let settings_tree = get_settings_tree().map_err(|e| CustomError::TreeError(e.to_string()))?;
-    for item in settings_tree.scan_prefix(FOLDER_PREFIX) {
-        let (_, value) = item.map_err(|e| CustomError::DbError(e.to_string()))?;
-        let (folder_path_in_db, _): (String, usize) =
-            decode_from_slice(&value, ENCODING_CONFIGURATION)
-                .map_err(|_| CustomError::DecodeError)?;
-        if folder_path_in_db == folder_path {
-            let _ = settings_tree.remove(folder_key(hash_string(folder_path)));
-        }
-    }
+    let key = folder_key(hash_string(&folder_path));
+    settings_tree
+        .remove(key)
+        .map_err(|e| CustomError::DbError(e.to_string()))?;
     Ok(())
 }
 
 pub(crate) fn remove_song_from_db(id: u64) -> Result<(), CustomError> {
     let song_tree = get_song_tree().map_err(|e| CustomError::TreeError(e.to_string()))?;
     let _ = song_tree.remove(song_key(id));
+    Ok(())
+}
+
+pub(crate) fn remove_all_songs_from_db() -> Result<(), CustomError> {
+    let song_tree = get_song_tree().map_err(|e| CustomError::TreeError(e.to_string()))?;
+    let _ = song_tree
+        .clear()
+        .map_err(|e| CustomError::TreeError(e.to_string()));
     Ok(())
 }

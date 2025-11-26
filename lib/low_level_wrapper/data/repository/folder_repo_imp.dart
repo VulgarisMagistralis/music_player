@@ -12,5 +12,7 @@ class LowLevelRepositoryImplementation implements FolderRepository {
   Future<List<String>> loadFolderList() async => await dataSource.loadFolders();
 
   @override
-  void saveFolderList({required List<String> folderList}) => dataSource.saveFolders(folderList: folderList);
+  Future<void> saveFolderList({required List<String> folderList}) async => await dataSource.saveFolders(folderList: folderList);
+  @override
+  Future<void> deleteFolder({required String folder}) async => await dataSource.deleteFolder(folder: folder);
 }

@@ -9,10 +9,12 @@
 import 'package:music_player/src/rust/api/data/music_index.dart';
 import 'package:music_player/src/rust/api/data/playlist.dart';
 import 'package:music_player/src/rust/api/data/song.dart';
+import 'package:music_player/src/rust/api/data/stream_event.dart';
 import 'package:music_player/src/rust/api/error/custom_error.dart';
 import 'package:music_player/src/rust/api/music_folder.dart';
 import 'package:music_player/src/rust/api/process_music.dart';
-import 'package:music_player/src/rust/api/utils/database_ops.dart';
+import 'package:music_player/src/rust/api/song_collection.dart';
+import 'package:music_player/src/rust/api/utils/logger.dart';
 import 'package:music_player/src/rust/api/utils/sort_modes.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -39,12 +41,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   get rust_arc_decrement_strong_count_PlaylistCollectionPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection;
 
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_SongPtr => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong;
-
   CrossPlatformFinalizerArg
   get rust_arc_decrement_strong_count_SongCollectionPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSongCollection;
+
+  @protected
+  AnyhowException dco_decode_AnyhowException(raw);
 
   @protected
   MusicIndex
@@ -65,12 +67,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  Song
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    raw,
-  );
-
-  @protected
   SongCollection
   dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSongCollection(
     raw,
@@ -85,12 +81,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   PlaylistCollection
   dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
-    raw,
-  );
-
-  @protected
-  Song
-  dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
     raw,
   );
 
@@ -119,12 +109,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  Song
-  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    raw,
-  );
-
-  @protected
   SongCollection
   dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSongCollection(
     raw,
@@ -137,10 +121,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  Map<BigInt, Song>
-  dco_decode_Map_u_64_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong_None(
-    raw,
-  );
+  Map<BigInt, Song> dco_decode_Map_u_64_song_None(raw);
 
   @protected
   MusicIndex
@@ -161,28 +142,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  Song
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    raw,
-  );
-
-  @protected
   SongCollection
   dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSongCollection(
     raw,
   );
 
   @protected
+  RustStreamSink<StreamEvent> dco_decode_StreamSink_stream_event_Sse(raw);
+
+  @protected
   String dco_decode_String(raw);
 
   @protected
-  Song
-  dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    raw,
-  );
+  Song dco_decode_box_autoadd_song(raw);
 
   @protected
   int dco_decode_box_autoadd_u_32(raw);
+
+  @protected
+  BigInt dco_decode_box_autoadd_u_64(raw);
 
   @protected
   CustomError dco_decode_custom_error(raw);
@@ -196,12 +174,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<Playlist>
   dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylist(
-    raw,
-  );
-
-  @protected
-  List<Song>
-  dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
     raw,
   );
 
@@ -221,19 +193,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  List<(BigInt, Song)>
-  dco_decode_list_record_u_64_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_song(
-    raw,
-  );
+  List<(BigInt, Song)> dco_decode_list_record_u_64_song(raw);
 
   @protected
-  Song?
-  dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    raw,
-  );
+  List<Song> dco_decode_list_song(raw);
+
+  @protected
+  Song? dco_decode_opt_box_autoadd_song(raw);
 
   @protected
   int? dco_decode_opt_box_autoadd_u_32(raw);
+
+  @protected
+  BigInt? dco_decode_opt_box_autoadd_u_64(raw);
+
+  @protected
+  Uint8List? dco_decode_opt_list_prim_u_8_strict(raw);
 
   @protected
   (BigInt, Playlist)
@@ -242,13 +217,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  (BigInt, Song)
-  dco_decode_record_u_64_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_song(
-    raw,
-  );
+  (BigInt, Song) dco_decode_record_u_64_song(raw);
+
+  @protected
+  Song dco_decode_song(raw);
 
   @protected
   SortBy dco_decode_sort_by(raw);
+
+  @protected
+  StreamEvent dco_decode_stream_event(raw);
 
   @protected
   int dco_decode_u_32(raw);
@@ -264,6 +242,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BigInt dco_decode_usize(raw);
+
+  @protected
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
 
   @protected
   MusicIndex
@@ -284,12 +265,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  Song
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    SseDeserializer deserializer,
-  );
-
-  @protected
   SongCollection
   sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSongCollection(
     SseDeserializer deserializer,
@@ -304,12 +279,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   PlaylistCollection
   sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  Song
-  sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
     SseDeserializer deserializer,
   );
 
@@ -338,12 +307,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  Song
-  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    SseDeserializer deserializer,
-  );
-
-  @protected
   SongCollection
   sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSongCollection(
     SseDeserializer deserializer,
@@ -356,10 +319,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  Map<BigInt, Song>
-  sse_decode_Map_u_64_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong_None(
-    SseDeserializer deserializer,
-  );
+  Map<BigInt, Song> sse_decode_Map_u_64_song_None(SseDeserializer deserializer);
 
   @protected
   MusicIndex
@@ -380,14 +340,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  Song
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
+  SongCollection
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSongCollection(
     SseDeserializer deserializer,
   );
 
   @protected
-  SongCollection
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSongCollection(
+  RustStreamSink<StreamEvent> sse_decode_StreamSink_stream_event_Sse(
     SseDeserializer deserializer,
   );
 
@@ -395,13 +354,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
-  Song
-  sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    SseDeserializer deserializer,
-  );
+  Song sse_decode_box_autoadd_song(SseDeserializer deserializer);
 
   @protected
   int sse_decode_box_autoadd_u_32(SseDeserializer deserializer);
+
+  @protected
+  BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer);
 
   @protected
   CustomError sse_decode_custom_error(SseDeserializer deserializer);
@@ -415,12 +374,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<Playlist>
   sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylist(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  List<Song>
-  sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
     SseDeserializer deserializer,
   );
 
@@ -440,19 +393,24 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  List<(BigInt, Song)>
-  sse_decode_list_record_u_64_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_song(
+  List<(BigInt, Song)> sse_decode_list_record_u_64_song(
     SseDeserializer deserializer,
   );
 
   @protected
-  Song?
-  sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    SseDeserializer deserializer,
-  );
+  List<Song> sse_decode_list_song(SseDeserializer deserializer);
+
+  @protected
+  Song? sse_decode_opt_box_autoadd_song(SseDeserializer deserializer);
 
   @protected
   int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
+
+  @protected
+  BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer);
+
+  @protected
+  Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
   (BigInt, Playlist)
@@ -461,13 +419,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  (BigInt, Song)
-  sse_decode_record_u_64_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_song(
-    SseDeserializer deserializer,
-  );
+  (BigInt, Song) sse_decode_record_u_64_song(SseDeserializer deserializer);
+
+  @protected
+  Song sse_decode_song(SseDeserializer deserializer);
 
   @protected
   SortBy sse_decode_sort_by(SseDeserializer deserializer);
+
+  @protected
+  StreamEvent sse_decode_stream_event(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_32(SseDeserializer deserializer);
@@ -486,6 +447,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   bool sse_decode_bool(SseDeserializer deserializer);
+
+  @protected
+  void sse_encode_AnyhowException(
+    AnyhowException self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
@@ -510,13 +477,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    Song self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void
   sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSongCollection(
     SongCollection self,
     SseSerializer serializer,
@@ -533,13 +493,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
   sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
     PlaylistCollection self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void
-  sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    Song self,
     SseSerializer serializer,
   );
 
@@ -573,13 +526,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
-  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    Song self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void
   sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSongCollection(
     SongCollection self,
     SseSerializer serializer,
@@ -593,8 +539,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void
-  sse_encode_Map_u_64_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong_None(
+  void sse_encode_Map_u_64_song_None(
     Map<BigInt, Song> self,
     SseSerializer serializer,
   );
@@ -622,15 +567,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    Song self,
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSongCollection(
+    SongCollection self,
     SseSerializer serializer,
   );
 
   @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSongCollection(
-    SongCollection self,
+  void sse_encode_StreamSink_stream_event_Sse(
+    RustStreamSink<StreamEvent> self,
     SseSerializer serializer,
   );
 
@@ -638,14 +582,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
-  void
-  sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    Song self,
-    SseSerializer serializer,
-  );
+  void sse_encode_box_autoadd_song(Song self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer);
 
   @protected
   void sse_encode_custom_error(CustomError self, SseSerializer serializer);
@@ -660,13 +603,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
   sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylist(
     List<Playlist> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void
-  sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    List<Song> self,
     SseSerializer serializer,
   );
 
@@ -693,21 +629,28 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void
-  sse_encode_list_record_u_64_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_song(
+  void sse_encode_list_record_u_64_song(
     List<(BigInt, Song)> self,
     SseSerializer serializer,
   );
 
   @protected
-  void
-  sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    Song? self,
-    SseSerializer serializer,
-  );
+  void sse_encode_list_song(List<Song> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_song(Song? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_list_prim_u_8_strict(
+    Uint8List? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
@@ -717,14 +660,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void
-  sse_encode_record_u_64_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_song(
+  void sse_encode_record_u_64_song(
     (BigInt, Song) self,
     SseSerializer serializer,
   );
 
   @protected
+  void sse_encode_song(Song self, SseSerializer serializer);
+
+  @protected
   void sse_encode_sort_by(SortBy self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_stream_event(StreamEvent self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_32(int self, SseSerializer serializer);
@@ -799,22 +747,6 @@ class RustLibWire implements BaseWire {
       );
 
   void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    int ptr,
-  ) => wasmModule
-      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-        ptr,
-      );
-
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    int ptr,
-  ) => wasmModule
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-        ptr,
-      );
-
-  void
   rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSongCollection(
     int ptr,
   ) => wasmModule
@@ -864,16 +796,6 @@ extension type RustLibWasmModule._(JSObject _) implements JSObject {
 
   external void
   rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
-    int ptr,
-  );
-
-  external void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
-    int ptr,
-  );
-
-  external void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSong(
     int ptr,
   );
 

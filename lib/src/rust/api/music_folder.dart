@@ -7,15 +7,18 @@ import 'package:music_player/src/rust/frb_generated.dart';
 import 'package:music_player/src/rust/api/error/custom_error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<void> setApplicationDataDirectory({required String path}) => RustLib
-    .instance
-    .api
-    .crateApiMusicFolderSetApplicationDataDirectory(path: path);
+Future<void> setAppDirectory({required String path}) =>
+    RustLib.instance.api.crateApiMusicFolderSetAppDirectory(path: path);
 
 Future<void> saveMusicFolderList({required List<String> folders}) => RustLib
     .instance
     .api
     .crateApiMusicFolderSaveMusicFolderList(folders: folders);
+
+Future<void> deleteMusicFolderList({required String folder}) => RustLib
+    .instance
+    .api
+    .crateApiMusicFolderDeleteMusicFolderList(folder: folder);
 
 Future<List<String>> getMusicFolderList() =>
     RustLib.instance.api.crateApiMusicFolderGetMusicFolderList();

@@ -4,9 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import 'package:music_player/src/rust/frb_generated.dart';
-import 'package:music_player/src/rust/api/data/song.dart';
-import 'package:music_player/src/rust/api/data/stream_event.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Stream<StreamEvent> readMusicFiles() =>
-    RustLib.instance.api.crateApiProcessMusicReadMusicFiles();
+Future<void> initRustLogger() =>
+    RustLib.instance.api.crateApiUtilsLoggerInitRustLogger();

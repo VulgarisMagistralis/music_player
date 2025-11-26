@@ -18,6 +18,11 @@ serde = { version = "1.0.228", features = ["derive"] }
 sled = "0.34.7"
 symphonia = "0.5.5"
 xxhash-rust = { version = "0.8.15", features = ["xxh64"] }
+tokio = "1.48.0"
+tokio-stream = "0.1.17"
+futures = "0.3.31"
+log = "0.4.28"
+android_logger = "0.15.1"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
