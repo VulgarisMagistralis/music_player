@@ -49,8 +49,17 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
+      - name: Debug keystore presence
+        run: |
+          pwd
+          ls -lh android/app
+
       - name: Build Android App Bundle
         run: fvm flutter build appbundle --release
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Upload to Google Play (Internal Track)
         uses: r0adkll/upload-google-play@v1
