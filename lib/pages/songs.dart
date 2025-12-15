@@ -1,14 +1,16 @@
+import 'dart:io' show File;
 import 'package:flutter/material.dart';
 import 'package:music_player/menu/nav_bar.dart';
 import 'package:music_player/route/routes.dart';
 import 'package:music_player/widgets/header.dart';
 import 'package:music_player/widgets/song_card.dart';
+import 'package:music_player/utilities/song_row.dart';
 import 'package:music_player/utilities/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/utilities/audio_handler.dart';
+import 'package:music_player/src/rust/api/data/song.dart';
 import 'package:music_player/widgets/loading_animation.dart';
-import 'package:music_player/common/animated_overflow_text.dart';
 import 'package:music_player/src/rust/api/data/stream_event.dart';
+import 'package:music_player/utilities/audio_session_manager.dart';
 import 'package:music_player/pages/error_pages/generic_error_page.dart';
 
 class SongsPage extends ConsumerStatefulWidget {
@@ -19,12 +21,11 @@ class SongsPage extends ConsumerStatefulWidget {
 }
 
 class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserver {
-  late final ScrollController scrollController;
-  bool playlistSet = false;
+  late final ScrollController _scrollController;
   @override
   void initState() {
     super.initState();
-    scrollController = ScrollController(
+    _scrollController = ScrollController(
       onAttach: (position) => WidgetsBinding.instance.addPostFrameCallback(
         (__) => position.animateTo(
           ref.read(songsPageScrollOffsetProvider.notifier).value,
@@ -33,32 +34,25 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
         ),
       ),
     );
-    scrollController.addListener(() => ref.read(songsPageScrollOffsetProvider.notifier).updateOffset(scrollController.offset));
+    _scrollController.addListener(() => ref.read(songsPageScrollOffsetProvider.notifier).updateOffset(_scrollController.offset));
     WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    scrollController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(processMusicFilesProvider, (prev, next) {
+    ref.listen(processMusicFilesProvider, (_, next) {
       next.whenData((event) {
-        switch (event.runtimeType) {
-          case StreamEvent_Song:
-            ref.invalidate(playlistSortedByProvider);
-            ref.invalidate(allSongsProvider);
-            ref.invalidate(sortedSongListProvider);
-          case StreamEvent_Error:
-            break;
-          case StreamEvent_Done:
-            ref.invalidate(playlistSortedByProvider);
-            ref.invalidate(allSongsProvider);
-            ref.invalidate(sortedSongListProvider);
+        if (event is StreamEvent_Done) {
+          ref.invalidate(playlistSortedByProvider);
+          ref.invalidate(allSongsProvider);
+          ref.invalidate(sortedSongListProvider);
         }
       });
     });
@@ -80,7 +74,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                     : ref
                           .watch(sortedSongListProvider)
                           .when(
-                            data: (sortedSongList) {
+                            data: (List<Song> sortedSongList) {
                               return sortedSongList.isEmpty
                                   ? GenericErrorPage(
                                       message: 'Couldn\'t find any music',
@@ -93,52 +87,19 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                                       showNavigation: true,
                                     )
                                   : ListView.builder(
-                                      shrinkWrap: true,
-                                      cacheExtent: 100.0,
                                       itemCount: sortedSongList.length,
-                                      controller: scrollController,
-                                      itemBuilder: (_, index) => Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              ref
-                                                  .watch(albumArtProvider(sortedSongList[index].id))
-                                                  .when(
-                                                    data: (bytes) => SizedBox(width: 50, height: 50, child: bytes != null ? Image.memory(bytes, fit: BoxFit.cover) : const SizedBox.shrink()),
-                                                    error: (error, stackTrace) => const SizedBox.shrink(),
-                                                    loading: () => const CircularProgressIndicator(),
-                                                  ),
-                                              const SizedBox(width: 10),
-                                              Expanded(
-                                                child: GestureDetector(
-                                                  child: AnimatedOverflowText(text: sortedSongList[index].title),
-                                                  onTap: () async {
-                                                    final PlayerAudioHandler audioHandler = ref.read(audioHandlerProvider);
-                                                    if (playlistSet) {
-                                                      await audioHandler.playSongAtIndex(index);
-                                                    } else {
-                                                      await audioHandler.setPlaylist('songs', sortedSongList, index: index);
-                                                      setState(() => playlistSet = true);
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                              IconButton(
-                                                icon: const Icon(
-                                                  false
-                                                      // songList[index].isInFavourites
-                                                      ? Icons.favorite_sharp
-                                                      : Icons.favorite_border,
-                                                ),
-                                                onPressed: () => setState(
-                                                  () => null, // songList[index] =
-                                                  //     Song.toggleFavourite(
-                                                  //         songList[index])
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                      controller: _scrollController,
+                                      itemBuilder: (_, index) => SongRow(
+                                        key: ValueKey(sortedSongList[index].id), // IMPORTANT
+                                        song: sortedSongList[index],
+                                        index: index,
+                                        onTap: (int i) async {
+                                          final handler = ref.read(audioHandlerProvider);
+                                          await handler.setPlaylist('songs', sortedSongList, index: i);
+                                          await ref
+                                              .read(audioSessionManagerProvider.notifier)
+                                              .updateState(songIndexInPlaylist: index, file: File(sortedSongList[index].path), title: sortedSongList[index].title, songId: sortedSongList[index].id);
+                                        },
                                       ),
                                     );
                             },

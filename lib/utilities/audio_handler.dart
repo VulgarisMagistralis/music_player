@@ -1,50 +1,46 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:audio_session/audio_session.dart';
-import 'package:flutter/material.dart' show debugPrint;
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:music_player/common/toast.dart';
 import 'package:music_player/data/audio_session_state.dart';
 import 'package:music_player/data/position.dart';
+import 'package:music_player/providers/setting_switches.dart';
 import 'package:music_player/src/rust/api/data/song.dart';
+import 'package:music_player/utilities/audio_session_manager.dart';
+import 'package:music_player/utilities/providers.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
-
-///TODO user settings
-bool resumeOnConnection = true;
-bool resumeOnDisconnect = false;
-bool pauseOnBackground = false;
-//possible?
-bool pauseOnHidden = false;
-bool pauseOnMuted = true;
-// if first launch or corrupted last song save=> start from 1st song in Songs (or configurable)
-bool resumeMusicOnLaunch = false;
 
 class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   final List<UriAudioSource> currentQueue = [];
+  final List<StreamSubscription> _subscriptionList = [];
   final AudioPlayer _player = AudioPlayer();
   AudioPlayer get player => _player;
   final Future<AudioSession> _session = AudioSession.instance;
-  late StreamSubscription<void>? _noisySubscription;
-  late StreamSubscription<double>? _volumeSubscription;
-  late StreamSubscription<AudioInterruptionEvent>? _interruptionSubscription;
-  late StreamSubscription<AudioDevicesChangedEvent>? _devicesChangedEventSubscription;
   Stream<PlayerState> get playerStateStream => _player.playerStateStream;
 
-  AudioProcessingState _mapProcessingState(ProcessingState processingState) => switch (processingState) {
-    ProcessingState.idle => AudioProcessingState.idle,
-    ProcessingState.ready => AudioProcessingState.ready,
-    ProcessingState.loading => AudioProcessingState.loading,
-    ProcessingState.buffering => AudioProcessingState.buffering,
-    ProcessingState.completed => AudioProcessingState.completed,
-  };
+  /// _______________ Life Cycle _______________
+  Future<void> init(ProviderContainer provider) async {
+    await _configureAudioSession();
+    await _configurePlayerAttributes();
+    _listenToPlayerState();
+    _listenToCurrentIndex();
+    _listenToInterruptions();
+    _listenToNoisyEvents(provider);
+    _listenToVolume(provider);
+    _listenToDevicesChanged(provider);
+  }
 
-  Future<void> init() async {
-    final session = await _session;
+  Future<void> _configureAudioSession() async {
+    final AudioSession session = await _session;
     await session.configure(const AudioSessionConfiguration.music());
     await session.setActive(true);
-    await _player.setAndroidAudioAttributes(const AndroidAudioAttributes(contentType: AndroidAudioContentType.music, usage: AndroidAudioUsage.media));
-    _player.playerStateStream.listen((playerState) {
+  }
+
+  void _listenToPlayerState() => _subscriptionList.add(
+    _player.playerStateStream.listen((PlayerState playerState) {
       playbackState.add(
         playbackState.value.copyWith(
           controls: [MediaControl.rewind, MediaControl.skipToPrevious, playerState.playing ? MediaControl.pause : MediaControl.play, MediaControl.skipToNext, MediaControl.fastForward],
@@ -59,41 +55,74 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
             MediaAction.seekForward,
             MediaAction.seekBackward,
           },
-          // Which controls to show in Android's compact view.
           androidCompactActionIndices: const [1, 2, 3],
           playing: playerState.playing,
           updatePosition: _player.position,
           bufferedPosition: _player.bufferedPosition,
-          processingState: _mapProcessingState(playerState.processingState),
+          processingState: switch (playerState.processingState) {
+            ProcessingState.idle => AudioProcessingState.idle,
+            ProcessingState.ready => AudioProcessingState.ready,
+            ProcessingState.loading => AudioProcessingState.loading,
+            ProcessingState.buffering => AudioProcessingState.buffering,
+            ProcessingState.completed => AudioProcessingState.completed,
+          },
         ),
       );
-    });
-    _player.currentIndexStream.listen((index) {
-      if (index != null && index < _player.sequence.length) mediaItem.add(_player.sequence[index].tag as MediaItem);
-    });
-    _interruptionSubscription = session.interruptionEventStream.listen((event) async {
+    }),
+  );
+
+  void _listenToInterruptions() async => _subscriptionList.add(
+    (await _session).interruptionEventStream.listen((AudioInterruptionEvent event) async {
       if (event.begin) {
-        switch (event.type) {
-          case AudioInterruptionType.pause:
-            await pause();
-          case AudioInterruptionType.duck:
-            await pause();
-          case AudioInterruptionType.unknown:
+        if (event.type == AudioInterruptionType.pause || event.type == AudioInterruptionType.duck) {
+          await pause();
         }
-      } else {
+      }
+      if (!event.begin && event.type == AudioInterruptionType.unknown) {
         await play();
       }
-    });
-    _noisySubscription = session.becomingNoisyEventStream.listen((_) async => resumeOnDisconnect ? null : await pause());
-    _volumeSubscription = _player.volumeStream.listen((volumeValue) async => volumeValue < 0 && pauseOnMuted ? await pause() : null);
-    _devicesChangedEventSubscription = session.devicesChangedEventStream.listen((event) async {
+    }),
+  );
+
+  /// test
+  void _listenToDevicesChanged(ProviderContainer provider) async => _subscriptionList.add(
+    (await _session).devicesChangedEventStream.listen((AudioDevicesChangedEvent event) async {
       if (event.devicesAdded.isNotEmpty) {
-        await ensureActive();
-        if (resumeOnConnection) await play();
-      } else {
-        await pause();
+        if (provider.read(playOnConnectProvider)) {
+          await ensureActive();
+          await play();
+        }
       }
-    });
+    }),
+  );
+
+  void _listenToNoisyEvents(ProviderContainer provider) async => _subscriptionList.add((await _session).becomingNoisyEventStream.listen((_) async => !provider.read(resumeAfterDisconnectProvider) ? await pause() : null));
+  // todo volume_controller 3.4.1
+  void _listenToVolume(ProviderContainer provider) => _subscriptionList.add(
+    _player.volumeStream.listen((double v) async {
+      v <= 0 && provider.read(pauseWhenMutedProvider) ? await pause() : null;
+    }),
+  );
+  void _listenToCurrentIndex() => _subscriptionList.add(_player.currentIndexStream.listen((index) => index != null && index < _player.sequence.length ? mediaItem.add(_player.sequence[index].tag as MediaItem) : null));
+
+  Future<void> restoreSession(ProviderContainer ref) async {
+    final AudioSessionState? savedAudioSession = ref.read(audioSessionManagerProvider);
+    if (savedAudioSession == null) return;
+    final List<Song> sortedSongList = await ref.read(sortedSongListProvider.future);
+    final index = sortedSongList.indexWhere((s) => s.id == savedAudioSession.songId);
+    await setPlaylist(savedAudioSession.playlistId, sortedSongList, index: index);
+    if (savedAudioSession.isPlaying) {
+      // await play();
+    }
+  }
+
+  Future<void> dispose() async {
+    await clearAudioSources();
+    await _player.dispose();
+    for (final StreamSubscription subscription in _subscriptionList) {
+      await subscription.cancel();
+    }
+    _subscriptionList.clear();
   }
 
   /// When android auto tap on song
@@ -101,10 +130,8 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   @override
   Future<void> skipToQueueItem(int index) async {
     if (_player.sequence.isEmpty || index < 0 || index >= _player.sequence.length) return;
-
     await _player.seek(Duration.zero, index: index);
     // await play();
-
     // Make sure mediaItem stream updates UI
     mediaItem.add(_player.sequence[index].tag as MediaItem);
   }
@@ -141,15 +168,58 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     // Set audio sources for Just Audio
     ///!XX
     int i = 0;
-    await _player.setAudioSources(
-      queueItems.map((MediaItem item) {
-        return AudioSource.uri(Uri.file(songList[i++].path), tag: item);
-      }).toList(),
-      initialIndex: index,
-    );
+    await _player.setAudioSources(queueItems.map((MediaItem item) => AudioSource.uri(Uri.file(songList[i++].path), tag: item)).toList(), initialIndex: index);
     await updateQueue(queueItems);
-
     // Start playback at the selected song
+    await _player.seek(Duration.zero, index: index);
+    await play();
+  }
+
+  Future<bool> ensureActive() async => _player.audioSource != null ? await (await _session).setActive(true) : false;
+
+  Future<void> clearAudioSources() async => await _player.clearAudioSources();
+
+  Stream<PositionData> get positionDataStream => Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
+    _player.positionStream,
+    _player.bufferedPositionStream,
+    _player.durationStream,
+    (position, bufferedPosition, duration) => PositionData(position, bufferedPosition, duration ?? Duration.zero),
+  );
+
+  /// _______________ Android Auto  _______________
+  Future<void> _configurePlayerAttributes() async => await _player.setAndroidAudioAttributes(const AndroidAudioAttributes(contentType: AndroidAudioContentType.music, usage: AndroidAudioUsage.media));
+
+  @override
+  Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {
+    if (parentMediaId == AudioService.browsableRootId) {
+      return [
+        const MediaItem(id: 'queue', title: 'Now Playing Queue', playable: false, extras: {'browsable': true, 'android.media.browse.CONTENT_STYLE_BROWSABLE_HINT': 1}),
+        const MediaItem(id: 'playlists', title: 'Playlists', playable: false, extras: {'browsable': true, 'android.media.browse.CONTENT_STYLE_BROWSABLE_HINT': 1}),
+      ];
+    }
+    if (parentMediaId == 'queue') {
+      return queue.value.map((item) {
+        return MediaItem(
+          id: item.id.startsWith('file:') || item.id.startsWith('content:') ? item.id : Uri.file(item.id).toString(), // ensure stable URI string
+          title: item.title,
+          album: item.album,
+          artist: item.artist,
+          artUri: item.artUri ?? (item.extras?['artPath'] != null ? Uri.file(item.extras!['artPath']) : null),
+          duration: item.duration,
+          extras: item.extras,
+        );
+      }).toList();
+    }
+    return [];
+  }
+
+  /// _______________ Controls _______________
+  @override
+  Future<void> play() async {
+    await ensureActive() ? await _player.play() : ToastManager().showErrorToast('Failed to open file');
+  }
+
+  Future<void> playSongAtIndex(int index) async {
     await _player.seek(Duration.zero, index: index);
     await play();
   }
@@ -165,43 +235,6 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     await (await _session).setActive(false);
   }
 
-  Future<bool> ensureActive() async => _player.audioSource != null ? await (await _session).setActive(true) : false;
-
-  @override
-  Future<void> play() async {
-    await ensureActive() ? await _player.play() : ToastManager().showErrorToast('Failed to open file');
-  }
-
-  Future<void> playSongAtIndex(int index) async {
-    await _player.seek(Duration.zero, index: index);
-    await play();
-  }
-
-  Future<void> clearAudioSources() async {
-    await _player.clearAudioSources();
-  }
-
-  Stream<PositionData> get positionDataStream => Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
-    _player.positionStream,
-    _player.bufferedPositionStream,
-    _player.durationStream,
-    (position, bufferedPosition, duration) => PositionData(position, bufferedPosition, duration ?? Duration.zero),
-  );
-
-  @override
-  Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {
-    // reflect modified version of app pages
-    if (parentMediaId == AudioService.browsableRootId) {
-      return [
-        const MediaItem(id: 'queue', title: 'Now Playing Queue', playable: false, extras: {'browsable': true}),
-        const MediaItem(id: 'playlists', title: 'Playlists', playable: false),
-        const MediaItem(id: 'playlists1', title: 'Playlists1', playable: false),
-      ];
-    }
-    if (parentMediaId == 'queue') return queue.value.map((item) => item.copyWith(playable: true)).toList();
-    return [];
-  }
-
   @override
   Future<void> skipToNext() async {
     await _player.seekToNext();
@@ -214,17 +247,9 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     await _player.play();
   }
 
-  Future<void> dispose() async {
-    await clearAudioSources();
-    await _player.dispose();
-    await _noisySubscription?.cancel();
-    await _interruptionSubscription?.cancel();
-    await _volumeSubscription?.cancel();
-    await _devicesChangedEventSubscription?.cancel();
-  }
-
   @override
   Future<void> seek(Duration position) => _player.seek(position);
+
   @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
     final newQueue = [...queue.value, mediaItem];

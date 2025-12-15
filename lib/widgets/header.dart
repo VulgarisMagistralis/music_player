@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:music_player/route/routes.dart';
 import 'package:music_player/utilities/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/src/rust/api/utils/sort_modes.dart';
 import 'package:music_player/utilities/sort_extensions.dart';
+import 'package:music_player/src/rust/api/utils/sort_modes.dart';
 
 class PlayerHeader extends ConsumerStatefulWidget {
   final bool showExtraButtons;
@@ -15,7 +15,7 @@ class PlayerHeader extends ConsumerStatefulWidget {
 }
 
 class _PlayerHeaderState extends ConsumerState<PlayerHeader> {
-  bool showFilterView = false;
+  bool _showFilterView = false;
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +30,11 @@ class _PlayerHeaderState extends ConsumerState<PlayerHeader> {
             if (widget.showExtraButtons)
               Row(
                 children: [
-                  // GestureDetector(onTap: () => ref.invalidate(readSongFileListProvider), child: const Icon(Icons.replay_circle_filled)),
                   const SizedBox(width: 10),
                   Transform(
                     alignment: Alignment.center,
                     transform: Matrix4.rotationY(pi),
-                    child: GestureDetector(onTap: () => setState(() => showFilterView = !showFilterView), child: const Icon(Icons.sort)),
+                    child: GestureDetector(onTap: () => setState(() => _showFilterView = !_showFilterView), child: const Icon(Icons.sort)),
                   ),
                 ],
               ),
@@ -45,7 +44,7 @@ class _PlayerHeaderState extends ConsumerState<PlayerHeader> {
           child: AnimatedSize(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            child: showFilterView
+            child: _showFilterView
                 ? Row(
                     children: [
                       const Spacer(),

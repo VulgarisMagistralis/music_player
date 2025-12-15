@@ -8,11 +8,12 @@ import 'package:music_player/utilities/file_system_entity_converter.dart';
 part 'audio_session_state.freezed.dart';
 part 'audio_session_state.g.dart';
 
-// to rust
+// todo update once playlists work
 @freezed
 abstract class AudioSessionState with _$AudioSessionState {
-  const factory AudioSessionState([
+  const factory AudioSessionState({
     @Default('songs') String playlistId,
+    BigInt? songId,
     @FileSystemEntityConverter() FileSystemEntity? file,
     String? title,
     @Default(0) int songIndexInPlaylist,
@@ -22,7 +23,7 @@ abstract class AudioSessionState with _$AudioSessionState {
     @Uint8ListBase64Converter() Uint8List? albumArt,
     @MediaItemConverter() MediaItem? asMediaItem,
     int? favouritePlaylistIndexOrNull,
-  ]) = _AudioSessionState;
+  }) = _AudioSessionState;
   factory AudioSessionState.initial() => const AudioSessionState();
   factory AudioSessionState.fromJson(Map<String, dynamic> json) => _$AudioSessionStateFromJson(json);
 }
