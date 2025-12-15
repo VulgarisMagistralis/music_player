@@ -62,7 +62,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.cenkt.music_player
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
-          track: qa
+          track: internal
           status: draft
 
       - name: Upload AAB
