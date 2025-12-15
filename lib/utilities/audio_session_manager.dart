@@ -1,49 +1,50 @@
-import 'package:just_audio/just_audio.dart';
-import 'package:music_player/data/audio_session_state.dart';
-import 'package:music_player/data/position.dart';
+import 'dart:io' show FileSystemEntity;
+import 'dart:typed_data' show Uint8List;
 import 'package:audio_service/audio_service.dart';
-import 'package:music_player/utilities/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/utilities/audio_handler.dart';
 import 'package:music_player/utilities/settings_data.dart';
-import 'package:flutter/material.dart' show WidgetsBindingObserver;
+import 'package:music_player/data/audio_session_state.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+part 'audio_session_manager.g.dart';
 
-class AudioSessionManager extends AsyncNotifier<AudioSessionState?>
-    with WidgetsBindingObserver {
-  late final PlayerAudioHandler _handler;
-  final List<UriAudioSource> _sources = [];
-  List<UriAudioSource> get queue => _sources;
-  PlayerAudioHandler get handler => _handler;
-  String get songName => state.value?.title ?? '';
+@Riverpod(keepAlive: true)
+class AudioSessionManager extends Notifier<AudioSessionState?> {
+  @override
+  AudioSessionState? build() => SharedPreferenceWithCacheHandler.instance.loadSongState();
 
-  Future<void> updateState() async {
-    final AudioSessionState? newState = AsyncData(state).value.value;
-    if (newState == null) return;
-    await SharedPreferenceWithCacheHandler.instance.saveSongState(newState);
+  Future<void> saveState() async {
+    if (state == null) return;
+    print('SAvING STATE ${state}');
+    await SharedPreferenceWithCacheHandler.instance.saveSongState(state!);
   }
 
-  Stream<PositionData> get positionStream =>
-      ref.read(audioHandlerProvider).positionDataStream;
-
-  @override
-  Future<AudioSessionState> build() async {
-    state = AsyncData(state.value ??
-        AsyncData(
-                await SharedPreferenceWithCacheHandler.instance.loadSongState())
-            .value ??
-        AudioSessionState.initial());
-    _handler = ref.read(audioHandlerProvider);
-    _handler.mediaItem.listen((MediaItem? newMediaItem) {
-      if (newMediaItem == null) return;
-      state = AsyncData(state.value!.copyWith(
-          title: newMediaItem.title, asMediaItem: newMediaItem, isReady: true));
-      SharedPreferenceWithCacheHandler.instance.saveSongState(state.value!);
-    });
-    _handler.playbackState.listen((PlaybackState playbackState) {
-      state =
-          AsyncData(state.value!.copyWith(isPlaying: playbackState.playing));
-      SharedPreferenceWithCacheHandler.instance.saveSongState(state.value!);
-    });
-    return state.value!;
+  Future<void> updateState({
+    String? playlistId,
+    BigInt? songId,
+    FileSystemEntity? file,
+    String? title,
+    int? songIndexInPlaylist,
+    bool? isPlaying,
+    bool? isReady,
+    double? playlistScrollOffset,
+    Uint8List? albumArt,
+    MediaItem? asMediaItem,
+    int? favouritePlaylistIndexOrNull,
+  }) async {
+    if (state == null) return;
+    state = state?.copyWith(
+      playlistId: playlistId ?? state!.playlistId,
+      songId: songId ?? state!.songId,
+      file: file,
+      title: title,
+      songIndexInPlaylist: songIndexInPlaylist ?? state!.songIndexInPlaylist,
+      isPlaying: isPlaying ?? state!.isPlaying,
+      isReady: isReady ?? state!.isReady,
+      playlistScrollOffset: playlistScrollOffset ?? state!.playlistScrollOffset,
+      albumArt: albumArt,
+      asMediaItem: asMediaItem,
+      favouritePlaylistIndexOrNull: favouritePlaylistIndexOrNull,
+    );
+    await saveState();
   }
 }
