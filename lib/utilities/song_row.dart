@@ -23,34 +23,36 @@ class _SongRowState extends ConsumerState<SongRow> with AutomaticKeepAliveClient
   Widget build(BuildContext context) {
     super.build(context);
     final bytes = ref.watch(albumArtProvider(widget.song.id).select((value) => value.value));
-    return Column(
-      children: [
-        Row(
-          children: [
-            SizedBox(width: 50, height: 50, child: bytes != null ? Image.memory(bytes, fit: BoxFit.cover, gaplessPlayback: true, cacheWidth: 50, cacheHeight: 50) : Image.asset('assets/icons/note_2.png', width: 50)),
-            const SizedBox(width: 10),
-            Expanded(
-              child: GestureDetector(
-                onTap: () => widget.onTap(widget.index),
-                child: AnimatedOverflowText(text: widget.song.title),
+    return SizedBox(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              SizedBox(width: 50, height: 50, child: bytes != null ? Image.memory(bytes, fit: BoxFit.cover, gaplessPlayback: true, cacheWidth: 50, cacheHeight: 50) : Image.asset('assets/icons/note_2.png', width: 50)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => widget.onTap(widget.index),
+                  child: AnimatedOverflowText(text: widget.song.title),
+                ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(
-                false
-                    // songList[index].isInFavourites
-                    ? Icons.favorite_sharp
-                    : Icons.favorite_border,
+              IconButton(
+                icon: const Icon(
+                  false
+                      // songList[index].isInFavourites
+                      ? Icons.favorite_sharp
+                      : Icons.favorite_border,
+                ),
+                onPressed: () => setState(
+                  () => null, // songList[index] =
+                  //     Song.toggleFavourite(
+                  //         songList[index])
+                ),
               ),
-              onPressed: () => setState(
-                () => null, // songList[index] =
-                //     Song.toggleFavourite(
-                //         songList[index])
-              ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

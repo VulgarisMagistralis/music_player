@@ -6,7 +6,6 @@
 import 'package:music_player/src/rust/frb_generated.dart';
 import 'package:music_player/src/rust/api/error/custom_error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'package:music_player/src/rust/api/data/song.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `borrow_decode`, `borrow_decode`, `clone`, `clone`, `decode`, `decode`, `encode`, `encode`, `fmt`, `fmt`
 
@@ -16,58 +15,55 @@ abstract class Playlist implements RustOpaqueInterface {
 
   String get name;
 
-  Uint64List get songs;
+  Uint64List get songIdList;
 
   set id(BigInt id);
 
   set name(String name);
 
-  set songs(Uint64List songs);
+  set songIdList(Uint64List songIdList);
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PlaylistCollection>>
 abstract class PlaylistCollection implements RustOpaqueInterface {
-  /// SongCollection struct
-  /// PlaylistCollection struct
-  /// PlayerState struct
   /// DB ops go through implementation and
   /// has a hashmap for fast responses
-  Future<Playlist> addPlaylist({required String name});
+  Future<Playlist> addPlaylist({required Playlist playlist});
 
-  BigInt get defaultPlaylistId;
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<void> addSong({required BigInt playlistId, required BigInt songId});
 
   Map<BigInt, Playlist> get playlistMap;
 
-  set defaultPlaylistId(BigInt defaultPlaylistId);
-
   set playlistMap(Map<BigInt, Playlist> playlistMap);
 
-  /// SongCollection struct
-  /// PlaylistCollection struct
-  /// PlayerState struct
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<void> deletePlaylist({required BigInt playlistId});
+
   /// DB ops go through implementation and
   /// has a hashmap for fast responses
   Future<List<Playlist>> getAllPlaylists();
 
-  /// SongCollection struct
-  /// PlaylistCollection struct
-  /// PlayerState struct
-  /// DB ops go through implementation and
-  /// has a hashmap for fast responses
-  Future<List<Song>> getDefaultPlaylist();
-
-  /// SongCollection struct
-  /// PlaylistCollection struct
-  /// PlayerState struct
   /// DB ops go through implementation and
   /// has a hashmap for fast responses
   Future<Playlist> getPlaylist({required BigInt playlistId});
 
-  /// SongCollection struct
-  /// PlaylistCollection struct
-  /// PlayerState struct
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
   /// DB ops go through implementation and
   /// has a hashmap for fast responses
-  factory PlaylistCollection() =>
+  static Future<PlaylistCollection> newInstance() =>
       RustLib.instance.api.crateApiDataPlaylistPlaylistCollectionNew();
+
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<void> removeSong({required BigInt playlistId, required BigInt songId});
+
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<void> renamePlaylist({
+    required BigInt playlistId,
+    required String newName,
+  });
 }

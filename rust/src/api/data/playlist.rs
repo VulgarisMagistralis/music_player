@@ -7,12 +7,11 @@ use std::collections::HashMap;
 pub struct Playlist {
     pub id: u64,
     pub name: String,
-    pub songs: Vec<u64>,
+    pub song_id_list: Vec<u64>,
 }
 
 #[derive(Serialize, Deserialize, Encode, Decode, Clone, Debug)]
 #[flutter_rust_bridge::frb(opaque)]
 pub struct PlaylistCollection {
     pub playlist_map: HashMap<u64, Playlist>,
-    pub default_playlist_id: u64,
 }

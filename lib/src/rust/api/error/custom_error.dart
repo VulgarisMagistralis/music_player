@@ -26,5 +26,6 @@ sealed class CustomError with _$CustomError implements FrbException {
   const factory CustomError.playlistCollectionError(String field0) =
       CustomError_PlaylistCollectionError;
   const factory CustomError.albumArtError() = CustomError_AlbumArtError;
+  const factory CustomError.playlistNotFound() = CustomError_PlaylistNotFound;
   const factory CustomError.unknown(String field0) = CustomError_Unknown;
 }

@@ -29,6 +29,9 @@ pub enum CustomError {
     #[error("Failed to load album art")]
     AlbumArtError,
 
+    #[error("Failed to load playlist")]
+    PlaylistNotFound,
+
     #[error("Unknown error: {0}")]
     Unknown(String),
 }
