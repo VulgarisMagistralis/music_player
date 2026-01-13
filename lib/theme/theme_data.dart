@@ -19,6 +19,7 @@ class CustomAppTheme {
     hoverColor: Colors.transparent,
     textTheme: TextTheme(
       bodyMedium: TextStyle(color: primaryTextColor, fontSize: 20),
+      bodySmall: TextStyle(color: primaryTextColor),
       labelMedium: TextStyle(color: primaryTextColor, fontSize: 20),
       headlineMedium: TextStyle(color: primaryTextColor, fontWeight: FontWeight.w700),
       displayMedium: TextStyle(color: primaryTextColor, fontWeight: FontWeight.w700),

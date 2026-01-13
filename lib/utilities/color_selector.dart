@@ -19,6 +19,7 @@ class _SelectorState extends ConsumerState<SettingColorSelector> {
   Widget build(BuildContext context) {
     final Color selectedColor = ref.watch(widget.provider);
     return ListTile(
+      contentPadding: const EdgeInsets.all(0),
       title: Text(widget.title),
       onTap: () => ColorPicker(
         pickersEnabled: const {ColorPickerType.wheel: true, ColorPickerType.accent: false, ColorPickerType.primary: false},

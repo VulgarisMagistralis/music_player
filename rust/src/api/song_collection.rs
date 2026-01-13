@@ -52,6 +52,21 @@ pub fn get_song_album_art(id: u64) -> Option<Vec<u8>> {
     song_collection.get_album_art(id)
 }
 
+#[flutter_rust_bridge::frb]
+pub fn get_song(id: u64) -> Option<Song> {
+    let song_collection = locked_song_collection();
+    song_collection.get_song(id)
+}
+
+// #[flutter_rust_bridge::frb]
+pub fn get_song_list(id_list: Vec<u64>) -> Vec<Song> {
+    let song_collection = locked_song_collection();
+    id_list
+        .into_iter()
+        .filter_map(|song_id| song_collection.get_song(song_id))
+        .collect()
+}
+
 impl SongCollection {
     pub fn new() -> Result<Self, CustomError> {
         let mut art_map: HashMap<u64, Vec<u8>> = HashMap::new();

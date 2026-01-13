@@ -8,14 +8,27 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'audio_session_manager.g.dart';
 
 @Riverpod(keepAlive: true)
-class AudioSessionManager extends Notifier<AudioSessionState?> {
+class AudioSessionManager extends Notifier<AudioSessionState> {
+  final base = AudioSessionState.initial();
   @override
-  AudioSessionState? build() => SharedPreferenceWithCacheHandler.instance.loadSongState();
+  AudioSessionState build() => SharedPreferenceWithCacheHandler.instance.loadSongState() ?? base;
 
-  Future<void> saveState() async {
-    if (state == null) return;
-    print('SAvING STATE ${state}');
-    await SharedPreferenceWithCacheHandler.instance.saveSongState(state!);
+  Future<void> saveState() async => await SharedPreferenceWithCacheHandler.instance.saveSongState(state);
+
+  void _validate(AudioSessionState s) {
+    if (s.isReady) {
+      assert(s.songId != null, 'Ready state without songId');
+      assert(s.asMediaItem != null, 'Ready state without MediaItem');
+    }
+
+    if (s.isPlaying) {
+      assert(s.file != null, 'Playing without file');
+    }
+  }
+
+  void updateFromMediaItem(MediaItem mediaItem, int index) async {
+    state = state.copyWith(songId: BigInt.parse(mediaItem.id), title: mediaItem.title, songIndexInPlaylist: index, asMediaItem: mediaItem, isReady: true);
+    await saveState();
   }
 
   Future<void> updateState({
@@ -31,20 +44,22 @@ class AudioSessionManager extends Notifier<AudioSessionState?> {
     MediaItem? asMediaItem,
     int? favouritePlaylistIndexOrNull,
   }) async {
-    if (state == null) return;
-    state = state?.copyWith(
-      playlistId: playlistId ?? state!.playlistId,
-      songId: songId ?? state!.songId,
+    final nextState = base.copyWith(
+      playlistId: playlistId ?? base.playlistId,
+      songId: songId ?? base.songId,
       file: file,
       title: title,
-      songIndexInPlaylist: songIndexInPlaylist ?? state!.songIndexInPlaylist,
-      isPlaying: isPlaying ?? state!.isPlaying,
-      isReady: isReady ?? state!.isReady,
-      playlistScrollOffset: playlistScrollOffset ?? state!.playlistScrollOffset,
+      songIndexInPlaylist: songIndexInPlaylist ?? base.songIndexInPlaylist,
+      isPlaying: isPlaying ?? base.isPlaying,
+      isReady: isReady ?? base.isReady,
+      playlistScrollOffset: playlistScrollOffset ?? base.playlistScrollOffset,
       albumArt: albumArt,
       asMediaItem: asMediaItem,
       favouritePlaylistIndexOrNull: favouritePlaylistIndexOrNull,
     );
+
+    _validate(nextState);
+    state = nextState;
     await saveState();
   }
 }

@@ -15,8 +15,8 @@ Future<Playlist> addPlaylistToCollection({required String name}) => RustLib
     .api
     .crateApiPlaylistCollectionAddPlaylistToCollection(name: name);
 
-Future<List<Playlist>> getAllPlaylists() =>
-    RustLib.instance.api.crateApiPlaylistCollectionGetAllPlaylists();
+Future<List<Playlist>> getAllPlaylistsFromCollection() => RustLib.instance.api
+    .crateApiPlaylistCollectionGetAllPlaylistsFromCollection();
 
 Future<void> removeSongFromPlaylist({
   required BigInt songId,

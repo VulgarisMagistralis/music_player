@@ -19,24 +19,25 @@ class SongCard extends ConsumerStatefulWidget {
 class _SongCardState extends ConsumerState<SongCard> {
   @override
   Widget build(BuildContext context) {
-    final audioHandler = ref.read(audioHandlerProvider);
+    final audioHandler = ref.watch(audioHandlerProvider);
     final AudioSessionState? audioState = ref.watch(audioSessionManagerProvider);
     return audioState == null
         ? const SizedBox.shrink()
         : Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              const Divider(),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (audioState.albumArt?.isNotEmpty ?? false) SizedBox(width: 35, height: 35, child: Image.memory(audioState.albumArt!, fit: BoxFit.cover)),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 3),
                   Expanded(child: AnimatedOverflowText(text: audioState.title ?? '')),
                 ],
               ),
               StreamBuilder<PlayerState>(stream: audioHandler.playerStateStream, builder: (_, __) => const ControlButtons()),
               Padding(
-                padding: const EdgeInsets.all(5),
+                padding: const EdgeInsets.all(1),
                 child: StreamBuilder<PositionData>(
                   stream: audioHandler.positionDataStream,
                   builder: (_, snapshot) => SeekBar(
@@ -47,6 +48,7 @@ class _SongCardState extends ConsumerState<SongCard> {
                   ),
                 ),
               ),
+              const Divider(),
             ],
           );
   }

@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show compute;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/src/rust/api/playlist_collection.dart';
 import 'package:music_player/utilities/audio_handler.dart';
 import 'package:music_player/utilities/image_resize.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -51,13 +51,23 @@ Future<List<Song>> sortedSongList(Ref ref) async {
   return getSortedSongs(sort: sortBy);
 }
 
-final Provider<PlayerAudioHandler> audioHandlerProvider = Provider<PlayerAudioHandler>((ref) => PlayerAudioHandler());
+@Riverpod(keepAlive: true)
+PlayerAudioHandler audioHandler(Ref ref) => PlayerAudioHandler();
 
 @Riverpod(keepAlive: true)
 Future<List<String>> getSavedFolderList(Ref ref) => LowLevelFolderDataSource().loadFolders();
 
 @Riverpod(keepAlive: true)
-PlaylistCollection playlistCollection(Ref ref) => PlaylistCollection();
+Future<List<Playlist>> playlistCollection(Ref ref) async => await getAllPlaylistsFromCollection();
+
+@Riverpod(keepAlive: true)
+Future<void> deletePlaylistFromCollection(Ref ref, {required BigInt playlistId}) async => await deletePlaylist(playlistId: playlistId);
+
+@Riverpod(keepAlive: false)
+Future<Playlist> addPlaylist(Ref ref, {required String newPlaylistName}) async => await addPlaylistToCollection(name: newPlaylistName);
+
+@Riverpod(keepAlive: true)
+Future<List<Song>> getPlaylistSongs(Ref ref, {required Playlist playlist}) async => await getSongList(idList: playlist.songIdList);
 
 @Riverpod(keepAlive: true)
 class PlaylistSortedBy extends _$PlaylistSortedBy {

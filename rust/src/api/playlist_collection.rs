@@ -36,7 +36,7 @@ pub fn add_playlist_to_collection(name: String) -> Result<Playlist, CustomError>
 }
 
 #[flutter_rust_bridge::frb]
-pub fn get_all_playlists() -> Vec<Playlist> {
+pub fn get_all_playlists_from_collection() -> Vec<Playlist> {
     let playlist_collection = locked_playlist_collection();
     playlist_collection.get_all_playlists()
 }
