@@ -58,7 +58,7 @@ pub fn get_song(id: u64) -> Option<Song> {
     song_collection.get_song(id)
 }
 
-// #[flutter_rust_bridge::frb]
+#[flutter_rust_bridge::frb]
 pub fn get_song_list(id_list: Vec<u64>) -> Vec<Song> {
     let song_collection = locked_song_collection();
     id_list

@@ -151,7 +151,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   ],
                 ),
               ),
-              const SongCard(),
+              const NowPlaying(),
             ],
           ),
         ),

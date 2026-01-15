@@ -46,3 +46,19 @@ Future<void> renamePlaylist({
   playlistId: playlistId,
   newName: newName,
 );
+
+Future<bool> isInFavourites({required BigInt songId}) => RustLib.instance.api
+    .crateApiPlaylistCollectionIsInFavourites(songId: songId);
+
+Future<void> addSongToFavourites({required BigInt songId}) => RustLib
+    .instance
+    .api
+    .crateApiPlaylistCollectionAddSongToFavourites(songId: songId);
+
+Future<void> removeSongFromFavourites({required BigInt songId}) => RustLib
+    .instance
+    .api
+    .crateApiPlaylistCollectionRemoveSongFromFavourites(songId: songId);
+
+Future<Playlist> getFavouritesFromCollection() => RustLib.instance.api
+    .crateApiPlaylistCollectionGetFavouritesFromCollection();

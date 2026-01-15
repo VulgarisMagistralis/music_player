@@ -34,7 +34,19 @@ abstract class PlaylistCollection implements RustOpaqueInterface {
   /// has a hashmap for fast responses
   Future<void> addSong({required BigInt playlistId, required BigInt songId});
 
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<void> addToFavourites({required BigInt songId});
+
+  Set<BigInt> get favouritesCache;
+
+  BigInt get favouritesPlaylistId;
+
   Map<BigInt, Playlist> get playlistMap;
+
+  set favouritesCache(Set<BigInt> favouritesCache);
+
+  set favouritesPlaylistId(BigInt favouritesPlaylistId);
 
   set playlistMap(Map<BigInt, Playlist> playlistMap);
 
@@ -44,17 +56,29 @@ abstract class PlaylistCollection implements RustOpaqueInterface {
 
   /// DB ops go through implementation and
   /// has a hashmap for fast responses
+  Future<Playlist> favourites();
+
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
   Future<List<Playlist>> getAllPlaylists();
 
   /// DB ops go through implementation and
   /// has a hashmap for fast responses
   Future<Playlist> getPlaylist({required BigInt playlistId});
 
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<bool> isFavourite({required BigInt songId});
+
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
   /// DB ops go through implementation and
   /// has a hashmap for fast responses
   static Future<PlaylistCollection> newInstance() =>
       RustLib.instance.api.crateApiDataPlaylistPlaylistCollectionNew();
+
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<void> removeFromFavourites({required BigInt songId});
 
   /// DB ops go through implementation and
   /// has a hashmap for fast responses

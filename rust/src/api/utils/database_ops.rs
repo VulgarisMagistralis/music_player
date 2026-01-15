@@ -102,14 +102,16 @@ pub(crate) fn get_song_art_from_db(id: u64) -> Result<Option<Vec<u8>>, CustomErr
 }
 
 pub(crate) fn save_playlist_to_db(playlist: Playlist) -> Result<Option<IVec>, CustomError> {
-    Ok(get_playlist_tree()
+    let added = get_playlist_tree()
         .map_err(|e| CustomError::TreeError(e.to_string()))?
         .insert(
             playlist_key(playlist.id),
             encode_to_vec(&playlist, ENCODING_CONFIGURATION)
                 .map_err(|_| CustomError::EncodeError)?,
         )
-        .map_err(|e| CustomError::DbError(e.to_string()))?)
+        .map_err(|e| CustomError::DbError(e.to_string()))?;
+    info!("adding playlist: {}", playlist.id);
+    Ok(added)
 }
 
 pub(crate) fn get_playlist_from_db(playlist_id: u64) -> Result<Playlist, CustomError> {
@@ -154,10 +156,14 @@ pub(crate) fn update_playlist_name_in_db(
 }
 
 pub(crate) fn delete_playlist_from_db(playlist_id: u64) -> Result<(), CustomError> {
-    get_playlist_tree()
+    let removed = get_playlist_tree()
         .map_err(|e| CustomError::TreeError(e.to_string()))?
         .remove(playlist_key(playlist_id))
         .map_err(|e| CustomError::DbError(e.to_string()))?;
+    info!("removing playlist: {}", playlist_id);
+    if removed.is_none() {
+        return Err(CustomError::PlaylistNotFound);
+    }
     Ok(())
 }
 

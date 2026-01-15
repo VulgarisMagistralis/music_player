@@ -1,6 +1,6 @@
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 ///todo add last sort by
 #[derive(Serialize, Deserialize, Encode, Decode, Clone, Debug)]
 #[flutter_rust_bridge::frb(opaque)]
@@ -14,4 +14,6 @@ pub struct Playlist {
 #[flutter_rust_bridge::frb(opaque)]
 pub struct PlaylistCollection {
     pub playlist_map: HashMap<u64, Playlist>,
+    pub favourites_playlist_id: u64,
+    pub favourites_cache: HashSet<u64>,
 }

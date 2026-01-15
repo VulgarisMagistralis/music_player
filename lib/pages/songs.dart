@@ -92,7 +92,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                                     ),
                                   ),
                                 ),
-                                const SongCard(),
+                                const NowPlaying(),
                               ],
                             ),
                           ),

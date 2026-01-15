@@ -133,7 +133,7 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
                   ),
                 },
               ),
-              _isKeyboardVisible ? const SizedBox.shrink() : const SongCard(),
+              _isKeyboardVisible ? const SizedBox.shrink() : const NowPlaying(),
 
               /// if playlist id open it otherwise list all
             ],

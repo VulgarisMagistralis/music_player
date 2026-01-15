@@ -1,18 +1,20 @@
 import 'dart:async' show Timer;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/src/rust/api/data/playlist.dart';
+import 'package:music_player/utilities/providers.dart';
+import 'package:music_player/widgets/album_art_widget.dart';
 import 'package:music_player/data/audio_session_state.dart';
+import 'package:music_player/widgets/favourites_button.dart';
 import 'package:music_player/common/animated_overflow_text.dart';
 import 'package:music_player/utilities/audio_session_manager.dart';
 import 'package:music_player/src/rust/api/data/song.dart' show Song;
-import 'package:music_player/utilities/providers.dart' show albumArtProvider;
 
 class SongRow extends ConsumerStatefulWidget {
   final Song song;
   final int index;
-  final bool isCompact;
   final void Function(int index) onTap;
-  const SongRow({super.key, required this.song, required this.index, required this.onTap, this.isCompact = false});
+  const SongRow({super.key, required this.song, required this.index, required this.onTap});
 
   @override
   ConsumerState<SongRow> createState() => _SongRowState();
@@ -26,7 +28,6 @@ class _SongRowState extends ConsumerState<SongRow> with AutomaticKeepAliveClient
   Widget build(BuildContext context) {
     super.build(context);
     final AudioSessionState? audioState = ref.watch(audioSessionManagerProvider);
-    final bytes = ref.watch(albumArtProvider(widget.song.id).select((value) => value.value));
     return SizedBox(
       child: Column(
         children: [
@@ -42,7 +43,20 @@ class _SongRowState extends ConsumerState<SongRow> with AutomaticKeepAliveClient
                   positionBuilder: (context, constraints) => RelativeRect.fromLTRB(position.dx, position.dy, position.dx, position.dy),
                   context: context,
                   items: [
-                    const PopupMenuItem(value: 1, child: Text('Add to playlist')),
+                    PopupMenuItem(
+                      value: 1,
+                      child: Text('Add to playlist'),
+                      onTap: () async {
+                        final List<Playlist> a = await ref.read(playlistCollectionProvider.future);
+                        if (context.mounted) {
+                          showMenu(
+                            context: context,
+                            items: a.map((e) => PopupMenuItem(child: Text(e.name))).toList(),
+                            positionBuilder: (context, constraints) => RelativeRect.fromLTRB(position.dx, position.dy, position.dx, position.dy),
+                          );
+                        }
+                      },
+                    ),
                     const PopupMenuItem(value: 2, child: Text('Ignore song')),
                     const PopupMenuItem(value: 3, child: Text('Details')),
                   ],
@@ -53,7 +67,7 @@ class _SongRowState extends ConsumerState<SongRow> with AutomaticKeepAliveClient
             onTapCancel: () => _longPressTimer?.cancel(),
             child: Row(
               children: [
-                SizedBox(width: 50, height: 50, child: bytes != null ? Image.memory(bytes, fit: BoxFit.cover, gaplessPlayback: true, cacheWidth: 50, cacheHeight: 50) : Image.asset('assets/icons/note_2.png', width: 50)),
+                AlbumArtWidget(songId: widget.song.id, width: 50),
                 const SizedBox(width: 10),
                 Expanded(
                   child: audioState?.songId == widget.song.id
@@ -63,19 +77,7 @@ class _SongRowState extends ConsumerState<SongRow> with AutomaticKeepAliveClient
                         )
                       : AnimatedOverflowText(text: widget.song.title),
                 ),
-                IconButton(
-                  icon: const Icon(
-                    false
-                        // songList[index].isInFavourites
-                        ? Icons.favorite_sharp
-                        : Icons.favorite_border,
-                  ),
-                  onPressed: () => setState(
-                    () => null, // songList[index] =
-                    //     Song.toggleFavourite(
-                    //         songList[index])
-                  ),
-                ),
+                FavouritesButton(songId: widget.song.id),
               ],
             ),
           ),
