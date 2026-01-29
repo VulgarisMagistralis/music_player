@@ -140,6 +140,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     /// Ignore media less than X seconds
                     /// toggle persistent player across pages
                     /// confirm deletion of playlists
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         const Text('Version'),

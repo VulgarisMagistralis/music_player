@@ -83,6 +83,12 @@ Future<void> addSongToFavouritesPlaylist(Ref ref, {required BigInt songId}) asyn
 Future<void> removeSongFromFavouritesPlaylist(Ref ref, {required BigInt songId}) async => await removeSongFromFavourites(songId: songId);
 
 @Riverpod(keepAlive: false)
+Future<void> addSongToTargetPlaylist(Ref ref, {required BigInt playlistId, required BigInt songId}) async => await addSongToPlaylist(playlistId: playlistId, songId: songId);
+
+@Riverpod(keepAlive: false)
+Future<void> removeSongFromTargetPlaylist(Ref ref, {required BigInt playlistId, required BigInt songId}) async => await removeSongFromPlaylist(playlistId: playlistId, songId: songId);
+
+@Riverpod(keepAlive: false)
 Future<Song?> getSongOrNull(Ref ref, {required BigInt? songId}) async => songId == null ? null : await getSong(id: songId);
 
 @Riverpod(keepAlive: false)

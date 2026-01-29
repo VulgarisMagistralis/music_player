@@ -9,7 +9,7 @@ use log::error;
 use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard, OnceLock};
 static PLAYLIST_COLLECTION: OnceLock<Mutex<PlaylistCollection>> = OnceLock::new();
-
+const FAVOURITES_ID: u64 = 0;
 pub(crate) fn locked_playlist_collection() -> MutexGuard<'static, PlaylistCollection> {
     match PLAYLIST_COLLECTION
         .get_or_init(|| Mutex::new(PlaylistCollection::new().expect("playlist init")))
@@ -97,33 +97,31 @@ impl PlaylistCollection {
             CustomError::PlaylistCollectionError("Failed to fetch playlists".into())
         })?;
 
-        let favourites_playlist_id =
-            if let Some(p) = playlists.iter().find(|p| p.name == "favourites") {
-                p.id
-            } else {
-                let id = next_playlist_id()?;
-                let favourites = Playlist {
-                    id,
-                    name: "favourites".into(),
-                    song_id_list: vec![],
-                };
-                save_playlist_to_db(favourites.clone())?;
-                playlists.push(favourites);
-                id
+        if let Some(p) = playlists.iter().find(|p| p.name == "favourites") {
+            p.id
+        } else {
+            let favourites = Playlist {
+                id: FAVOURITES_ID,
+                name: "favourites".into(),
+                song_id_list: vec![],
             };
+            save_playlist_to_db(favourites.clone())?;
+            playlists.push(favourites);
+            FAVOURITES_ID
+        };
 
         let playlist_map: HashMap<u64, Playlist> =
             playlists.into_iter().map(|p| (p.id, p)).collect();
 
         let favourites_cache = playlist_map
-            .get(&favourites_playlist_id)
+            .get(&FAVOURITES_ID)
             .map(|p| p.song_id_list.iter().copied().collect())
             .unwrap_or_default();
 
         Ok(Self {
             playlist_map,
             favourites_cache,
-            favourites_playlist_id,
+            favourites_playlist_id: FAVOURITES_ID,
         })
     }
 

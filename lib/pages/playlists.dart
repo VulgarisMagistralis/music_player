@@ -20,7 +20,7 @@ class PlaylistPage extends ConsumerStatefulWidget {
 }
 
 class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBindingObserver {
-  String placeholderPlaylistName = 'New Playlist';
+  String placeholderPlaylistName = 'New Playlist Name';
   bool _isKeyboardVisible = false;
 
   @override
@@ -109,19 +109,22 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
                             ExpansionTile(
                               title: const Text('Create Playlist'),
                               children: [
-                                TextField(
-                                  onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
-                                  decoration: InputDecoration(border: const OutlineInputBorder(), hintText: placeholderPlaylistName),
-                                  onSubmitted: (newPlaylistName) async {
-                                    if (newPlaylistName.isEmpty) return;
-                                    try {
-                                      await ref.read(addPlaylistProvider(newPlaylistName: newPlaylistName).future);
-                                      ToastManager().showInfoToast('Created $newPlaylistName');
-                                    } catch (e) {
-                                      ToastManager().showErrorToast('Failed to create $newPlaylistName');
-                                    }
-                                    ref.invalidate(playlistCollectionProvider);
-                                  },
+                                Padding(
+                                  padding: const EdgeInsetsGeometry.only(right: 15),
+                                  child: TextField(
+                                    onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                                    decoration: InputDecoration(hintText: placeholderPlaylistName),
+                                    onSubmitted: (newPlaylistName) async {
+                                      if (newPlaylistName.isEmpty) newPlaylistName = placeholderPlaylistName;
+                                      try {
+                                        await ref.read(addPlaylistProvider(newPlaylistName: newPlaylistName).future);
+                                        ToastManager().showInfoToast('Created $newPlaylistName');
+                                      } catch (e) {
+                                        ToastManager().showErrorToast('Failed to create $newPlaylistName');
+                                      }
+                                      ref.invalidate(playlistCollectionProvider);
+                                    },
+                                  ),
                                 ),
                               ],
                             ),

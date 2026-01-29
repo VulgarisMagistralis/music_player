@@ -8,16 +8,17 @@ import 'package:music_player/common/common.dart' show HiddenThumbComponentShape;
 ///Headers, default text, subtitles
 ///
 class CustomAppTheme {
-  final Color? primaryTextColor;
-  final Color? accentColor;
-  final Color? mainBackgroundColor;
-  CustomAppTheme({this.mainBackgroundColor, this.primaryTextColor, this.accentColor});
+  final Color primaryTextColor;
+  final Color accentColor;
+  final Color mainBackgroundColor;
+  CustomAppTheme({required this.mainBackgroundColor, required this.primaryTextColor, required this.accentColor});
   ThemeData get materialTheme => ThemeData(
-    colorScheme: primaryTextColor == null ? null : ColorScheme.fromSeed(seedColor: primaryTextColor!, secondary: accentColor),
+    colorScheme: ColorScheme.fromSeed(seedColor: primaryTextColor, secondary: accentColor),
     highlightColor: Colors.transparent,
     splashColor: Colors.transparent,
     hoverColor: Colors.transparent,
     textTheme: TextTheme(
+      bodyLarge: TextStyle(color: accentColor),
       bodyMedium: TextStyle(color: primaryTextColor, fontSize: 20),
       bodySmall: TextStyle(color: primaryTextColor),
       labelMedium: TextStyle(color: primaryTextColor, fontSize: 20),
@@ -56,6 +57,11 @@ class CustomAppTheme {
       trackOutlineColor: WidgetStateProperty<Color?>.fromMap(<WidgetStatesConstraint, Color?>{WidgetState.any: accentColor}),
       trackColor: WidgetStateProperty<Color?>.fromMap(<WidgetStatesConstraint, Color?>{WidgetState.any: mainBackgroundColor}),
       thumbColor: WidgetStateProperty<Color?>.fromMap(<WidgetStatesConstraint, Color?>{WidgetState.any: primaryTextColor}),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      hintStyle: TextStyle(color: Colors.grey.shade500),
+      border: const UnderlineInputBorder(borderSide: BorderSide.none),
+      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: primaryTextColor)),
     ),
   );
 }

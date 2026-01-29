@@ -1,6 +1,7 @@
 import 'dart:async' show Timer;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/common/toast.dart';
 import 'package:music_player/src/rust/api/data/playlist.dart';
 import 'package:music_player/utilities/providers.dart';
 import 'package:music_player/widgets/album_art_widget.dart';
@@ -45,13 +46,28 @@ class _SongRowState extends ConsumerState<SongRow> with AutomaticKeepAliveClient
                   items: [
                     PopupMenuItem(
                       value: 1,
-                      child: Text('Add to playlist'),
+                      child: const Text('Add to playlist'),
                       onTap: () async {
-                        final List<Playlist> a = await ref.read(playlistCollectionProvider.future);
+                        final List<Playlist> playlists = await ref.read(playlistCollectionProvider.future);
                         if (context.mounted) {
                           showMenu(
                             context: context,
-                            items: a.map((e) => PopupMenuItem(child: Text(e.name))).toList(),
+                            items: playlists
+                                .map(
+                                  (playlist) => PopupMenuItem(
+                                    child: Text(playlist.name),
+                                    onTap: () async {
+                                      try {
+                                        await ref.read(addSongToTargetPlaylistProvider(songId: widget.song.id, playlistId: playlist.id).future);
+                                        ToastManager().showInfoToast('Added to ${playlist.name}');
+                                      } catch (e) {
+                                        ToastManager().showErrorToast('Failed to add song to ${playlist.name}');
+                                      }
+                                      ref.invalidate(playlistCollectionProvider);
+                                    },
+                                  ),
+                                )
+                                .toList(),
                             positionBuilder: (context, constraints) => RelativeRect.fromLTRB(position.dx, position.dy, position.dx, position.dy),
                           );
                         }
