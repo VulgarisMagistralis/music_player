@@ -16,7 +16,7 @@ jobs:
       - name: Install FVM
         run: |
           curl -fsSL https://fvm.app/install.sh | bash
-          echo "$HOME/fvm/default/bin" >> $GITHUB_PATH
+          echo "$HOME/fvm/bin" >> $GITHUB_PATH
 
       - name: Install Flutter SDK via FVM
         run: |
