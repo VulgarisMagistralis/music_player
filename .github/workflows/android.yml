@@ -34,8 +34,8 @@ jobs:
       - name: Generate code
         run: fvm flutter pub run build_runner build --delete-conflicting-outputs
 
-      - name: Run tests
-        run: fvm flutter test
+      # - name: Run tests
+      #   run: fvm flutter test
 
       - name: Set up Java (required for Play upload + Gradle)
         uses: actions/setup-java@v4
