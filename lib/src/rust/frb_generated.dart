@@ -9,6 +9,7 @@ import 'package:music_player/src/rust/api/data/song.dart';
 import 'package:music_player/src/rust/api/data/stream_event.dart';
 import 'package:music_player/src/rust/api/error/custom_error.dart';
 import 'package:music_player/src/rust/api/music_folder.dart';
+import 'package:music_player/src/rust/api/playlist_collection.dart';
 import 'package:music_player/src/rust/api/process_music.dart';
 import 'package:music_player/src/rust/api/song_collection.dart';
 import 'package:music_player/src/rust/api/utils/logger.dart';
@@ -75,7 +76,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 1031325408;
+  int get rustContentHash => 1239713164;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -106,11 +107,27 @@ abstract class RustLibApi extends BaseApi {
 
   Future<Playlist> crateApiDataPlaylistPlaylistCollectionAddPlaylist({
     required PlaylistCollection that,
-    required String name,
+    required Playlist playlist,
+  });
+
+  Future<void> crateApiDataPlaylistPlaylistCollectionAddSong({
+    required PlaylistCollection that,
+    required BigInt playlistId,
+    required BigInt songId,
+  });
+
+  Future<void> crateApiDataPlaylistPlaylistCollectionAddToFavourites({
+    required PlaylistCollection that,
+    required BigInt songId,
+  });
+
+  Set<BigInt>
+  crateApiDataPlaylistPlaylistCollectionAutoAccessorGetFavouritesCache({
+    required PlaylistCollection that,
   });
 
   BigInt
-  crateApiDataPlaylistPlaylistCollectionAutoAccessorGetDefaultPlaylistId({
+  crateApiDataPlaylistPlaylistCollectionAutoAccessorGetFavouritesPlaylistId({
     required PlaylistCollection that,
   });
 
@@ -119,9 +136,15 @@ abstract class RustLibApi extends BaseApi {
     required PlaylistCollection that,
   });
 
-  void crateApiDataPlaylistPlaylistCollectionAutoAccessorSetDefaultPlaylistId({
+  void crateApiDataPlaylistPlaylistCollectionAutoAccessorSetFavouritesCache({
     required PlaylistCollection that,
-    required BigInt defaultPlaylistId,
+    required Set<BigInt> favouritesCache,
+  });
+
+  void
+  crateApiDataPlaylistPlaylistCollectionAutoAccessorSetFavouritesPlaylistId({
+    required PlaylistCollection that,
+    required BigInt favouritesPlaylistId,
   });
 
   void crateApiDataPlaylistPlaylistCollectionAutoAccessorSetPlaylistMap({
@@ -129,11 +152,16 @@ abstract class RustLibApi extends BaseApi {
     required Map<BigInt, Playlist> playlistMap,
   });
 
-  Future<List<Playlist>> crateApiDataPlaylistPlaylistCollectionGetAllPlaylists({
+  Future<void> crateApiDataPlaylistPlaylistCollectionDeletePlaylist({
+    required PlaylistCollection that,
+    required BigInt playlistId,
+  });
+
+  Future<Playlist> crateApiDataPlaylistPlaylistCollectionFavourites({
     required PlaylistCollection that,
   });
 
-  Future<List<Song>> crateApiDataPlaylistPlaylistCollectionGetDefaultPlaylist({
+  Future<List<Playlist>> crateApiDataPlaylistPlaylistCollectionGetAllPlaylists({
     required PlaylistCollection that,
   });
 
@@ -142,7 +170,29 @@ abstract class RustLibApi extends BaseApi {
     required BigInt playlistId,
   });
 
-  PlaylistCollection crateApiDataPlaylistPlaylistCollectionNew();
+  Future<bool> crateApiDataPlaylistPlaylistCollectionIsFavourite({
+    required PlaylistCollection that,
+    required BigInt songId,
+  });
+
+  Future<PlaylistCollection> crateApiDataPlaylistPlaylistCollectionNew();
+
+  Future<void> crateApiDataPlaylistPlaylistCollectionRemoveFromFavourites({
+    required PlaylistCollection that,
+    required BigInt songId,
+  });
+
+  Future<void> crateApiDataPlaylistPlaylistCollectionRemoveSong({
+    required PlaylistCollection that,
+    required BigInt playlistId,
+    required BigInt songId,
+  });
+
+  Future<void> crateApiDataPlaylistPlaylistCollectionRenamePlaylist({
+    required PlaylistCollection that,
+    required BigInt playlistId,
+    required String newName,
+  });
 
   BigInt crateApiDataPlaylistPlaylistAutoAccessorGetId({
     required Playlist that,
@@ -152,7 +202,7 @@ abstract class RustLibApi extends BaseApi {
     required Playlist that,
   });
 
-  Uint64List crateApiDataPlaylistPlaylistAutoAccessorGetSongs({
+  Uint64List crateApiDataPlaylistPlaylistAutoAccessorGetSongIdList({
     required Playlist that,
   });
 
@@ -166,9 +216,9 @@ abstract class RustLibApi extends BaseApi {
     required String name,
   });
 
-  void crateApiDataPlaylistPlaylistAutoAccessorSetSongs({
+  void crateApiDataPlaylistPlaylistAutoAccessorSetSongIdList({
     required Playlist that,
-    required Uint64List songs,
+    required Uint64List songIdList,
   });
 
   Future<void> crateApiDataSongSongCollectionAddSong({
@@ -220,21 +270,49 @@ abstract class RustLibApi extends BaseApi {
     required BigInt id,
   });
 
+  Future<Playlist> crateApiPlaylistCollectionAddPlaylistToCollection({
+    required String name,
+  });
+
   Future<void> crateApiSongCollectionAddSongToCollection({
     required Song song,
     Uint8List? art,
+  });
+
+  Future<void> crateApiPlaylistCollectionAddSongToFavourites({
+    required BigInt songId,
+  });
+
+  Future<void> crateApiPlaylistCollectionAddSongToPlaylist({
+    required BigInt songId,
+    required BigInt playlistId,
   });
 
   Future<void> crateApiMusicFolderDeleteMusicFolderList({
     required String folder,
   });
 
+  Future<void> crateApiPlaylistCollectionDeletePlaylist({
+    required BigInt playlistId,
+  });
+
+  Future<List<Playlist>>
+  crateApiPlaylistCollectionGetAllPlaylistsFromCollection();
+
   Future<List<Song>> crateApiSongCollectionGetAllSongsFromCollection();
+
+  Future<Playlist> crateApiPlaylistCollectionGetFavouritesFromCollection();
 
   Future<List<String>> crateApiMusicFolderGetMusicFolderList();
 
+  Future<Song?> crateApiSongCollectionGetSong({required BigInt id});
+
   Future<Uint8List?> crateApiSongCollectionGetSongAlbumArt({
     required BigInt id,
+  });
+
+  Future<List<Song>> crateApiSongCollectionGetSongList({
+    required Uint64List idList,
   });
 
   Future<List<Song>> crateApiSongCollectionGetSortedSongs({
@@ -245,7 +323,25 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiUtilsLoggerInitRustLogger();
 
+  Future<bool> crateApiPlaylistCollectionIsInFavourites({
+    required BigInt songId,
+  });
+
   Stream<StreamEvent> crateApiProcessMusicReadMusicFiles();
+
+  Future<void> crateApiPlaylistCollectionRemoveSongFromFavourites({
+    required BigInt songId,
+  });
+
+  Future<void> crateApiPlaylistCollectionRemoveSongFromPlaylist({
+    required BigInt songId,
+    required BigInt playlistId,
+  });
+
+  Future<void> crateApiPlaylistCollectionRenamePlaylist({
+    required BigInt playlistId,
+    required String newName,
+  });
 
   Future<void> crateApiMusicFolderSaveMusicFolderList({
     required List<String> folders,
@@ -442,7 +538,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<Playlist> crateApiDataPlaylistPlaylistCollectionAddPlaylist({
     required PlaylistCollection that,
-    required String name,
+    required Playlist playlist,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -452,7 +548,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          sse_encode_String(name, serializer);
+          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylist(
+            playlist,
+            serializer,
+          );
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -466,7 +565,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_custom_error,
         ),
         constMeta: kCrateApiDataPlaylistPlaylistCollectionAddPlaylistConstMeta,
-        argValues: [that, name],
+        argValues: [that, playlist],
         apiImpl: this,
       ),
     );
@@ -476,12 +575,92 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   get kCrateApiDataPlaylistPlaylistCollectionAddPlaylistConstMeta =>
       const TaskConstMeta(
         debugName: 'PlaylistCollection_add_playlist',
-        argNames: ['that', 'name'],
+        argNames: ['that', 'playlist'],
       );
 
   @override
-  BigInt
-  crateApiDataPlaylistPlaylistCollectionAutoAccessorGetDefaultPlaylistId({
+  Future<void> crateApiDataPlaylistPlaylistCollectionAddSong({
+    required PlaylistCollection that,
+    required BigInt playlistId,
+    required BigInt songId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
+            that,
+            serializer,
+          );
+          sse_encode_u_64(playlistId, serializer);
+          sse_encode_u_64(songId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_custom_error,
+        ),
+        constMeta: kCrateApiDataPlaylistPlaylistCollectionAddSongConstMeta,
+        argValues: [that, playlistId, songId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDataPlaylistPlaylistCollectionAddSongConstMeta =>
+      const TaskConstMeta(
+        debugName: 'PlaylistCollection_add_song',
+        argNames: ['that', 'playlistId', 'songId'],
+      );
+
+  @override
+  Future<void> crateApiDataPlaylistPlaylistCollectionAddToFavourites({
+    required PlaylistCollection that,
+    required BigInt songId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
+            that,
+            serializer,
+          );
+          sse_encode_u_64(songId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 7,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_custom_error,
+        ),
+        constMeta:
+            kCrateApiDataPlaylistPlaylistCollectionAddToFavouritesConstMeta,
+        argValues: [that, songId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiDataPlaylistPlaylistCollectionAddToFavouritesConstMeta =>
+      const TaskConstMeta(
+        debugName: 'PlaylistCollection_add_to_favourites',
+        argNames: ['that', 'songId'],
+      );
+
+  @override
+  Set<BigInt>
+  crateApiDataPlaylistPlaylistCollectionAutoAccessorGetFavouritesCache({
     required PlaylistCollection that,
   }) {
     return handler.executeSync(
@@ -492,14 +671,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_u_64,
+          decodeSuccessData: sse_decode_Set_u_64_None,
           decodeErrorData: null,
         ),
         constMeta:
-            kCrateApiDataPlaylistPlaylistCollectionAutoAccessorGetDefaultPlaylistIdConstMeta,
+            kCrateApiDataPlaylistPlaylistCollectionAutoAccessorGetFavouritesCacheConstMeta,
         argValues: [that],
         apiImpl: this,
       ),
@@ -507,9 +686,44 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta
-  get kCrateApiDataPlaylistPlaylistCollectionAutoAccessorGetDefaultPlaylistIdConstMeta =>
+  get kCrateApiDataPlaylistPlaylistCollectionAutoAccessorGetFavouritesCacheConstMeta =>
       const TaskConstMeta(
-        debugName: 'PlaylistCollection_auto_accessor_get_default_playlist_id',
+        debugName: 'PlaylistCollection_auto_accessor_get_favourites_cache',
+        argNames: ['that'],
+      );
+
+  @override
+  BigInt
+  crateApiDataPlaylistPlaylistCollectionAutoAccessorGetFavouritesPlaylistId({
+    required PlaylistCollection that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_u_64,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDataPlaylistPlaylistCollectionAutoAccessorGetFavouritesPlaylistIdConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiDataPlaylistPlaylistCollectionAutoAccessorGetFavouritesPlaylistIdConstMeta =>
+      const TaskConstMeta(
+        debugName:
+            'PlaylistCollection_auto_accessor_get_favourites_playlist_id',
         argNames: ['that'],
       );
 
@@ -526,7 +740,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -549,9 +763,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiDataPlaylistPlaylistCollectionAutoAccessorSetDefaultPlaylistId({
+  void crateApiDataPlaylistPlaylistCollectionAutoAccessorSetFavouritesCache({
     required PlaylistCollection that,
-    required BigInt defaultPlaylistId,
+    required Set<BigInt> favouritesCache,
   }) {
     return handler.executeSync(
       SyncTask(
@@ -561,26 +775,63 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          sse_encode_u_64(defaultPlaylistId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+          sse_encode_Set_u_64_None(favouritesCache, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: null,
         ),
         constMeta:
-            kCrateApiDataPlaylistPlaylistCollectionAutoAccessorSetDefaultPlaylistIdConstMeta,
-        argValues: [that, defaultPlaylistId],
+            kCrateApiDataPlaylistPlaylistCollectionAutoAccessorSetFavouritesCacheConstMeta,
+        argValues: [that, favouritesCache],
         apiImpl: this,
       ),
     );
   }
 
   TaskConstMeta
-  get kCrateApiDataPlaylistPlaylistCollectionAutoAccessorSetDefaultPlaylistIdConstMeta =>
+  get kCrateApiDataPlaylistPlaylistCollectionAutoAccessorSetFavouritesCacheConstMeta =>
       const TaskConstMeta(
-        debugName: 'PlaylistCollection_auto_accessor_set_default_playlist_id',
-        argNames: ['that', 'defaultPlaylistId'],
+        debugName: 'PlaylistCollection_auto_accessor_set_favourites_cache',
+        argNames: ['that', 'favouritesCache'],
+      );
+
+  @override
+  void
+  crateApiDataPlaylistPlaylistCollectionAutoAccessorSetFavouritesPlaylistId({
+    required PlaylistCollection that,
+    required BigInt favouritesPlaylistId,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
+            that,
+            serializer,
+          );
+          sse_encode_u_64(favouritesPlaylistId, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDataPlaylistPlaylistCollectionAutoAccessorSetFavouritesPlaylistIdConstMeta,
+        argValues: [that, favouritesPlaylistId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiDataPlaylistPlaylistCollectionAutoAccessorSetFavouritesPlaylistIdConstMeta =>
+      const TaskConstMeta(
+        debugName:
+            'PlaylistCollection_auto_accessor_set_favourites_playlist_id',
+        argNames: ['that', 'favouritesPlaylistId'],
       );
 
   @override
@@ -600,7 +851,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             playlistMap,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -622,6 +873,84 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<void> crateApiDataPlaylistPlaylistCollectionDeletePlaylist({
+    required PlaylistCollection that,
+    required BigInt playlistId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
+            that,
+            serializer,
+          );
+          sse_encode_u_64(playlistId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 14,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_custom_error,
+        ),
+        constMeta:
+            kCrateApiDataPlaylistPlaylistCollectionDeletePlaylistConstMeta,
+        argValues: [that, playlistId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiDataPlaylistPlaylistCollectionDeletePlaylistConstMeta =>
+      const TaskConstMeta(
+        debugName: 'PlaylistCollection_delete_playlist',
+        argNames: ['that', 'playlistId'],
+      );
+
+  @override
+  Future<Playlist> crateApiDataPlaylistPlaylistCollectionFavourites({
+    required PlaylistCollection that,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 15,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylist,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDataPlaylistPlaylistCollectionFavouritesConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiDataPlaylistPlaylistCollectionFavouritesConstMeta =>
+      const TaskConstMeta(
+        debugName: 'PlaylistCollection_favourites',
+        argNames: ['that'],
+      );
+
+  @override
   Future<List<Playlist>> crateApiDataPlaylistPlaylistCollectionGetAllPlaylists({
     required PlaylistCollection that,
   }) {
@@ -636,7 +965,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 10,
+            funcId: 16,
             port: port_,
           );
         },
@@ -661,44 +990,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<Song>> crateApiDataPlaylistPlaylistCollectionGetDefaultPlaylist({
-    required PlaylistCollection that,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
-            that,
-            serializer,
-          );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 11,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_song,
-          decodeErrorData: sse_decode_custom_error,
-        ),
-        constMeta:
-            kCrateApiDataPlaylistPlaylistCollectionGetDefaultPlaylistConstMeta,
-        argValues: [that],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta
-  get kCrateApiDataPlaylistPlaylistCollectionGetDefaultPlaylistConstMeta =>
-      const TaskConstMeta(
-        debugName: 'PlaylistCollection_get_default_playlist',
-        argNames: ['that'],
-      );
-
-  @override
   Future<Playlist> crateApiDataPlaylistPlaylistCollectionGetPlaylist({
     required PlaylistCollection that,
     required BigInt playlistId,
@@ -715,7 +1006,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 12,
+            funcId: 17,
             port: port_,
           );
         },
@@ -739,12 +1030,56 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  PlaylistCollection crateApiDataPlaylistPlaylistCollectionNew() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<bool> crateApiDataPlaylistPlaylistCollectionIsFavourite({
+    required PlaylistCollection that,
+    required BigInt songId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
+            that,
+            serializer,
+          );
+          sse_encode_u_64(songId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 18,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bool,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDataPlaylistPlaylistCollectionIsFavouriteConstMeta,
+        argValues: [that, songId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiDataPlaylistPlaylistCollectionIsFavouriteConstMeta =>
+      const TaskConstMeta(
+        debugName: 'PlaylistCollection_is_favourite',
+        argNames: ['that', 'songId'],
+      );
+
+  @override
+  Future<PlaylistCollection> crateApiDataPlaylistPlaylistCollectionNew() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 19,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -762,6 +1097,129 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: 'PlaylistCollection_new', argNames: []);
 
   @override
+  Future<void> crateApiDataPlaylistPlaylistCollectionRemoveFromFavourites({
+    required PlaylistCollection that,
+    required BigInt songId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
+            that,
+            serializer,
+          );
+          sse_encode_u_64(songId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 20,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_custom_error,
+        ),
+        constMeta:
+            kCrateApiDataPlaylistPlaylistCollectionRemoveFromFavouritesConstMeta,
+        argValues: [that, songId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiDataPlaylistPlaylistCollectionRemoveFromFavouritesConstMeta =>
+      const TaskConstMeta(
+        debugName: 'PlaylistCollection_remove_from_favourites',
+        argNames: ['that', 'songId'],
+      );
+
+  @override
+  Future<void> crateApiDataPlaylistPlaylistCollectionRemoveSong({
+    required PlaylistCollection that,
+    required BigInt playlistId,
+    required BigInt songId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
+            that,
+            serializer,
+          );
+          sse_encode_u_64(playlistId, serializer);
+          sse_encode_u_64(songId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 21,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_custom_error,
+        ),
+        constMeta: kCrateApiDataPlaylistPlaylistCollectionRemoveSongConstMeta,
+        argValues: [that, playlistId, songId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiDataPlaylistPlaylistCollectionRemoveSongConstMeta =>
+      const TaskConstMeta(
+        debugName: 'PlaylistCollection_remove_song',
+        argNames: ['that', 'playlistId', 'songId'],
+      );
+
+  @override
+  Future<void> crateApiDataPlaylistPlaylistCollectionRenamePlaylist({
+    required PlaylistCollection that,
+    required BigInt playlistId,
+    required String newName,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylistCollection(
+            that,
+            serializer,
+          );
+          sse_encode_u_64(playlistId, serializer);
+          sse_encode_String(newName, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 22,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_custom_error,
+        ),
+        constMeta:
+            kCrateApiDataPlaylistPlaylistCollectionRenamePlaylistConstMeta,
+        argValues: [that, playlistId, newName],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiDataPlaylistPlaylistCollectionRenamePlaylistConstMeta =>
+      const TaskConstMeta(
+        debugName: 'PlaylistCollection_rename_playlist',
+        argNames: ['that', 'playlistId', 'newName'],
+      );
+
+  @override
   BigInt crateApiDataPlaylistPlaylistAutoAccessorGetId({
     required Playlist that,
   }) {
@@ -773,7 +1231,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_u_64,
@@ -804,7 +1262,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -824,7 +1282,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Uint64List crateApiDataPlaylistPlaylistAutoAccessorGetSongs({
+  Uint64List crateApiDataPlaylistPlaylistAutoAccessorGetSongIdList({
     required Playlist that,
   }) {
     return handler.executeSync(
@@ -835,13 +1293,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_64_strict,
           decodeErrorData: null,
         ),
-        constMeta: kCrateApiDataPlaylistPlaylistAutoAccessorGetSongsConstMeta,
+        constMeta:
+            kCrateApiDataPlaylistPlaylistAutoAccessorGetSongIdListConstMeta,
         argValues: [that],
         apiImpl: this,
       ),
@@ -849,9 +1308,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta
-  get kCrateApiDataPlaylistPlaylistAutoAccessorGetSongsConstMeta =>
+  get kCrateApiDataPlaylistPlaylistAutoAccessorGetSongIdListConstMeta =>
       const TaskConstMeta(
-        debugName: 'Playlist_auto_accessor_get_songs',
+        debugName: 'Playlist_auto_accessor_get_song_id_list',
         argNames: ['that'],
       );
 
@@ -869,7 +1328,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_u_64(id, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -902,7 +1361,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -922,9 +1381,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiDataPlaylistPlaylistAutoAccessorSetSongs({
+  void crateApiDataPlaylistPlaylistAutoAccessorSetSongIdList({
     required Playlist that,
-    required Uint64List songs,
+    required Uint64List songIdList,
   }) {
     return handler.executeSync(
       SyncTask(
@@ -934,25 +1393,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          sse_encode_list_prim_u_64_strict(songs, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
+          sse_encode_list_prim_u_64_strict(songIdList, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: null,
         ),
-        constMeta: kCrateApiDataPlaylistPlaylistAutoAccessorSetSongsConstMeta,
-        argValues: [that, songs],
+        constMeta:
+            kCrateApiDataPlaylistPlaylistAutoAccessorSetSongIdListConstMeta,
+        argValues: [that, songIdList],
         apiImpl: this,
       ),
     );
   }
 
   TaskConstMeta
-  get kCrateApiDataPlaylistPlaylistAutoAccessorSetSongsConstMeta =>
+  get kCrateApiDataPlaylistPlaylistAutoAccessorSetSongIdListConstMeta =>
       const TaskConstMeta(
-        debugName: 'Playlist_auto_accessor_set_songs',
-        argNames: ['that', 'songs'],
+        debugName: 'Playlist_auto_accessor_set_song_id_list',
+        argNames: ['that', 'songIdList'],
       );
 
   @override
@@ -974,7 +1434,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 20,
+            funcId: 29,
             port: port_,
           );
         },
@@ -1007,7 +1467,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_Map_u_64_song_None,
@@ -1042,7 +1502,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_Map_u_64_song_None(songMap, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1075,7 +1535,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 23,
+            funcId: 32,
             port: port_,
           );
         },
@@ -1115,7 +1575,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 24,
+            funcId: 33,
             port: port_,
           );
         },
@@ -1151,7 +1611,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 25,
+            funcId: 34,
             port: port_,
           );
         },
@@ -1189,7 +1649,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 26,
+            funcId: 35,
             port: port_,
           );
         },
@@ -1227,7 +1687,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 27,
+            funcId: 36,
             port: port_,
           );
         },
@@ -1257,7 +1717,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 28,
+            funcId: 37,
             port: port_,
           );
         },
@@ -1291,7 +1751,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 29,
+            funcId: 38,
             port: port_,
           );
         },
@@ -1329,7 +1789,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 30,
+            funcId: 39,
             port: port_,
           );
         },
@@ -1351,6 +1811,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<Playlist> crateApiPlaylistCollectionAddPlaylistToCollection({
+    required String name,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(name, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 40,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylist,
+          decodeErrorData: sse_decode_custom_error,
+        ),
+        constMeta: kCrateApiPlaylistCollectionAddPlaylistToCollectionConstMeta,
+        argValues: [name],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiPlaylistCollectionAddPlaylistToCollectionConstMeta =>
+      const TaskConstMeta(
+        debugName: 'add_playlist_to_collection',
+        argNames: ['name'],
+      );
+
+  @override
   Future<void> crateApiSongCollectionAddSongToCollection({
     required Song song,
     Uint8List? art,
@@ -1364,7 +1859,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 31,
+            funcId: 41,
             port: port_,
           );
         },
@@ -1386,6 +1881,74 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<void> crateApiPlaylistCollectionAddSongToFavourites({
+    required BigInt songId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_64(songId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 42,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_custom_error,
+        ),
+        constMeta: kCrateApiPlaylistCollectionAddSongToFavouritesConstMeta,
+        argValues: [songId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPlaylistCollectionAddSongToFavouritesConstMeta =>
+      const TaskConstMeta(
+        debugName: 'add_song_to_favourites',
+        argNames: ['songId'],
+      );
+
+  @override
+  Future<void> crateApiPlaylistCollectionAddSongToPlaylist({
+    required BigInt songId,
+    required BigInt playlistId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_64(songId, serializer);
+          sse_encode_u_64(playlistId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 43,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_custom_error,
+        ),
+        constMeta: kCrateApiPlaylistCollectionAddSongToPlaylistConstMeta,
+        argValues: [songId, playlistId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPlaylistCollectionAddSongToPlaylistConstMeta =>
+      const TaskConstMeta(
+        debugName: 'add_song_to_playlist',
+        argNames: ['songId', 'playlistId'],
+      );
+
+  @override
   Future<void> crateApiMusicFolderDeleteMusicFolderList({
     required String folder,
   }) {
@@ -1397,7 +1960,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 32,
+            funcId: 44,
             port: port_,
           );
         },
@@ -1419,6 +1982,73 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<void> crateApiPlaylistCollectionDeletePlaylist({
+    required BigInt playlistId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_64(playlistId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 45,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_custom_error,
+        ),
+        constMeta: kCrateApiPlaylistCollectionDeletePlaylistConstMeta,
+        argValues: [playlistId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPlaylistCollectionDeletePlaylistConstMeta =>
+      const TaskConstMeta(
+        debugName: 'delete_playlist',
+        argNames: ['playlistId'],
+      );
+
+  @override
+  Future<List<Playlist>>
+  crateApiPlaylistCollectionGetAllPlaylistsFromCollection() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 46,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylist,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiPlaylistCollectionGetAllPlaylistsFromCollectionConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiPlaylistCollectionGetAllPlaylistsFromCollectionConstMeta =>
+      const TaskConstMeta(
+        debugName: 'get_all_playlists_from_collection',
+        argNames: [],
+      );
+
+  @override
   Future<List<Song>> crateApiSongCollectionGetAllSongsFromCollection() {
     return handler.executeNormal(
       NormalTask(
@@ -1427,7 +2057,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 33,
+            funcId: 47,
             port: port_,
           );
         },
@@ -1449,6 +2079,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<Playlist> crateApiPlaylistCollectionGetFavouritesFromCollection() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 48,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPlaylist,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiPlaylistCollectionGetFavouritesFromCollectionConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiPlaylistCollectionGetFavouritesFromCollectionConstMeta =>
+      const TaskConstMeta(
+        debugName: 'get_favourites_from_collection',
+        argNames: [],
+      );
+
+  @override
   Future<List<String>> crateApiMusicFolderGetMusicFolderList() {
     return handler.executeNormal(
       NormalTask(
@@ -1457,7 +2120,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 34,
+            funcId: 49,
             port: port_,
           );
         },
@@ -1476,6 +2139,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: 'get_music_folder_list', argNames: []);
 
   @override
+  Future<Song?> crateApiSongCollectionGetSong({required BigInt id}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_64(id, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 50,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_box_autoadd_song,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSongCollectionGetSongConstMeta,
+        argValues: [id],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSongCollectionGetSongConstMeta =>
+      const TaskConstMeta(debugName: 'get_song', argNames: ['id']);
+
+  @override
   Future<Uint8List?> crateApiSongCollectionGetSongAlbumArt({
     required BigInt id,
   }) {
@@ -1487,7 +2178,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 35,
+            funcId: 51,
             port: port_,
           );
         },
@@ -1506,6 +2197,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: 'get_song_album_art', argNames: ['id']);
 
   @override
+  Future<List<Song>> crateApiSongCollectionGetSongList({
+    required Uint64List idList,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_u_64_strict(idList, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 52,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_song,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSongCollectionGetSongListConstMeta,
+        argValues: [idList],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSongCollectionGetSongListConstMeta =>
+      const TaskConstMeta(debugName: 'get_song_list', argNames: ['idList']);
+
+  @override
   Future<List<Song>> crateApiSongCollectionGetSortedSongs({
     required SortBy sort,
   }) {
@@ -1517,7 +2238,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 36,
+            funcId: 53,
             port: port_,
           );
         },
@@ -1544,7 +2265,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 37,
+            funcId: 54,
             port: port_,
           );
         },
@@ -1571,7 +2292,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 38,
+            funcId: 55,
             port: port_,
           );
         },
@@ -1590,6 +2311,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: 'init_rust_logger', argNames: []);
 
   @override
+  Future<bool> crateApiPlaylistCollectionIsInFavourites({
+    required BigInt songId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_64(songId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 56,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bool,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiPlaylistCollectionIsInFavouritesConstMeta,
+        argValues: [songId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPlaylistCollectionIsInFavouritesConstMeta =>
+      const TaskConstMeta(debugName: 'is_in_favourites', argNames: ['songId']);
+
+  @override
   Stream<StreamEvent> crateApiProcessMusicReadMusicFiles() {
     final sink = RustStreamSink<StreamEvent>();
     unawaited(
@@ -1601,7 +2352,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 39,
+              funcId: 57,
               port: port_,
             );
           },
@@ -1622,6 +2373,111 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: 'read_music_files', argNames: ['sink']);
 
   @override
+  Future<void> crateApiPlaylistCollectionRemoveSongFromFavourites({
+    required BigInt songId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_64(songId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 58,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_custom_error,
+        ),
+        constMeta: kCrateApiPlaylistCollectionRemoveSongFromFavouritesConstMeta,
+        argValues: [songId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiPlaylistCollectionRemoveSongFromFavouritesConstMeta =>
+      const TaskConstMeta(
+        debugName: 'remove_song_from_favourites',
+        argNames: ['songId'],
+      );
+
+  @override
+  Future<void> crateApiPlaylistCollectionRemoveSongFromPlaylist({
+    required BigInt songId,
+    required BigInt playlistId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_64(songId, serializer);
+          sse_encode_u_64(playlistId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 59,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_custom_error,
+        ),
+        constMeta: kCrateApiPlaylistCollectionRemoveSongFromPlaylistConstMeta,
+        argValues: [songId, playlistId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiPlaylistCollectionRemoveSongFromPlaylistConstMeta =>
+      const TaskConstMeta(
+        debugName: 'remove_song_from_playlist',
+        argNames: ['songId', 'playlistId'],
+      );
+
+  @override
+  Future<void> crateApiPlaylistCollectionRenamePlaylist({
+    required BigInt playlistId,
+    required String newName,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_64(playlistId, serializer);
+          sse_encode_String(newName, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 60,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_custom_error,
+        ),
+        constMeta: kCrateApiPlaylistCollectionRenamePlaylistConstMeta,
+        argValues: [playlistId, newName],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPlaylistCollectionRenamePlaylistConstMeta =>
+      const TaskConstMeta(
+        debugName: 'rename_playlist',
+        argNames: ['playlistId', 'newName'],
+      );
+
+  @override
   Future<void> crateApiMusicFolderSaveMusicFolderList({
     required List<String> folders,
   }) {
@@ -1633,7 +2489,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 40,
+            funcId: 61,
             port: port_,
           );
         },
@@ -1664,7 +2520,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 41,
+            funcId: 62,
             port: port_,
           );
         },
@@ -1877,6 +2733,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Set<BigInt> dco_decode_Set_u_64_None(raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Set.from(dco_decode_list_prim_u_64_strict(raw));
+  }
+
+  @protected
   RustStreamSink<StreamEvent> dco_decode_StreamSink_stream_event_Sse(raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
@@ -1886,6 +2748,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   String dco_decode_String(raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as String;
+  }
+
+  @protected
+  bool dco_decode_bool(raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
   }
 
   @protected
@@ -1929,6 +2797,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 8:
         return const CustomError_AlbumArtError();
       case 9:
+        return const CustomError_PlaylistNotFound();
+      case 10:
         return CustomError_Unknown(dco_decode_String(raw[1]));
       default:
         throw Exception('unreachable');
@@ -2334,6 +3204,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Set<BigInt> sse_decode_Set_u_64_None(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    final inner = sse_decode_list_prim_u_64_strict(deserializer);
+    return Set.from(inner);
+  }
+
+  @protected
   RustStreamSink<StreamEvent> sse_decode_StreamSink_stream_event_Sse(
     SseDeserializer deserializer,
   ) {
@@ -2346,6 +3223,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     final inner = sse_decode_list_prim_u_8_strict(deserializer);
     return utf8.decoder.convert(inner);
+  }
+
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8() != 0;
   }
 
   @protected
@@ -2396,6 +3279,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 8:
         return const CustomError_AlbumArtError();
       case 9:
+        return const CustomError_PlaylistNotFound();
+      case 10:
         final var_field0 = sse_decode_String(deserializer);
         return CustomError_Unknown(var_field0);
       default:
@@ -2650,12 +3535,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  bool sse_decode_bool(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getUint8() != 0;
-  }
-
-  @protected
   void sse_encode_AnyhowException(
     AnyhowException self,
     SseSerializer serializer,
@@ -2882,6 +3761,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_Set_u_64_None(Set<BigInt> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_64_strict(
+      Uint64List.fromList(self.toList()),
+      serializer,
+    );
+  }
+
+  @protected
   void sse_encode_StreamSink_stream_event_Sse(
     RustStreamSink<StreamEvent> self,
     SseSerializer serializer,
@@ -2902,6 +3790,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_String(String self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
+  }
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self ? 1 : 0);
   }
 
   @protected
@@ -2949,8 +3843,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(field0, serializer);
       case CustomError_AlbumArtError():
         sse_encode_i_32(8, serializer);
-      case CustomError_Unknown(field0: final field0):
+      case CustomError_PlaylistNotFound():
         sse_encode_i_32(9, serializer);
+      case CustomError_Unknown(field0: final field0):
+        sse_encode_i_32(10, serializer);
         sse_encode_String(field0, serializer);
     }
   }
@@ -3178,12 +4074,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putBigUint64(self);
   }
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putUint8(self ? 1 : 0);
-  }
 }
 
 @sealed
@@ -3238,19 +4128,38 @@ class PlaylistCollectionImpl extends RustOpaque implements PlaylistCollection {
         .rust_arc_decrement_strong_count_PlaylistCollectionPtr,
   );
 
-  /// SongCollection struct
-  /// PlaylistCollection struct
-  /// PlayerState struct
   /// DB ops go through implementation and
   /// has a hashmap for fast responses
-  Future<Playlist> addPlaylist({required String name}) =>
+  Future<Playlist> addPlaylist({required Playlist playlist}) =>
       RustLib.instance.api.crateApiDataPlaylistPlaylistCollectionAddPlaylist(
         that: this,
-        name: name,
+        playlist: playlist,
       );
 
-  BigInt get defaultPlaylistId => RustLib.instance.api
-      .crateApiDataPlaylistPlaylistCollectionAutoAccessorGetDefaultPlaylistId(
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<void> addSong({required BigInt playlistId, required BigInt songId}) =>
+      RustLib.instance.api.crateApiDataPlaylistPlaylistCollectionAddSong(
+        that: this,
+        playlistId: playlistId,
+        songId: songId,
+      );
+
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<void> addToFavourites({required BigInt songId}) => RustLib.instance.api
+      .crateApiDataPlaylistPlaylistCollectionAddToFavourites(
+        that: this,
+        songId: songId,
+      );
+
+  Set<BigInt> get favouritesCache => RustLib.instance.api
+      .crateApiDataPlaylistPlaylistCollectionAutoAccessorGetFavouritesCache(
+        that: this,
+      );
+
+  BigInt get favouritesPlaylistId => RustLib.instance.api
+      .crateApiDataPlaylistPlaylistCollectionAutoAccessorGetFavouritesPlaylistId(
         that: this,
       );
 
@@ -3259,10 +4168,16 @@ class PlaylistCollectionImpl extends RustOpaque implements PlaylistCollection {
         that: this,
       );
 
-  set defaultPlaylistId(BigInt defaultPlaylistId) => RustLib.instance.api
-      .crateApiDataPlaylistPlaylistCollectionAutoAccessorSetDefaultPlaylistId(
+  set favouritesCache(Set<BigInt> favouritesCache) => RustLib.instance.api
+      .crateApiDataPlaylistPlaylistCollectionAutoAccessorSetFavouritesCache(
         that: this,
-        defaultPlaylistId: defaultPlaylistId,
+        favouritesCache: favouritesCache,
+      );
+
+  set favouritesPlaylistId(BigInt favouritesPlaylistId) => RustLib.instance.api
+      .crateApiDataPlaylistPlaylistCollectionAutoAccessorSetFavouritesPlaylistId(
+        that: this,
+        favouritesPlaylistId: favouritesPlaylistId,
       );
 
   set playlistMap(Map<BigInt, Playlist> playlistMap) => RustLib.instance.api
@@ -3271,31 +4186,71 @@ class PlaylistCollectionImpl extends RustOpaque implements PlaylistCollection {
         playlistMap: playlistMap,
       );
 
-  /// SongCollection struct
-  /// PlaylistCollection struct
-  /// PlayerState struct
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<void> deletePlaylist({required BigInt playlistId}) =>
+      RustLib.instance.api.crateApiDataPlaylistPlaylistCollectionDeletePlaylist(
+        that: this,
+        playlistId: playlistId,
+      );
+
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<Playlist> favourites() => RustLib.instance.api
+      .crateApiDataPlaylistPlaylistCollectionFavourites(that: this);
+
   /// DB ops go through implementation and
   /// has a hashmap for fast responses
   Future<List<Playlist>> getAllPlaylists() => RustLib.instance.api
       .crateApiDataPlaylistPlaylistCollectionGetAllPlaylists(that: this);
 
-  /// SongCollection struct
-  /// PlaylistCollection struct
-  /// PlayerState struct
-  /// DB ops go through implementation and
-  /// has a hashmap for fast responses
-  Future<List<Song>> getDefaultPlaylist() => RustLib.instance.api
-      .crateApiDataPlaylistPlaylistCollectionGetDefaultPlaylist(that: this);
-
-  /// SongCollection struct
-  /// PlaylistCollection struct
-  /// PlayerState struct
   /// DB ops go through implementation and
   /// has a hashmap for fast responses
   Future<Playlist> getPlaylist({required BigInt playlistId}) =>
       RustLib.instance.api.crateApiDataPlaylistPlaylistCollectionGetPlaylist(
         that: this,
         playlistId: playlistId,
+      );
+
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<bool> isFavourite({required BigInt songId}) =>
+      RustLib.instance.api.crateApiDataPlaylistPlaylistCollectionIsFavourite(
+        that: this,
+        songId: songId,
+      );
+
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<void> removeFromFavourites({required BigInt songId}) => RustLib
+      .instance
+      .api
+      .crateApiDataPlaylistPlaylistCollectionRemoveFromFavourites(
+        that: this,
+        songId: songId,
+      );
+
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<void> removeSong({
+    required BigInt playlistId,
+    required BigInt songId,
+  }) => RustLib.instance.api.crateApiDataPlaylistPlaylistCollectionRemoveSong(
+    that: this,
+    playlistId: playlistId,
+    songId: songId,
+  );
+
+  /// DB ops go through implementation and
+  /// has a hashmap for fast responses
+  Future<void> renamePlaylist({
+    required BigInt playlistId,
+    required String newName,
+  }) =>
+      RustLib.instance.api.crateApiDataPlaylistPlaylistCollectionRenamePlaylist(
+        that: this,
+        playlistId: playlistId,
+        newName: newName,
       );
 }
 
@@ -3324,8 +4279,8 @@ class PlaylistImpl extends RustOpaque implements Playlist {
   String get name => RustLib.instance.api
       .crateApiDataPlaylistPlaylistAutoAccessorGetName(that: this);
 
-  Uint64List get songs => RustLib.instance.api
-      .crateApiDataPlaylistPlaylistAutoAccessorGetSongs(that: this);
+  Uint64List get songIdList => RustLib.instance.api
+      .crateApiDataPlaylistPlaylistAutoAccessorGetSongIdList(that: this);
 
   set id(BigInt id) => RustLib.instance.api
       .crateApiDataPlaylistPlaylistAutoAccessorSetId(that: this, id: id);
@@ -3333,10 +4288,10 @@ class PlaylistImpl extends RustOpaque implements Playlist {
   set name(String name) => RustLib.instance.api
       .crateApiDataPlaylistPlaylistAutoAccessorSetName(that: this, name: name);
 
-  set songs(Uint64List songs) =>
-      RustLib.instance.api.crateApiDataPlaylistPlaylistAutoAccessorSetSongs(
+  set songIdList(Uint64List songIdList) => RustLib.instance.api
+      .crateApiDataPlaylistPlaylistAutoAccessorSetSongIdList(
         that: this,
-        songs: songs,
+        songIdList: songIdList,
       );
 }
 

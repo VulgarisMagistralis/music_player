@@ -14,9 +14,11 @@ class _ControlButtonState extends ConsumerState<ControlButtons> {
   @override
   Widget build(BuildContext context) {
     final audioHandler = ref.watch(audioHandlerProvider);
-    return Row(mainAxisSize: MainAxisSize.min, children: [
-      IconButton(icon: const Icon(Icons.skip_previous), iconSize: 32, onPressed: () async => await audioHandler.skipToPrevious()),
-      StreamBuilder(
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(icon: const Icon(Icons.skip_previous), iconSize: 32, onPressed: () async => await audioHandler.skipToPrevious()),
+        StreamBuilder(
           stream: audioHandler.playbackState,
           builder: (_, snapshot) {
             final playerState = snapshot.data;
@@ -31,9 +33,11 @@ class _ControlButtonState extends ConsumerState<ControlButtons> {
             } else {
               return IconButton(icon: const Icon(Icons.replay), iconSize: 32, onPressed: () async => await audioHandler.seek(Duration.zero));
             }
-          }),
-      IconButton(icon: const Icon(Icons.stop), iconSize: 32, onPressed: () async => await audioHandler.stop()),
-      IconButton(icon: const Icon(Icons.skip_next), iconSize: 32, onPressed: () async => audioHandler.skipToNext())
-    ]);
+          },
+        ),
+        IconButton(icon: const Icon(Icons.stop), iconSize: 32, onPressed: () async => await audioHandler.stop()),
+        IconButton(icon: const Icon(Icons.skip_next), iconSize: 32, onPressed: () async => audioHandler.skipToNext()),
+      ],
+    );
   }
 }

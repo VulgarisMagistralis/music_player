@@ -25,28 +25,46 @@ pub(crate) fn locked_song_collection() -> std::sync::MutexGuard<'static, SongCol
         }
     }
 }
+
 #[flutter_rust_bridge::frb]
 pub fn add_song_to_collection(song: Song, art: Option<Vec<u8>>) -> Result<(), String> {
-    let mut sc = locked_song_collection();
-    sc.add_song(song, art).map_err(|e| e.to_string())
+    let mut song_collection = locked_song_collection();
+    song_collection
+        .add_song(song, art)
+        .map_err(|e| e.to_string())
 }
 
 #[flutter_rust_bridge::frb]
 pub fn get_all_songs_from_collection() -> Vec<Song> {
-    let sc = locked_song_collection();
-    sc.get_all_songs()
+    let song_collection = locked_song_collection();
+    song_collection.get_all_songs()
 }
 
 #[flutter_rust_bridge::frb]
 pub fn get_sorted_songs(sort: SortBy) -> Vec<Song> {
-    let sc = locked_song_collection();
-    sc.get_all_sorted(sort)
+    let song_collection = locked_song_collection();
+    song_collection.get_all_sorted(sort)
 }
 
 #[flutter_rust_bridge::frb]
 pub fn get_song_album_art(id: u64) -> Option<Vec<u8>> {
-    let sc = locked_song_collection();
-    sc.get_album_art(id)
+    let song_collection = locked_song_collection();
+    song_collection.get_album_art(id)
+}
+
+#[flutter_rust_bridge::frb]
+pub fn get_song(id: u64) -> Option<Song> {
+    let song_collection = locked_song_collection();
+    song_collection.get_song(id)
+}
+
+#[flutter_rust_bridge::frb]
+pub fn get_song_list(id_list: Vec<u64>) -> Vec<Song> {
+    let song_collection = locked_song_collection();
+    id_list
+        .into_iter()
+        .filter_map(|song_id| song_collection.get_song(song_id))
+        .collect()
 }
 
 impl SongCollection {
@@ -58,7 +76,6 @@ impl SongCollection {
             .map(|song| {
                 let id = song.id;
                 if let Ok(Some(bytes)) = get_song_art_from_db(id) {
-                    info!("GETTING ART!!!");
                     art_map.insert(id, bytes);
                 }
                 (id, song)
@@ -76,7 +93,9 @@ impl SongCollection {
     }
 
     pub fn get_all_songs(&self) -> Vec<Song> {
-        self.song_map.values().cloned().collect()
+        let mut song_list: Vec<Song> = self.song_map.values().cloned().collect();
+        song_list.sort_by_key(|song| song.id);
+        song_list
     }
 
     pub fn add_song(&mut self, song: Song, album_art: Option<Vec<u8>>) -> Result<(), CustomError> {

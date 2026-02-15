@@ -9,6 +9,7 @@ import 'package:music_player/src/rust/api/data/song.dart';
 import 'package:music_player/src/rust/api/data/stream_event.dart';
 import 'package:music_player/src/rust/api/error/custom_error.dart';
 import 'package:music_player/src/rust/api/music_folder.dart';
+import 'package:music_player/src/rust/api/playlist_collection.dart';
 import 'package:music_player/src/rust/api/process_music.dart';
 import 'package:music_player/src/rust/api/song_collection.dart';
 import 'package:music_player/src/rust/api/utils/logger.dart';
@@ -146,10 +147,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  Set<BigInt> dco_decode_Set_u_64_None(raw);
+
+  @protected
   RustStreamSink<StreamEvent> dco_decode_StreamSink_stream_event_Sse(raw);
 
   @protected
   String dco_decode_String(raw);
+
+  @protected
+  bool dco_decode_bool(raw);
 
   @protected
   Song dco_decode_box_autoadd_song(raw);
@@ -344,12 +351,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  Set<BigInt> sse_decode_Set_u_64_None(SseDeserializer deserializer);
+
+  @protected
   RustStreamSink<StreamEvent> sse_decode_StreamSink_stream_event_Sse(
     SseDeserializer deserializer,
   );
 
   @protected
   String sse_decode_String(SseDeserializer deserializer);
+
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
   Song sse_decode_box_autoadd_song(SseDeserializer deserializer);
@@ -442,9 +455,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BigInt sse_decode_usize(SseDeserializer deserializer);
-
-  @protected
-  bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
   void sse_encode_AnyhowException(
@@ -571,6 +581,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_Set_u_64_None(Set<BigInt> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_StreamSink_stream_event_Sse(
     RustStreamSink<StreamEvent> self,
     SseSerializer serializer,
@@ -578,6 +591,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_String(String self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_song(Song self, SseSerializer serializer);
@@ -686,9 +702,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer);
 }
 
 // Section: wire_class
