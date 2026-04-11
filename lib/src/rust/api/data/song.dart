@@ -24,6 +24,8 @@ abstract class SongCollection implements RustOpaqueInterface {
 
   Future<Uint8List?> getAlbumArt({required BigInt songId});
 
+  Future<String> getAlbumArtFilePath({required BigInt songId});
+
   Future<List<Song>> getAllSongs();
 
   ///! also add to playlist collection

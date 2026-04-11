@@ -88,7 +88,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                                       key: ValueKey(sortedSongList[index].id),
                                       song: sortedSongList[index],
                                       index: index,
-                                      onTap: (int i) async => await ref.read(audioHandlerProvider).setPlaylist('songs', sortedSongList, index: i),
+                                      onTap: (int i) async => await (await ref.read(audioHandlerProvider.future)).setPlaylist('songs', sortedSongList, index: i),
                                     ),
                                   ),
                                 ),

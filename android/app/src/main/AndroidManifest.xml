@@ -21,9 +21,22 @@
         <meta-data
             android:name="com.google.android.gms.car.application"
             android:resource="@xml/automotive_app_desc" />
-
+        <provider                                                                                                                                                                 
+                android:name="androidx.core.content.FileProvider"                                                                                                                     
+                android:authorities="com.cenkt.music_player.fileprovider"                                                                                                                   
+                android:exported="false"                                                                                                                                              
+                android:grantUriPermissions="true">                                                                                                                                   
+                <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/file_paths" />                                                                                                                        
+        </provider>
+        <provider
+            android:name=".ArtworkProvider"
+            android:authorities="com.cenkt.music_player.artwork"
+            android:exported="true"
+            android:grantUriPermissions="false" />
         <activity
-            android:name="com.ryanheise.audioservice.AudioServiceActivity"
+            android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"

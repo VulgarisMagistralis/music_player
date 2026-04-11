@@ -93,7 +93,7 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
                                             (songMap) => SongRow(
                                               song: songMap.value,
                                               index: songMap.key,
-                                              onTap: (int i) async => await ref.read(audioHandlerProvider).setPlaylist('songs', songList, index: i),
+                                              onTap: (int i) async => await ref.read(audioHandlerSyncProvider).setPlaylist('songs', songList, index: i),
                                             ),
                                           )
                                           .toList(),

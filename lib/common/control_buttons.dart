@@ -13,7 +13,7 @@ class ControlButtons extends ConsumerStatefulWidget {
 class _ControlButtonState extends ConsumerState<ControlButtons> {
   @override
   Widget build(BuildContext context) {
-    final audioHandler = ref.watch(audioHandlerProvider);
+    final audioHandler = ref.watch(audioHandlerSyncProvider);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

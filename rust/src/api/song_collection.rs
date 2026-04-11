@@ -47,6 +47,12 @@ pub fn get_sorted_songs(sort: SortBy) -> Vec<Song> {
 }
 
 #[flutter_rust_bridge::frb]
+pub fn get_song_album_art_file_path(id: u64) -> String {
+    let song_collection = locked_song_collection();
+    song_collection.get_album_art_file_path(id)
+}
+
+#[flutter_rust_bridge::frb]
 pub fn get_song_album_art(id: u64) -> Option<Vec<u8>> {
     let song_collection = locked_song_collection();
     song_collection.get_album_art(id)
@@ -90,6 +96,10 @@ impl SongCollection {
 
     pub fn get_album_art(&self, song_id: u64) -> Option<Vec<u8>> {
         self.art_map.get(&song_id).cloned()
+    }
+
+    pub fn get_album_art_file_path(&self, song_id: u64) -> String {
+        format!("thumbnails/art_{}.jpg", song_id)
     }
 
     pub fn get_all_songs(&self) -> Vec<Song> {

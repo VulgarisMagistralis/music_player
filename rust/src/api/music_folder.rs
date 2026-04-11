@@ -6,19 +6,43 @@ use log::info;
 use std::path::PathBuf;
 use std::sync::OnceLock;
 static APP_DATA_DIR: OnceLock<PathBuf> = OnceLock::new();
+static APP_CACHE_DIR: OnceLock<PathBuf> = OnceLock::new();
 
 #[flutter_rust_bridge::frb()]
-pub fn set_app_directory(path: String) -> Result<(), CustomError> {
-    info!("App dir: {}", path);
-    let _ = APP_DATA_DIR.set(PathBuf::from(&path)).map_err(|_| {
-        info!("App data dir already set");
-        CustomError::AlreadyInitialized("App data dir already set".into())
-    });
-    let mut db_path = PathBuf::from(&path);
+pub fn set_app_directory(
+    application_directory: String,
+    cache_directory: String,
+) -> Result<(), CustomError> {
+    info!("App dir: {}", application_directory);
+    let _ = APP_DATA_DIR
+        .set(PathBuf::from(&application_directory))
+        .map_err(|_| {
+            info!("App data dir already set");
+            CustomError::AlreadyInitialized("App data dir already set".into())
+        });
+    let _ = APP_CACHE_DIR
+        .set(PathBuf::from(&cache_directory))
+        .map_err(|_| {
+            info!("App cache dir already set");
+            CustomError::AlreadyInitialized("App data dir already set".into())
+        });
+    let mut db_path = PathBuf::from(&application_directory);
     db_path.push("library_db");
     info!("{}", format!("{}", db_path.to_string_lossy()));
     set_db_dir(db_path.to_string_lossy().to_string()).map_err(|e| CustomError::DbError(e))?;
     Ok(())
+}
+
+pub fn get_thumbnails_dir() -> Result<PathBuf, CustomError> {
+    let base_path = APP_CACHE_DIR
+        .get()
+        .ok_or_else(|| CustomError::InvalidPath("App data directory not initialized".into()))?;
+    let thumb_path = base_path.join("thumbnails");
+    if !thumb_path.exists() {
+        std::fs::create_dir_all(&thumb_path)
+            .map_err(|e| CustomError::InvalidPath(e.to_string()))?;
+    }
+    Ok(thumb_path)
 }
 
 #[flutter_rust_bridge::frb()]

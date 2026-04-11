@@ -1,5 +1,6 @@
 use crate::api::data::{playlist::Playlist, song::Song};
 use crate::api::error::custom_error::CustomError;
+use crate::api::playlist_collection::locked_playlist_collection;
 use crate::api::utils::hash::hash_string;
 use bincode::config::{standard, Configuration};
 use bincode::{decode_from_slice, encode_to_vec};
@@ -31,21 +32,44 @@ fn folder_key(id: u64) -> String {
 }
 
 pub(crate) fn set_db_dir(db_dir: String) -> Result<(), String> {
+    info!("Opening sled DB at: {}", db_dir);
     let db_path = PathBuf::from(&db_dir);
     if let Err(_) = DB_INSTANCE_DIR.set(db_path.clone()) {
         info!("DB directory already set (ignoring)");
     }
+    if let Ok(tree) = open_or_fetch_tree(PLAYLIST_TREE.to_string()) {
+        info!("PLAYLIST TREE CONTENTS ON STARTUP:");
+        for item in tree.iter() {
+            if let Ok((k, v)) = item {
+                info!("  key: {:?}", k);
+                if let Ok((playlist, _)) =
+                    decode_from_slice::<Playlist, _>(&v, ENCODING_CONFIGURATION)
+                {
+                    info!(
+                        "  playlist: id={} name={} songs={:?}",
+                        playlist.id, playlist.name, playlist.song_id_list
+                    );
+                }
+            }
+        }
+    }
+    info!("creating dir");
     std::fs::create_dir_all(&db_path).map_err(|e| {
         error!("Failed to create DB dir: {e}");
         format!("Failed to create DB dir: {e}")
     })?;
+    info!("opening sled at: {}", db_dir);
     let db = sled::open(db_path).map_err(|e| {
         error!("{}", format!("Failed to open sled DB: {}", e));
         format!("Failed to open sled DB: {}", e)
     });
+    info!("sled opened, setting instance");
     if let Err(_) = DB_INSTANCE.set(db?) {
         info!("DB instance already set (ignoring)");
     }
+    info!("initializing playlist collection");
+    let _unused = locked_playlist_collection();
+    info!("playlist collection initialized");
     info!("{}", DB_INSTANCE.get().is_none());
     Ok(())
 }
@@ -89,7 +113,8 @@ pub(crate) fn save_song_art_to_db(id: u64, data: Vec<u8>) -> Result<(), CustomEr
     let tree = get_song_art_tree().map_err(|e| CustomError::TreeError(e.to_string()))?;
     tree.insert(id.to_be_bytes(), data)
         .map_err(|e| CustomError::DbError(e.to_string()))?;
-    let _ = tree.flush();
+    tree.flush()
+        .map_err(|e| CustomError::DbError(e.to_string()))?;
     Ok(())
 }
 
@@ -102,13 +127,15 @@ pub(crate) fn get_song_art_from_db(id: u64) -> Result<Option<Vec<u8>>, CustomErr
 }
 
 pub(crate) fn save_playlist_to_db(playlist: Playlist) -> Result<Option<IVec>, CustomError> {
-    let added = get_playlist_tree()
-        .map_err(|e| CustomError::TreeError(e.to_string()))?
+    let tree = get_playlist_tree().map_err(|e| CustomError::TreeError(e.to_string()))?;
+    let added = tree
         .insert(
             playlist_key(playlist.id),
             encode_to_vec(&playlist, ENCODING_CONFIGURATION)
                 .map_err(|_| CustomError::EncodeError)?,
         )
+        .map_err(|e| CustomError::DbError(e.to_string()))?;
+    tree.flush()
         .map_err(|e| CustomError::DbError(e.to_string()))?;
     info!("adding playlist: {}", playlist.id);
     Ok(added)

@@ -16,7 +16,7 @@ class NowPlaying extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final audioHandler = ref.watch(audioHandlerProvider);
+    final audioHandler = ref.watch(audioHandlerSyncProvider);
     final BigInt? songIdOrNull = ref.watch(audioSessionManagerProvider.select((s) => s.songId));
     final AsyncValue<Song?> currentSongOrNullAsync = ref.watch(getSongOrNullProvider(songId: songIdOrNull));
     return songIdOrNull == null

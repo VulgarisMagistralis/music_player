@@ -7,8 +7,16 @@ import 'package:music_player/src/rust/frb_generated.dart';
 import 'package:music_player/src/rust/api/error/custom_error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<void> setAppDirectory({required String path}) =>
-    RustLib.instance.api.crateApiMusicFolderSetAppDirectory(path: path);
+Future<void> setAppDirectory({
+  required String applicationDirectory,
+  required String cacheDirectory,
+}) => RustLib.instance.api.crateApiMusicFolderSetAppDirectory(
+  applicationDirectory: applicationDirectory,
+  cacheDirectory: cacheDirectory,
+);
+
+Future<PathBuf> getThumbnailsDir() =>
+    RustLib.instance.api.crateApiMusicFolderGetThumbnailsDir();
 
 Future<void> saveMusicFolderList({required List<String> folders}) => RustLib
     .instance
@@ -22,3 +30,6 @@ Future<void> deleteMusicFolderList({required String folder}) => RustLib
 
 Future<List<String>> getMusicFolderList() =>
     RustLib.instance.api.crateApiMusicFolderGetMusicFolderList();
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PathBuf>>
+abstract class PathBuf implements RustOpaqueInterface {}

@@ -1,6 +1,7 @@
 use crate::api::data::song::Song;
 use crate::api::data::stream_event::StreamEvent;
 use crate::api::music_folder::get_music_folder_list;
+use crate::api::music_folder::get_thumbnails_dir;
 use crate::api::song_collection::locked_song_collection;
 use crate::api::utils::hash::hash_string;
 use crate::frb_generated::StreamSink;
@@ -16,6 +17,14 @@ use tokio::task::spawn;
 #[flutter_rust_bridge::frb()]
 pub async fn read_music_files(sink: StreamSink<StreamEvent>) {
     spawn(async move {
+        let thumbnails_dir = match get_thumbnails_dir() {
+            Ok(f) => f,
+            Err(_) => {
+                let _ = sink.add(StreamEvent::Error("Failed to fetch folder".into()));
+                return;
+            }
+        };
+
         let folders = match get_music_folder_list() {
             Ok(f) => f,
             Err(_) => {
@@ -110,6 +119,14 @@ pub async fn read_music_files(sink: StreamSink<StreamEvent>) {
                         duration: None,
                         album_art_id,
                     };
+                    let album_art_file_name = format!("art_{}.jpg", song.id);
+                    let album_art_path = thumbnails_dir.join(album_art_file_name);
+                    if let Some(album_art_bytes) = album_art.clone() {
+                        if let Err(e) = std::fs::write(&album_art_path, album_art_bytes) {
+                            eprintln!("Failed to write artwork for song {}: {}", song.id, e);
+                        }
+                    }
+
                     if let Err(e) = locked_collection.add_song(song.clone(), album_art.clone()) {
                         let _ = sink.add(StreamEvent::Error(e.to_string()));
                         continue;

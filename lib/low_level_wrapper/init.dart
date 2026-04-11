@@ -9,7 +9,8 @@ class LowLevelInitializer {
     await RustLib.init();
     // ignore: invalid_use_of_internal_member
     await RustLib.instance.api.crateApiUtilsLoggerInitRustLogger();
-    LowLevelRepositoryImplementation().setDirectory(applicationDirectory: (await getApplicationSupportDirectory()).path);
+    final applicationDirectory = (await getApplicationSupportDirectory()).path;
+    await LowLevelRepositoryImplementation().setDirectory(cacheDirectory: (await getExternalCacheDirectories())?.first.path ?? applicationDirectory, applicationDirectory: applicationDirectory);
     _initialized = true;
   }
 }

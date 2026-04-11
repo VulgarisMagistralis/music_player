@@ -1,19 +1,22 @@
-import 'dart:async';
 import 'dart:io';
-import 'package:audio_session/audio_session.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:audio_service/audio_service.dart';
-import 'package:music_player/common/toast.dart';
-import 'package:music_player/data/audio_session_state.dart';
-import 'package:music_player/data/position.dart';
-import 'package:music_player/providers/setting_switches.dart';
-import 'package:music_player/src/rust/api/data/song.dart';
-import 'package:music_player/utilities/audio_session_manager.dart';
-import 'package:music_player/utilities/providers.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'dart:async';
+import 'package:music_player/utilities/song_to_media.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:audio_session/audio_session.dart';
+import 'package:audio_service/audio_service.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:music_player/common/toast.dart';
+import 'package:music_player/data/position.dart';
+import 'package:music_player/utilities/providers.dart';
+import 'package:music_player/src/rust/api/data/song.dart';
+import 'package:music_player/data/audio_session_state.dart';
+import 'package:music_player/providers/setting_switches.dart';
+import 'package:music_player/src/rust/api/song_collection.dart';
+import 'package:music_player/utilities/audio_session_manager.dart';
 
 class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
+  late ProviderContainer _container;
   final List<UriAudioSource> currentQueue = [];
   final List<StreamSubscription> _subscriptionList = [];
   final AudioPlayer _player = AudioPlayer();
@@ -23,6 +26,7 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
 
   /// _______________ Life Cycle _______________
   Future<void> init(ProviderContainer provider) async {
+    _container = provider;
     await _configureAudioSession();
     await _configurePlayerAttributes();
     _listenToPlayerState();
@@ -84,7 +88,6 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     }),
   );
 
-  /// test
   void _listenToDevicesChanged(ProviderContainer provider) async => _subscriptionList.add(
     (await _session).devicesChangedEventStream.listen((AudioDevicesChangedEvent event) async {
       if (event.devicesAdded.isNotEmpty) {
@@ -97,7 +100,7 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   );
 
   void _listenToNoisyEvents(ProviderContainer provider) async => _subscriptionList.add((await _session).becomingNoisyEventStream.listen((_) async => !provider.read(resumeAfterDisconnectProvider) ? await pause() : null));
-  // todo volume_controller 3.4.1
+
   void _listenToVolume(ProviderContainer provider) => _subscriptionList.add(
     _player.volumeStream.listen((double v) async {
       v <= 0 && provider.read(pauseWhenMutedProvider) ? await pause() : null;
@@ -115,13 +118,12 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
 
   Future<void> restoreSession(ProviderContainer ref) async {
     final AudioSessionState? savedAudioSession = ref.read(audioSessionManagerProvider);
-    if (savedAudioSession == null) return;
-    final List<Song> sortedSongList = await ref.read(sortedSongListProvider.future);
-    final index = sortedSongList.indexWhere((s) => s.id == savedAudioSession.songId);
-    await setPlaylist(savedAudioSession.playlistId, sortedSongList, index: index);
-    if (savedAudioSession.isPlaying) {
-      // await play();
-    }
+    if (savedAudioSession == null || savedAudioSession.songId == null) return;
+    final song = await getSong(id: savedAudioSession.songId!);
+    if (song == null) return;
+    final newMediaItem = await SongMediaItemFactory.fromSong(song);
+    await _player.setAudioSource(AudioSource.uri(Uri.file(song.path), tag: newMediaItem));
+    mediaItem.add(newMediaItem);
   }
 
   Future<void> dispose() async {
@@ -131,16 +133,14 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
       await subscription.cancel();
     }
     _subscriptionList.clear();
+    final session = await _session;
+    await session.setActive(false);
   }
 
-  /// When android auto tap on song
-  /// need to match that action to player action
   @override
   Future<void> skipToQueueItem(int index) async {
-    if (_player.sequence.isEmpty || index < 0 || index >= _player.sequence.length) return;
+    if (index < 0 || index >= _player.sequence.length) return;
     await _player.seek(Duration.zero, index: index);
-    // await play();
-    // Make sure mediaItem stream updates UI
     mediaItem.add(_player.sequence[index].tag as MediaItem);
   }
 
@@ -150,30 +150,35 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     if (index >= 0) {
       await _player.seek(Duration.zero, index: index);
       await play();
+      return;
+    }
+    final songs = await getAllSongsFromCollection();
+    final songIndex = songs.indexWhere((s) => Uri.file(s.path).toString() == mediaId);
+    if (songIndex >= 0) {
+      await setPlaylist('aa_browse', songs, index: songIndex);
     }
   }
 
   Future<void> setPlaylist(String playlistId, List<Song> songList, {int index = 0}) async {
-    final List<AudioSessionState> sources = [];
-    final List<AudioSource> audioSources = [];
+    final List<AudioSource> validSources = [];
     final List<MediaItem> queueItems = [];
+    final List<AudioSessionState> sessionStates = [];
     for (int i = 0; i < songList.length; i++) {
       final Song song = songList[i];
-      try {
-        final MediaItem mediaItem = MediaItem(id: song.id.toString(), title: song.title);
-        sources.add(AudioSessionState(playlistId: playlistId, file: File(song.path), title: song.title, songIndexInPlaylist: i, asMediaItem: mediaItem));
-        queueItems.add(mediaItem);
-        audioSources.add(AudioSource.uri(Uri.file(song.path), tag: mediaItem));
-      } catch (_) {
-        ToastManager().showErrorToast('Skipped ${song.title}\nCannot find the file');
+      final file = File(song.path);
+      if (file.existsSync()) {
+        final MediaItem newMediaItem = await SongMediaItemFactory.fromSong(song);
+        validSources.add(AudioSource.uri(Uri.file(song.path), tag: newMediaItem));
+        queueItems.add(newMediaItem);
+        sessionStates.add(AudioSessionState(playlistId: playlistId, file: file, title: song.title, songIndexInPlaylist: i, asMediaItem: newMediaItem));
+      } else {
+        ToastManager().showErrorToast('Skipped ${song.title}\nFile not found');
       }
     }
-    // Update AudioService queue
-    // Set audio sources for Just Audio
-    await _player.setAudioSources(audioSources, initialIndex: index);
+    if (validSources.isEmpty) return;
+    final safeIndex = index < validSources.length ? index : 0;
+    await _player.setAudioSources(validSources, initialIndex: safeIndex);
     await updateQueue(queueItems);
-    // Start playback at the selected song
-    await _player.seek(Duration.zero, index: index);
     await play();
   }
 
@@ -188,52 +193,65 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     (position, bufferedPosition, duration) => PositionData(position, bufferedPosition, duration ?? Duration.zero),
   );
 
-  /// _______________ Android Auto  _______________
   Future<void> _configurePlayerAttributes() async => await _player.setAndroidAudioAttributes(const AndroidAudioAttributes(contentType: AndroidAudioContentType.music, usage: AndroidAudioUsage.media));
 
   @override
   Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {
-    if (parentMediaId == AudioService.browsableRootId) {
-      return [
-        const MediaItem(id: 'queue', title: 'Now Playing Queue', playable: false, extras: {'browsable': true, 'android.media.browse.CONTENT_STYLE_BROWSABLE_HINT': 1}),
-        const MediaItem(id: 'playlists', title: 'Playlists', playable: false, extras: {'browsable': true, 'android.media.browse.CONTENT_STYLE_BROWSABLE_HINT': 1}),
-      ];
+    switch (parentMediaId) {
+      case AudioService.browsableRootId:
+        return [
+          const MediaItem(id: 'all_songs', title: 'All Songs', playable: false, extras: {'android.media.browse.CONTENT_STYLE_BROWSABLE_HINT': 2}),
+          const MediaItem(id: 'favourites', title: 'Favourites', playable: false, extras: {'android.media.browse.CONTENT_STYLE_BROWSABLE_HINT': 2}),
+          const MediaItem(id: 'playlists', title: 'Playlists', playable: false, extras: {'android.media.browse.CONTENT_STYLE_BROWSABLE_HINT': 2}),
+        ];
+
+      case 'all_songs':
+        final songs = await _container.read(allSongsProvider.future);
+        return await SongMediaItemFactory.fromSongs(songs);
+
+      case 'favourites':
+        final playlist = await _container.read(getFavouritesPlaylistProvider.future);
+        final songs = await _container.read(getPlaylistSongsProvider(playlist: playlist).future);
+        return await SongMediaItemFactory.fromSongs(songs);
+
+      case 'playlists':
+        final playlists = await _container.read(playlistCollectionProvider.future);
+        return playlists.map((p) => MediaItem(id: 'playlist_${p.id}', title: p.name, playable: false, extras: {'android.media.browse.CONTENT_STYLE_BROWSABLE_HINT': 2})).toList();
+
+      default:
+        if (parentMediaId.startsWith('playlist_')) {
+          final playlistId = BigInt.parse(parentMediaId.replaceFirst('playlist_', ''));
+          final playlists = await _container.read(playlistCollectionProvider.future);
+          final playlist = playlists.firstWhere((p) => p.id == playlistId);
+          final songs = await _container.read(getPlaylistSongsProvider(playlist: playlist).future);
+          return await SongMediaItemFactory.fromSongs(songs);
+        }
+        return [];
     }
-    if (parentMediaId == 'queue') {
-      return queue.value.map((item) {
-        return MediaItem(
-          id: item.id.startsWith('file:') || item.id.startsWith('content:') ? item.id : Uri.file(item.id).toString(), // ensure stable URI string
-          title: item.title,
-          album: item.album,
-          artist: item.artist,
-          artUri: item.artUri ?? (item.extras?['artPath'] != null ? Uri.file(item.extras!['artPath']) : null),
-          duration: item.duration,
-          extras: item.extras,
-        );
-      }).toList();
-    }
-    return [];
   }
 
-  /// _______________ Controls _______________
   @override
   Future<void> play() async {
-    await ensureActive() ? await _player.play() : ToastManager().showErrorToast('Failed to open file');
+    try {
+      await ensureActive() ? await _player.play() : ToastManager().showErrorToast('Failed to open file');
+    } catch (e) {
+      ToastManager().showErrorToast('Error playing audio: $e');
+    }
   }
 
   Future<void> playSongAtIndex(int index) async {
+    if (index < 0 || index >= _player.sequence.length) return;
     await _player.seek(Duration.zero, index: index);
     await play();
   }
 
   @override
-  Future<void> pause() async {
-    await _player.pause();
-  }
+  Future<void> pause() async => await _player.pause();
 
   @override
   Future<void> stop() async {
     await _player.stop();
+    playbackState.add(playbackState.value.copyWith(processingState: AudioProcessingState.idle));
     await (await _session).setActive(false);
   }
 
@@ -253,9 +271,5 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   Future<void> seek(Duration position) => _player.seek(position);
 
   @override
-  Future<void> addQueueItem(MediaItem mediaItem) async {
-    final newQueue = [...queue.value, mediaItem];
-    queue.add(newQueue);
-    await _player.setAudioSources(newQueue.map((item) => AudioSource.uri(Uri.parse(item.id), tag: item)).toList(), initialIndex: 0);
-  }
+  Future<void> addQueueItem(MediaItem mediaItem) async => queue.add([...queue.value, mediaItem]);
 }
