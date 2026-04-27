@@ -10,12 +10,13 @@ class SongMediaItemFactory {
     final relativePath = await getSongAlbumArtFilePath(id: song.id);
     final artPath = '$path/$relativePath';
     return MediaItem(
-      id: song.id.toString(),
+      id: Uri.file(song.path).toString(),
       title: song.title,
       artist: song.artist,
       album: song.album,
       duration: song.duration != null ? Duration(seconds: song.duration!) : null,
       artUri: Uri.parse(getThumbnailUri(artPath)),
+      extras: {'songId': song.id.toString()},
     );
   }
 

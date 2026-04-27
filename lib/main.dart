@@ -28,7 +28,7 @@ Future<void> _initializeAudioServices(ProviderContainer providerContainer) async
   final PlayerAudioHandler handler = await providerContainer.read(audioHandlerProvider.future);
   try {
     await handler.init(providerContainer);
-    await handler.restoreSession(providerContainer);
+    await handler.restoreSession();
   } catch (e) {
     ToastManager().showErrorToast('Failed to start audio services');
     debugPrint('Background init error: $e');

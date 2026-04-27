@@ -65,7 +65,8 @@ Future<PlayerAudioHandler> audioHandler(Ref ref) async {
   return await AudioService.init(
     builder: () => PlayerAudioHandler(),
     config: const AudioServiceConfig(
-      androidNotificationOngoing: true,
+      androidNotificationOngoing: false,
+      androidStopForegroundOnPause: false,
       androidNotificationChannelName: 'Audio playback',
       androidNotificationChannelId: 'com.cenkt.music_player',
       androidNotificationIcon: 'mipmap/ic_launcher_foreground',

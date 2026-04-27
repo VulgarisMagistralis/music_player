@@ -5,6 +5,7 @@ use crate::api::music_folder::get_thumbnails_dir;
 use crate::api::song_collection::locked_song_collection;
 use crate::api::utils::hash::hash_string;
 use crate::frb_generated::StreamSink;
+use lofty::file::AudioFile;
 use lofty::file::TaggedFileExt;
 use lofty::probe::Probe;
 use lofty::tag::Accessor;
@@ -85,7 +86,11 @@ pub async fn read_music_files(sink: StreamSink<StreamEvent>) {
                         continue;
                     }
                 };
+
                 if let Some(primary_tag) = tagged_file.primary_tag() {
+                    let duration = tagged_file.properties().duration().as_secs();
+                    let artist = primary_tag.artist().unwrap_or_default().to_string();
+                    let album = primary_tag.album().unwrap_or_default().to_string();
                     let path_string = path_file.to_string_lossy().to_string();
                     let album_art: Option<Vec<u8>> =
                         primary_tag.pictures().first().map(|p| p.data().to_vec());
@@ -105,8 +110,8 @@ pub async fn read_music_files(sink: StreamSink<StreamEvent>) {
                                 )
                             })
                             .to_string(),
-                        artist: "".into(),
-                        album: "".into(),
+                        artist: artist,
+                        album: album,
                         last_modified_at: fs::metadata(path_file)
                             .and_then(|m| m.modified())
                             .ok()
@@ -116,11 +121,11 @@ pub async fn read_music_files(sink: StreamSink<StreamEvent>) {
                                     .map(|d| d.as_secs() as i64)
                             })
                             .unwrap_or(0),
-                        duration: None,
+                        duration: Some(duration as u32),
                         album_art_id,
                     };
                     let album_art_file_name = format!("art_{}.jpg", song.id);
-                    let album_art_path = thumbnails_dir.join(album_art_file_name);
+                    let album_art_path: PathBuf = thumbnails_dir.join(album_art_file_name);
                     if let Some(album_art_bytes) = album_art.clone() {
                         if let Err(e) = std::fs::write(&album_art_path, album_art_bytes) {
                             eprintln!("Failed to write artwork for song {}: {}", song.id, e);

@@ -54,7 +54,6 @@ class _AnimatedOverflowTextState extends State<AnimatedOverflowText> with Single
         final bool willOverflow = textPainter.width > constraints.maxWidth;
         if (willOverflow) WidgetsBinding.instance.addPostFrameCallback((_) => mounted && _scrollController.hasClients ? _startLoopScroll() : null);
         return Container(
-          width: double.infinity,
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
           child: willOverflow

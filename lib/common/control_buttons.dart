@@ -17,6 +17,7 @@ class _ControlButtonState extends ConsumerState<ControlButtons> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        IconButton(icon: const Icon(Icons.fast_rewind), iconSize: 32, onPressed: () async => audioHandler.rewind()),
         IconButton(icon: const Icon(Icons.skip_previous), iconSize: 32, onPressed: () async => await audioHandler.skipToPrevious()),
         StreamBuilder(
           stream: audioHandler.playbackState,
@@ -37,6 +38,8 @@ class _ControlButtonState extends ConsumerState<ControlButtons> {
         ),
         IconButton(icon: const Icon(Icons.stop), iconSize: 32, onPressed: () async => await audioHandler.stop()),
         IconButton(icon: const Icon(Icons.skip_next), iconSize: 32, onPressed: () async => audioHandler.skipToNext()),
+        IconButton(icon: const Icon(Icons.shuffle), iconSize: 32, onPressed: () async => audioHandler.setShuffleMode(AudioServiceShuffleMode.all)),
+        IconButton(icon: const Icon(Icons.repeat), iconSize: 32, onPressed: () async => audioHandler.setRepeatMode(AudioServiceRepeatMode.all)),
       ],
     );
   }
