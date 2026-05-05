@@ -80,7 +80,7 @@ app.*.symbols
 .ralph/
 
 .claude/**
-.CLAUDE.md
+CLAUDE.md
 
 # Remove generated
 **/*.g.dart
