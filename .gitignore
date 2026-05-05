@@ -85,3 +85,4 @@ CLAUDE.md
 # Remove generated
 **/*.g.dart
 **/*.freezed.dart
+app_localizations**
