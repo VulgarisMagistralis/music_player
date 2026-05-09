@@ -10,6 +10,7 @@ import 'package:music_player/widgets/favourites_button.dart';
 import 'package:music_player/common/animated_overflow_text.dart';
 import 'package:music_player/utilities/audio_session_manager.dart';
 import 'package:music_player/src/rust/api/data/song.dart' show Song;
+import 'package:music_player/widgets/song_info_sheet.dart';
 
 class SongRow extends ConsumerStatefulWidget {
   final Song song;
@@ -73,8 +74,18 @@ class _SongRowState extends ConsumerState<SongRow> with AutomaticKeepAliveClient
                         }
                       },
                     ),
-                    const PopupMenuItem(value: 2, child: Text('Ignore song')),
-                    const PopupMenuItem(value: 3, child: Text('Details')),
+                    PopupMenuItem(
+                      value: 2,
+                      child: const Text('Ignore song'),
+                      onTap: () {
+                        // TODO: implement ignore song
+                      },
+                    ),
+                    PopupMenuItem(
+                      value: 3,
+                      child: const Text('Details'),
+                      onTap: () => SongInfoSheet.show(context, widget.song),
+                    ),
                   ],
                 );
               });

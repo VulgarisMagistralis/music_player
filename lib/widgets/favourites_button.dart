@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:music_player/l10n/app_localizations.dart';
 import 'package:music_player/common/toast.dart';
 import 'package:music_player/utilities/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -27,7 +28,7 @@ class FavouritesButton extends ConsumerWidget {
             ? IconButton(icon: const Icon(Icons.favorite_sharp), onPressed: () async => _toggleFavourite(ref, isFavourite))
             : IconButton(icon: const Icon(Icons.favorite_border), onPressed: () async => _toggleFavourite(ref, isFavourite)),
         error: (_, __) {
-          ToastManager().showErrorToast('Favourite status is unknown');
+          ToastManager().showErrorToast(AppLocalizations.of(context).toast_favourite_unknown);
           return IconButton(icon: const Icon(Icons.favorite_border), onPressed: () async => _toggleFavourite(ref, false));
         },
         loading: () => const CircularProgressIndicator(),

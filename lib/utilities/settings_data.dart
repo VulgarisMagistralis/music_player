@@ -19,7 +19,6 @@ class SharedPreferenceWithCacheHandler {
 
   AudioSessionState? loadSongState() {
     final String? storedStateSerialized = _sharedPreferences.getString(_lastSongStateKey);
-    print('LAODING STATE $storedStateSerialized');
     return storedStateSerialized == null ? null : AudioSessionState.fromJson(jsonDecode(storedStateSerialized));
   }
 
@@ -35,4 +34,7 @@ class SharedPreferenceWithCacheHandler {
   ///Technically duplicate
   Future<void> saveInteger(String key, int value) async => await _sharedPreferences.setInt(key, value);
   int? loadInteger(String key) => _sharedPreferences.getInt(key);
+
+  Future<void> saveString(String key, String value) async => await _sharedPreferences.setString(key, value);
+  String? loadString(String key) => _sharedPreferences.getString(key);
 }

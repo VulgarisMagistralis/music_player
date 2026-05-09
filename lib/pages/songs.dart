@@ -25,7 +25,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
     super.initState();
     _scrollController = ScrollController(
       onAttach: (position) => WidgetsBinding.instance.addPostFrameCallback(
-        (__) => position.animateTo(
+        (_) => position.animateTo(
           ref.read(songsPageScrollOffsetProvider.notifier).value,
           curve: Curves.fastOutSlowIn,
           duration: Duration(milliseconds: (ref.read(songsPageScrollOffsetProvider.notifier).value * 0.55 + 0.2).floor()),
@@ -49,7 +49,6 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
       next.whenData((event) {
         if (event is StreamEvent_Done) {
           ref.invalidate(playlistSortedByProvider);
-          ref.invalidate(allSongsProvider);
           ref.invalidate(sortedSongListProvider);
         }
       });
@@ -88,7 +87,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                                       key: ValueKey(sortedSongList[index].id),
                                       song: sortedSongList[index],
                                       index: index,
-                                      onTap: (int i) async => await (await ref.read(audioHandlerProvider.future)).setPlaylist('songs', sortedSongList, index: i),
+                                      onTap: (int i) async => await ref.read(audioHandlerSyncProvider).setPlaylist('songs', sortedSongList, index: i),
                                     ),
                                   ),
                                 ),

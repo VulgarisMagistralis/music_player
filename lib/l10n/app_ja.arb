@@ -1,0 +1,71 @@
+{
+  "@@locale": "ja",
+
+  "toast_audio_start_failed": "オーディオサービスの起動に失敗しました",
+  "toast_favourite_unknown": "お気に入り状態が不明です",
+  "toast_folder_load_error": "このフォルダーの読み込みに失敗しました。再読み込み中...",
+  "toast_playlist_deleted": "{name}を削除しました",
+  "@toast_playlist_deleted": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_playlist_delete_failed": "{name}の削除に失敗しました",
+  "@toast_playlist_delete_failed": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_load_songs_failed": "曲の読み込みに失敗しました",
+  "toast_playlist_created": "{name}を作成しました",
+  "@toast_playlist_created": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_playlist_create_failed": "{name}の作成に失敗しました",
+  "@toast_playlist_create_failed": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_added_to_playlist": "{name}に追加しました",
+  "@toast_added_to_playlist": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_add_to_playlist_failed": "{name}への追加に失敗しました",
+  "@toast_add_to_playlist_failed": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_skipped_not_found": "{title}をスキップしました\nファイルが見つかりません",
+  "@toast_skipped_not_found": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "toast_audio_session_failed": "オーディオセッションを有効にできませんでした",
+  "toast_audio_play_error": "再生エラー: {error}",
+  "@toast_audio_play_error": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "toast_could_not_open_settings": "設定を開くことができませんでした",
+  "toast_album_art_failed": "アルバムのアートワークの取得に失敗しました",
+  "settings_page_title": "プレーヤー",
+  "settings_behaviour_title": "動作",
+  "settings_behaviour_play_on_launch": "起動時自動再生",
+  "settings_behaviour_play_on_connect": "デバイス接続時自動再生",
+  "settings_behaviour_resume_after_disconnect": "デバイス切断後再開",
+  "settings_behaviour_paused_on_hidden": "アプリ非表示時に一時停止",
+  "settings_behaviour_paused_when_muted": "ミュート時に一時停止",
+  "settings_playback_title": "再生",
+  "settings_appearance_title": "外観",
+  "settings_appearance_theme_mode": "テーマモード",
+  "settings_appearance_theme_color": "テーマカラー",
+  "settings_appearance_language": "言語"
+}

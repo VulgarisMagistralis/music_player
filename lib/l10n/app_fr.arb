@@ -1,0 +1,71 @@
+{
+  "@@locale": "fr",
+
+  "toast_audio_start_failed": "Échec du démarrage des services audio",
+  "toast_favourite_unknown": "Le statut favori est inconnu",
+  "toast_folder_load_error": "Erreur de chargement de ce dossier. Rechargement...",
+  "toast_playlist_deleted": "Supprimée {name}",
+  "@toast_playlist_deleted": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_playlist_delete_failed": "Échec de la suppression de {name}",
+  "@toast_playlist_delete_failed": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_load_songs_failed": "Échec du chargement des chansons",
+  "toast_playlist_created": "Créée {name}",
+  "@toast_playlist_created": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_playlist_create_failed": "Échec de la création de {name}",
+  "@toast_playlist_create_failed": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_added_to_playlist": "Ajoutée à {name}",
+  "@toast_added_to_playlist": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_add_to_playlist_failed": "Échec de l'ajout de la chanson à {name}",
+  "@toast_add_to_playlist_failed": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_skipped_not_found": "Passée {title}\nFichier introuvable",
+  "@toast_skipped_not_found": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "toast_audio_session_failed": "Impossible d'activer la session audio",
+  "toast_audio_play_error": "Erreur de lecture : {error}",
+  "@toast_audio_play_error": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "toast_could_not_open_settings": "Impossible d'ouvrir les paramètres",
+  "toast_album_art_failed": "Impossible d'obtenir la couverture d'album",
+  "settings_page_title": "Lecteur",
+  "settings_behaviour_title": "Comportement",
+  "settings_behaviour_play_on_launch": "Lecture automatique au démarrage",
+  "settings_behaviour_play_on_connect": "Lecture automatique à la connexion",
+  "settings_behaviour_resume_after_disconnect": "Reprendre après déconnexion",
+  "settings_behaviour_paused_on_hidden": "Pause lorsque l'application est masquée",
+  "settings_behaviour_paused_when_muted": "Pause en cas de mise en sourdine",
+  "settings_playback_title": "Lecture",
+  "settings_appearance_title": "Apparence",
+  "settings_appearance_theme_mode": "Mode du thème",
+  "settings_appearance_theme_color": "Couleur du thème",
+  "settings_appearance_language": "Langue"
+}

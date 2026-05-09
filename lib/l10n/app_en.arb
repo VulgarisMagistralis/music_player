@@ -1,0 +1,87 @@
+{
+  "@@locale": "en",
+
+  "toast_audio_start_failed": "Failed to start audio services",
+  "toast_favourite_unknown": "Favourite status is unknown",
+  "toast_folder_load_error": "Encountered loading error from this folder. Reloading...",
+  "toast_playlist_deleted": "Deleted {name}",
+  "@toast_playlist_deleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_delete_failed": "Failed to delete {name}",
+  "@toast_playlist_delete_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_load_songs_failed": "Failed to load songs",
+  "toast_playlist_created": "Created {name}",
+  "@toast_playlist_created": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_create_failed": "Failed to create {name}",
+  "@toast_playlist_create_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_added_to_playlist": "Added to {name}",
+  "@toast_added_to_playlist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_add_to_playlist_failed": "Failed to add song to {name}",
+  "@toast_add_to_playlist_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_skipped_not_found": "Skipped {title}\nFile not found",
+  "@toast_skipped_not_found": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_audio_session_failed": "Could not activate audio session",
+  "toast_audio_play_error": "Error playing audio: {error}",
+  "@toast_audio_play_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_could_not_open_settings": "Could not open settings",
+  "toast_album_art_failed": "Couldn't fetch Album Art",
+  "settings_page_title": "Player",
+  "settings_behaviour_title": "Behaviour",
+  "settings_behaviour_play_on_launch": "Auto-play on launch",
+  "settings_behaviour_play_on_connect": "Auto-play on device connect",
+  "settings_behaviour_resume_after_disconnect": "Resume after device disconnect",
+  "settings_behaviour_paused_on_hidden": "Pause on app hidden",
+  "settings_behaviour_paused_when_muted": "Pause when device muted",
+  "settings_playback_title": "Playback",
+  "settings_appearance_title": "Appearance",
+  "settings_appearance_theme_mode": "Theme mode",
+  "settings_appearance_theme_color": "Theme color",
+  "settings_appearance_language": "Language"
+}

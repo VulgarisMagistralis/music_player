@@ -128,6 +128,18 @@ class PlaylistSortedBy extends _$PlaylistSortedBy {
   void update(SortBy newSortingRule) => state = newSortingRule;
 }
 
+@riverpod
+Future<List<Song>> searchSongs(Ref ref, {required String query}) async {
+  final all = await ref.watch(allSongsProvider.future);
+  if (query.trim().isEmpty) return [];
+  final lower = query.toLowerCase();
+  return all.where((s) =>
+    s.title.toLowerCase().contains(lower) ||
+    s.artist.toLowerCase().contains(lower) ||
+    s.album.toLowerCase().contains(lower)
+  ).toList();
+}
+
 final favouriteSongsBootstrapProvider = FutureProvider<List<Song>>((ref) async {
   final playlist = await ref.watch(getFavouritesPlaylistProvider.future);
   return ref.watch(getPlaylistSongsProvider(playlist: playlist).future);

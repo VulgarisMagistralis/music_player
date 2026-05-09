@@ -47,6 +47,20 @@ class CustomAppTheme {
       backgroundColor: primaryTextColor,
       iconTheme: WidgetStateProperty.all(IconThemeData(color: primaryTextColor, size: 20, shadows: const [Shadow(blurRadius: 2)])),
     ),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        isDense: true,
+        fillColor: mainBackgroundColor,
+        activeIndicatorBorder: const BorderSide(width: 0),
+        contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+        enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
+        suffixStyle: TextStyle(color: primaryTextColor, fontSize: 20),
+        border: const UnderlineInputBorder(borderRadius: BorderRadius.all(Radius.zero)),
+      ),
+      menuStyle: MenuStyle(backgroundColor: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Color?>{WidgetState.any: mainBackgroundColor})),
+      textStyle: TextStyle(color: accentColor, fontSize: 20),
+    ),
 
     /// Seek bar
     sliderTheme: SliderThemeData(inactiveTrackColor: accentColor, thumbShape: HiddenThumbComponentShape(), activeTrackColor: primaryTextColor),

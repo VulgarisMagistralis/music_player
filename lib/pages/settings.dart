@@ -10,12 +10,14 @@ import 'package:music_player/providers/ui_elements.dart';
 import 'package:music_player/providers/theme_colors.dart';
 import 'package:music_player/widgets/setting_number.dart';
 import 'package:music_player/widgets/setting_switch.dart';
+import 'package:music_player/widgets/setting_locale_selector.dart';
 import 'package:music_player/utilities/color_selector.dart';
 import 'package:music_player/providers/setting_switches.dart';
 import 'package:music_player/utilities/string_extension.dart';
 import 'package:music_player/providers/utility_providers.dart';
 import 'package:music_player/common/animated_overflow_text.dart';
 import 'package:music_player/low_level_wrapper/init.dart' show LowLevelInitializer;
+import 'package:music_player/l10n/app_localizations.dart';
 
 /// Loaded saved folders, enable ordering , delete/add
 /// show/hide icon for songs without album art
@@ -28,7 +30,7 @@ class SettingsPage extends ConsumerStatefulWidget {
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
   Future<void> _pickDirectory(BuildContext context) async {
-    final result = await FilePicker.platform.getDirectoryPath();
+    final result = await FilePicker.getDirectoryPath();
     if (result != null && result.isNotEmpty) {
       final List<String> libraryPathList = await ref.read(loadLibraryProvider.future);
       if (!libraryPathList.contains(result)) {
@@ -57,7 +59,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 child: ListView(
                   shrinkWrap: true,
                   children: [
-                    const Center(child: Text('Source')),
+                    Center(child: Text(AppLocalizations.of(context).settings_page_title)),
                     ExpansionTile(
                       title: Row(
                         children: [
@@ -81,7 +83,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                 await LowLevelInitializer.init();
                                 ref.invalidate(loadLibraryProvider);
                               });
-                              ToastManager().showErrorToast('Encountered loading error from this folder. Reloading...');
+                              ToastManager().showErrorToast(AppLocalizations.of(context).toast_folder_load_error);
                               return const SizedBox.shrink();
                             },
                             loading: () => const CircularProgressIndicator(),
@@ -114,11 +116,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           ref.invalidate(loadLibraryProvider);
                           return [const Text('ERROR!')];
                         },
-                        loading: () => [Text('Trying to read folder')],
+                        loading: () => [const Text('Trying to read folder')],
                       ),
                     ),
                     const Divider(),
-                    const Center(child: Text('Theme')),
+                    Center(child: Text(AppLocalizations.of(context).settings_appearance_title)),
                     SettingColorSelector(title: 'Background Color', provider: primaryBackgroundColorProvider, onUpdate: ref.read(primaryBackgroundColorProvider.notifier).update),
                     SettingColorSelector(title: 'Main Text Color', provider: primaryTextColorProvider, onUpdate: ref.read(primaryTextColorProvider.notifier).update),
                     SettingColorSelector(title: 'Accent Color', provider: primaryAccentColorProvider, onUpdate: ref.read(primaryAccentColorProvider.notifier).update),
@@ -135,8 +137,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     SettingSwitch(label: 'Show navigation buttons', provider: showAndroidNavigationButtonsProvider, onToggle: ref.read(showAndroidNavigationButtonsProvider.notifier).setFlag),
                     SettingNumberSelector(label: 'Rewind Interval', provider: rewindIntervalInSecondsProvider, onUpdate: ref.read(rewindIntervalInSecondsProvider.notifier).update),
                     SettingNumberSelector(label: 'Fast Forward Interval', provider: fastForwardIntervalInSecondsProvider, onUpdate: ref.read(fastForwardIntervalInSecondsProvider.notifier).update),
+                    const SettingLocaleSelector(label: 'Language'),
 
-                    ///TODO Locale
                     /// Ignore media less than X seconds
                     /// toggle persistent player across pages
                     /// confirm deletion of playlists

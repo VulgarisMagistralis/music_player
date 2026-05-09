@@ -1,0 +1,71 @@
+{
+  "@@locale": "es",
+
+  "toast_audio_start_failed": "Error al iniciar los servicios de audio",
+  "toast_favourite_unknown": "El estado de favorito es desconocido",
+  "toast_folder_load_error": "Error al cargar esta carpeta. Recargando...",
+  "toast_playlist_deleted": "Eliminada {name}",
+  "@toast_playlist_deleted": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_playlist_delete_failed": "Error al eliminar {name}",
+  "@toast_playlist_delete_failed": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_load_songs_failed": "Error al cargar las canciones",
+  "toast_playlist_created": "Creada {name}",
+  "@toast_playlist_created": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_playlist_create_failed": "Error al crear {name}",
+  "@toast_playlist_create_failed": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_added_to_playlist": "Añadida a {name}",
+  "@toast_added_to_playlist": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_add_to_playlist_failed": "Error al añadir la canción a {name}",
+  "@toast_add_to_playlist_failed": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_skipped_not_found": "Omitida {title}\nArchivo no encontrado",
+  "@toast_skipped_not_found": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "toast_audio_session_failed": "No se pudo activar la sesión de audio",
+  "toast_audio_play_error": "Error al reproducir: {error}",
+  "@toast_audio_play_error": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "toast_could_not_open_settings": "No se pudieron abrir los ajustes",
+  "toast_album_art_failed": "No se pudo obtener la portada del álbum",
+  "settings_page_title": "Reproductor",
+  "settings_behaviour_title": "Comportamiento",
+  "settings_behaviour_play_on_launch": "Reproducción automática al iniciar",
+  "settings_behaviour_play_on_connect": "Reproducción automática al conectar dispositivo",
+  "settings_behaviour_resume_after_disconnect": "Reanudar tras desconectar dispositivo",
+  "settings_behaviour_paused_on_hidden": "Pausar al ocultar la aplicación",
+  "settings_behaviour_paused_when_muted": "Pausar al silenciar el dispositivo",
+  "settings_playback_title": "Reproducción",
+  "settings_appearance_title": "Apariencia",
+  "settings_appearance_theme_mode": "Modo de tema",
+  "settings_appearance_theme_color": "Color del tema",
+  "settings_appearance_language": "Idioma"
+}

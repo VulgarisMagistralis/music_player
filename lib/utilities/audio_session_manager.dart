@@ -20,10 +20,6 @@ class AudioSessionManager extends Notifier<AudioSessionState> {
       assert(s.songId != null, 'Ready state without songId');
       assert(s.asMediaItem != null, 'Ready state without MediaItem');
     }
-
-    if (s.isPlaying) {
-      assert(s.file != null, 'Playing without file');
-    }
   }
 
   void updateFromMediaItem(MediaItem mediaItem, int index) async {

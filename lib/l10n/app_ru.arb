@@ -1,0 +1,71 @@
+{
+  "@@locale": "ru",
+
+  "toast_audio_start_failed": "Не удалось запустить аудиослужбы",
+  "toast_favourite_unknown": "Статус избранного неизвестен",
+  "toast_folder_load_error": "Ошибка при загрузке этой папки. Перезагрузка...",
+  "toast_playlist_deleted": "Удалено {name}",
+  "@toast_playlist_deleted": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_playlist_delete_failed": "Не удалось удалить {name}",
+  "@toast_playlist_delete_failed": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_load_songs_failed": "Не удалось загрузить песни",
+  "toast_playlist_created": "Создано {name}",
+  "@toast_playlist_created": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_playlist_create_failed": "Не удалось создать {name}",
+  "@toast_playlist_create_failed": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_added_to_playlist": "Добавлено в {name}",
+  "@toast_added_to_playlist": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_add_to_playlist_failed": "Не удалось добавить песню в {name}",
+  "@toast_add_to_playlist_failed": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "toast_skipped_not_found": "Пропущено {title}\nФайл не найден",
+  "@toast_skipped_not_found": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "toast_audio_session_failed": "Не удалось активировать аудиосессию",
+  "toast_audio_play_error": "Ошибка воспроизведения: {error}",
+  "@toast_audio_play_error": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "toast_could_not_open_settings": "Не удалось открыть настройки",
+  "toast_album_art_failed": "Не удалось получить обложку альбома",
+  "settings_page_title": "Плеер",
+  "settings_behaviour_title": "Поведение",
+  "settings_behaviour_play_on_launch": "Автовоспроизведение при запуске",
+  "settings_behaviour_play_on_connect": "Автовоспроизведение при подключении",
+  "settings_behaviour_resume_after_disconnect": "Возобновить после отключения",
+  "settings_behaviour_paused_on_hidden": "Пауза при скрытии приложения",
+  "settings_behaviour_paused_when_muted": "Пауза при отключении звука",
+  "settings_playback_title": "Воспроизведение",
+  "settings_appearance_title": "Внешний вид",
+  "settings_appearance_theme_mode": "Режим темы",
+  "settings_appearance_theme_color": "Цвет темы",
+  "settings_appearance_language": "Язык"
+}
