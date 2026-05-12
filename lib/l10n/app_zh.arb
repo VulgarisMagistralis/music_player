@@ -1,57 +1,72 @@
 {
   "@@locale": "zh",
-
   "toast_audio_start_failed": "启动音频服务失败",
   "toast_favourite_unknown": "收藏状态未知",
   "toast_folder_load_error": "从此文件夹加载时遇到错误。正在重新加载...",
   "toast_playlist_deleted": "已删除{name}",
   "@toast_playlist_deleted": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_playlist_delete_failed": "无法删除{name}",
   "@toast_playlist_delete_failed": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_load_songs_failed": "加载歌曲失败",
   "toast_playlist_created": "已创建{name}",
   "@toast_playlist_created": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_playlist_create_failed": "无法创建{name}",
   "@toast_playlist_create_failed": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_added_to_playlist": "已添加到{name}",
   "@toast_added_to_playlist": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_add_to_playlist_failed": "无法将歌曲添加到{name}",
   "@toast_add_to_playlist_failed": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_skipped_not_found": "已跳过{title}\n未找到文件",
   "@toast_skipped_not_found": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "toast_audio_session_failed": "无法激活音频会话",
   "toast_audio_play_error": "播放音频时出错: {error}",
   "@toast_audio_play_error": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "toast_could_not_open_settings": "无法打开设置",
@@ -67,5 +82,15 @@
   "settings_appearance_title": "外观",
   "settings_appearance_theme_mode": "主题模式",
   "settings_appearance_theme_color": "主题颜色",
-  "settings_appearance_language": "语言"
+  "settings_appearance_language": "语言",
+  "button_exit": "退出",
+  "button_open_settings": "打开设置",
+  "dialog_cancel": "取消",
+  "dialog_playlist_new_name": "播放列表名称",
+  "dialog_save": "保存",
+  "error_lost_beat": "节奏乱了...",
+  "loading_new_version": "有新版本可用: {version}",
+  "loading_version": "正在读取版本信息",
+  "permission_required_body": "似乎已拒绝访问。您可以前往设置以授予必要的权限。",
+  "permission_required_title": "需要权限才能继续"
 }

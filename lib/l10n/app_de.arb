@@ -1,57 +1,72 @@
 {
   "@@locale": "de",
-
   "toast_audio_start_failed": "Audio-Dienste konnten nicht gestartet werden",
   "toast_favourite_unknown": "Favoritenstatus ist unbekannt",
   "toast_folder_load_error": "Fehler beim Laden dieses Ordners. Neu laden...",
   "toast_playlist_deleted": "Gelöscht {name}",
   "@toast_playlist_deleted": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_playlist_delete_failed": "{name} konnte nicht gelöscht werden",
   "@toast_playlist_delete_failed": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_load_songs_failed": "Lieder konnten nicht geladen werden",
   "toast_playlist_created": "Erstellt {name}",
   "@toast_playlist_created": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_playlist_create_failed": "{name} konnte nicht erstellt werden",
   "@toast_playlist_create_failed": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_added_to_playlist": "Zu {name} hinzugefügt",
   "@toast_added_to_playlist": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_add_to_playlist_failed": "Lied konnte nicht zu {name} hinzugefügt werden",
   "@toast_add_to_playlist_failed": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_skipped_not_found": "Übersprungen {title}\nDatei nicht gefunden",
   "@toast_skipped_not_found": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "toast_audio_session_failed": "Audio-Sitzung konnte nicht aktiviert werden",
   "toast_audio_play_error": "Wiedergabefehler: {error}",
   "@toast_audio_play_error": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "toast_could_not_open_settings": "Einstellungen konnten nicht geöffnet werden",
@@ -67,5 +82,15 @@
   "settings_appearance_title": "Erscheinungsbild",
   "settings_appearance_theme_mode": "Designmodus",
   "settings_appearance_theme_color": "Designfarbe",
-  "settings_appearance_language": "Sprache"
+  "settings_appearance_language": "Sprache",
+  "button_exit": "Beenden",
+  "button_open_settings": "Einstellungen öffnen",
+  "dialog_cancel": "Abbrechen",
+  "dialog_playlist_new_name": "Wiedergabelistenname",
+  "dialog_save": "Speichern",
+  "error_lost_beat": "Wir haben den Takt verloren...",
+  "loading_new_version": "Neue Version verfügbar: {version}",
+  "loading_version": "Versionsinformationen werden gelesen",
+  "permission_required_body": "Der Zugriff wurde verweigert. Sie können zu den Einstellungen gehen und die benötigten Berechtigungen erteilen.",
+  "permission_required_title": "Berechtigung erforderlich"
 }

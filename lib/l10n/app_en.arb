@@ -83,5 +83,22 @@
   "settings_appearance_title": "Appearance",
   "settings_appearance_theme_mode": "Theme mode",
   "settings_appearance_theme_color": "Theme color",
-  "settings_appearance_language": "Language"
+  "settings_appearance_language": "Language",
+  "dialog_playlist_new_name": "New Playlist Name",
+  "dialog_save": "Save",
+  "dialog_cancel": "Cancel",
+  "error_lost_beat": "We lost the beat...",
+  "button_exit": "Exit",
+  "button_open_settings": "Open Settings",
+  "permission_required_title": "Permission required to continue",
+  "permission_required_body": "It seems you've denied access. You can go to settings to grant the necessary permissions.",
+  "loading_version": "Reading version information",
+  "loading_new_version": "New Version Available: {version}",
+  "@loading_new_version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  }
 }

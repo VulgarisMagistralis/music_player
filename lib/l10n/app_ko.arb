@@ -1,57 +1,72 @@
 {
   "@@locale": "ko",
-
   "toast_audio_start_failed": "오디오 서비스 시작 실패",
   "toast_favourite_unknown": "즐겨찾기 상태가 알 수 없습니다",
   "toast_folder_load_error": "이 폴더 로딩 중 오류가 발생했습니다. 다시 로딩 중...",
   "toast_playlist_deleted": "{name}(이)가 삭제되었습니다",
   "@toast_playlist_deleted": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_playlist_delete_failed": "{name}(이)를 삭제하지 못했습니다",
   "@toast_playlist_delete_failed": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_load_songs_failed": "노래 로딩 실패",
   "toast_playlist_created": "{name}(이)가 생성되었습니다",
   "@toast_playlist_created": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_playlist_create_failed": "{name}(이)를 생성하지 못했습니다",
   "@toast_playlist_create_failed": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_added_to_playlist": "{name}(이)에 추가되었습니다",
   "@toast_added_to_playlist": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_add_to_playlist_failed": "{name}(이)에 노래를 추가하지 못했습니다",
   "@toast_add_to_playlist_failed": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_skipped_not_found": "{title}(이)가 건너뛰었습니다\n파일을 찾을 수 없습니다",
   "@toast_skipped_not_found": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "toast_audio_session_failed": "오디오 세션을 활성화할 수 없습니다",
   "toast_audio_play_error": "재생 중 오류: {error}",
   "@toast_audio_play_error": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "toast_could_not_open_settings": "설정을 열 수 없습니다",
@@ -67,5 +82,15 @@
   "settings_appearance_title": "표현",
   "settings_appearance_theme_mode": "테마 모드",
   "settings_appearance_theme_color": "테마 색상",
-  "settings_appearance_language": "언어"
+  "settings_appearance_language": "언어",
+  "button_exit": "나가기",
+  "button_open_settings": "설정 열기",
+  "dialog_cancel": "취소",
+  "dialog_playlist_new_name": "재생 목록 이름",
+  "dialog_save": "저장",
+  "error_lost_beat": "음악이 끊겼습니다...",
+  "loading_new_version": "새 버전 사용 가능: {version}",
+  "loading_version": "버전 정보 읽는 중",
+  "permission_required_body": "접근이 거부되었습니다. 설정에서 필요한 권한을 부여할 수 있습니다.",
+  "permission_required_title": "계속하려면 권한이 필요합니다"
 }

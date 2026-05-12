@@ -2,6 +2,7 @@ import 'dart:async' show Timer;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/common/toast.dart';
+import 'package:music_player/l10n/app_localizations.dart';
 import 'package:music_player/src/rust/api/data/playlist.dart';
 import 'package:music_player/utilities/providers.dart';
 import 'package:music_player/widgets/album_art_widget.dart';
@@ -60,9 +61,13 @@ class _SongRowState extends ConsumerState<SongRow> with AutomaticKeepAliveClient
                                     onTap: () async {
                                       try {
                                         await ref.read(addSongToTargetPlaylistProvider(songId: widget.song.id, playlistId: playlist.id).future);
-                                        ToastManager().showInfoToast('Added to ${playlist.name}');
+                                        if (context.mounted) {
+                                          ToastManager().showInfoToast(AppLocalizations.of(context).toast_added_to_playlist(playlist.name));
+                                        }
                                       } catch (e) {
-                                        ToastManager().showErrorToast('Failed to add song to ${playlist.name}');
+                                        if (context.mounted) {
+                                          ToastManager().showErrorToast(AppLocalizations.of(context).toast_add_to_playlist_failed(playlist.name));
+                                        }
                                       }
                                       ref.invalidate(playlistCollectionProvider);
                                     },
@@ -81,11 +86,7 @@ class _SongRowState extends ConsumerState<SongRow> with AutomaticKeepAliveClient
                         // TODO: implement ignore song
                       },
                     ),
-                    PopupMenuItem(
-                      value: 3,
-                      child: const Text('Details'),
-                      onTap: () => SongInfoSheet.show(context, widget.song),
-                    ),
+                    PopupMenuItem(value: 3, child: const Text('Details'), onTap: () => SongInfoSheet.show(context, widget.song)),
                   ],
                 );
               });

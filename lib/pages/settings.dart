@@ -137,7 +137,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     SettingSwitch(label: 'Show navigation buttons', provider: showAndroidNavigationButtonsProvider, onToggle: ref.read(showAndroidNavigationButtonsProvider.notifier).setFlag),
                     SettingNumberSelector(label: 'Rewind Interval', provider: rewindIntervalInSecondsProvider, onUpdate: ref.read(rewindIntervalInSecondsProvider.notifier).update),
                     SettingNumberSelector(label: 'Fast Forward Interval', provider: fastForwardIntervalInSecondsProvider, onUpdate: ref.read(fastForwardIntervalInSecondsProvider.notifier).update),
-                    const SettingLocaleSelector(label: 'Language'),
+                    SettingLocaleSelector(label: AppLocalizations.of(context).settings_appearance_language),
 
                     /// Ignore media less than X seconds
                     /// toggle persistent player across pages

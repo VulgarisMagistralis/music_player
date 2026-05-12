@@ -1,57 +1,72 @@
 {
   "@@locale": "fr",
-
   "toast_audio_start_failed": "Échec du démarrage des services audio",
   "toast_favourite_unknown": "Le statut favori est inconnu",
   "toast_folder_load_error": "Erreur de chargement de ce dossier. Rechargement...",
   "toast_playlist_deleted": "Supprimée {name}",
   "@toast_playlist_deleted": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_playlist_delete_failed": "Échec de la suppression de {name}",
   "@toast_playlist_delete_failed": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_load_songs_failed": "Échec du chargement des chansons",
   "toast_playlist_created": "Créée {name}",
   "@toast_playlist_created": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_playlist_create_failed": "Échec de la création de {name}",
   "@toast_playlist_create_failed": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_added_to_playlist": "Ajoutée à {name}",
   "@toast_added_to_playlist": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_add_to_playlist_failed": "Échec de l'ajout de la chanson à {name}",
   "@toast_add_to_playlist_failed": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toast_skipped_not_found": "Passée {title}\nFichier introuvable",
   "@toast_skipped_not_found": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "toast_audio_session_failed": "Impossible d'activer la session audio",
   "toast_audio_play_error": "Erreur de lecture : {error}",
   "@toast_audio_play_error": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "toast_could_not_open_settings": "Impossible d'ouvrir les paramètres",
@@ -67,5 +82,15 @@
   "settings_appearance_title": "Apparence",
   "settings_appearance_theme_mode": "Mode du thème",
   "settings_appearance_theme_color": "Couleur du thème",
-  "settings_appearance_language": "Langue"
+  "settings_appearance_language": "Langue",
+  "button_exit": "Quitter",
+  "button_open_settings": "Ouvrir les paramètres",
+  "dialog_cancel": "Annuler",
+  "dialog_playlist_new_name": "Nom de la playlist",
+  "dialog_save": "Enregistrer",
+  "error_lost_beat": "Le rythme s'est perdu...",
+  "loading_new_version": "Nouvelle version disponible : {version}",
+  "loading_version": "Lecture des informations de version",
+  "permission_required_body": "L'accès semble refusé. Vous pouvez accéder aux paramètres pour accorder les autorisations nécessaires.",
+  "permission_required_title": "Autorisation requise pour continuer"
 }
