@@ -10,8 +10,8 @@ use lofty::file::TaggedFileExt;
 use lofty::probe::Probe;
 use lofty::tag::Accessor;
 use std::borrow::Cow;
+use std::collections::HashMap;
 use std::fs;
-use std::path::Path;
 use std::path::PathBuf;
 use tokio::task::spawn;
 
@@ -33,111 +33,136 @@ pub async fn read_music_files(sink: StreamSink<StreamEvent>) {
                 return;
             }
         };
-        let mut locked_collection = locked_song_collection();
+
         if folders.is_empty() {
-            let _ = locked_collection.remove_all_songs();
+            let _ = locked_song_collection().remove_all_songs();
             let _ = sink.add(StreamEvent::Done);
             return;
         }
-
-        for folder in folders {
-            let dir = PathBuf::from(&folder);
+        let existing: HashMap<u64, i64> = {
+            let collection = locked_song_collection();
+            collection
+                .get_all_songs()
+                .into_iter()
+                .map(|s| (s.id, s.last_modified_at))
+                .collect()
+        };
+        let mut all_paths: Vec<PathBuf> = Vec::new();
+        for folder in &folders {
+            let dir = PathBuf::from(folder);
             if !dir.exists() || !dir.is_dir() {
                 continue;
             }
             let entries = match fs::read_dir(&dir) {
                 Ok(e) => e,
                 Err(_) => {
-                    let _ = sink.add(StreamEvent::Error("Failed to read file".into()));
+                    let _ = sink.add(StreamEvent::Error("Failed to read directory".into()));
                     continue;
                 }
             };
-            for entry in entries {
-                let entry = match entry {
-                    Ok(e) => e,
-                    Err(_) => {
-                        let _ = sink.add(StreamEvent::Error("Corrupted entry".into()));
-                        continue;
-                    }
-                };
+            for entry in entries.flatten() {
                 let path = entry.path();
-                let path_file = Path::new(&path);
-                if !path_file.is_file() {
+                if !path.is_file() {
                     continue;
                 }
-                let ext = match path_file.extension().and_then(|e| e.to_str()) {
-                    Some(e) => e.to_lowercase(),
-                    None => {
-                        let _ = sink.add(StreamEvent::Error("File missing extension".into()));
-                        continue;
-                    }
-                };
-                if !matches!(ext.to_lowercase().as_str(), "mp3" | "flac" | "wav" | "m4a") {
-                    let _ = sink.add(StreamEvent::Error(format!("Unsupported file type {}", ext)));
+                let ext = path
+                    .extension()
+                    .and_then(|e| e.to_str())
+                    .map(|e| e.to_lowercase())
+                    .unwrap_or_default();
+                if matches!(ext.as_str(), "mp3" | "flac" | "wav" | "m4a") {
+                    all_paths.push(path);
+                }
+            }
+        }
+
+        let mut songs_to_add: Vec<(Song, Option<Vec<u8>>)> = Vec::new();
+
+        for path in all_paths {
+            let path_string = path.to_string_lossy().to_string();
+            let song_id = hash_string(&path_string);
+            let last_modified = fs::metadata(&path)
+                .and_then(|m| m.modified())
+                .ok()
+                .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                .map(|d| d.as_secs() as i64)
+                .unwrap_or(0);
+
+            if existing.get(&song_id) == Some(&last_modified) {
+                if let Some(cached) = locked_song_collection().get_song(song_id) {
+                    let _ = sink.add(StreamEvent::Song(cached));
+                }
+                continue;
+            }
+
+            let path_for_probe = path.clone();
+            let tagged_file = match tokio::task::spawn_blocking(move || {
+                Probe::open(&path_for_probe).and_then(|p| p.read())
+            })
+            .await
+            {
+                Ok(Ok(t)) => t,
+                Ok(Err(e)) => {
+                    let _ = sink.add(StreamEvent::Error(format!(
+                        "Skipping file: failed to read tags ({e})"
+                    )));
                     continue;
                 }
+                Err(_) => {
+                    let _ = sink.add(StreamEvent::Error("Tag read task panicked".into()));
+                    continue;
+                }
+            };
 
-                let tagged_file = match Probe::open(path_file).and_then(|p| p.read()) {
-                    Ok(t) => t,
-                    Err(e) => {
-                        let _ = sink.add(StreamEvent::Error(format!(
-                            "Skipping file : failed to read tags ({e})",
-                        )));
-                        continue;
-                    }
-                };
+            let Some(primary_tag) = tagged_file.primary_tag() else {
+                continue;
+            };
 
-                if let Some(primary_tag) = tagged_file.primary_tag() {
-                    let duration = tagged_file.properties().duration().as_secs();
-                    let artist = primary_tag.artist().unwrap_or_default().to_string();
-                    let album = primary_tag.album().unwrap_or_default().to_string();
-                    let path_string = path_file.to_string_lossy().to_string();
-                    let album_art: Option<Vec<u8>> =
-                        primary_tag.pictures().first().map(|p| p.data().to_vec());
-                    let album_art_id = album_art.as_ref().map(|_| hash_string(&path_string));
-                    let song = Song {
-                        id: hash_string(&path_string),
-                        path: path_string,
-                        title: primary_tag
-                            .title()
-                            .unwrap_or_else(|| {
-                                Cow::Owned(
-                                    path_file
-                                        .file_stem()
-                                        .unwrap_or_default()
-                                        .to_string_lossy()
-                                        .to_string(),
-                                )
-                            })
-                            .to_string(),
-                        artist: artist,
-                        album: album,
-                        last_modified_at: fs::metadata(path_file)
-                            .and_then(|m| m.modified())
-                            .ok()
-                            .and_then(|t| {
-                                t.duration_since(std::time::UNIX_EPOCH)
-                                    .ok()
-                                    .map(|d| d.as_secs() as i64)
-                            })
-                            .unwrap_or(0),
-                        duration: Some(duration as u32),
-                        album_art_id,
-                    };
-                    let album_art_file_name = format!("art_{}.jpg", song.id);
-                    let album_art_path: PathBuf = thumbnails_dir.join(album_art_file_name);
-                    if let Some(album_art_bytes) = album_art.clone() {
-                        if let Err(e) = std::fs::write(&album_art_path, album_art_bytes) {
-                            eprintln!("Failed to write artwork for song {}: {}", song.id, e);
-                        }
-                    }
+            let duration = tagged_file.properties().duration().as_secs();
+            let artist = primary_tag.artist().unwrap_or_default().to_string();
+            let album = primary_tag.album().unwrap_or_default().to_string();
+            let album_art: Option<Vec<u8>> =
+                primary_tag.pictures().first().map(|p| p.data().to_vec());
+            let album_art_id = album_art.as_ref().map(|_| hash_string(&path_string));
 
-                    if let Err(e) = locked_collection.add_song(song.clone(), album_art.clone()) {
-                        let _ = sink.add(StreamEvent::Error(e.to_string()));
-                        continue;
+            let song = Song {
+                id: song_id,
+                path: path_string,
+                title: primary_tag
+                    .title()
+                    .unwrap_or_else(|| {
+                        Cow::Owned(
+                            path.file_stem()
+                                .unwrap_or_default()
+                                .to_string_lossy()
+                                .to_string(),
+                        )
+                    })
+                    .to_string(),
+                artist,
+                album,
+                last_modified_at: last_modified,
+                duration: Some(duration as u32),
+                album_art_id,
+            };
+            let album_art_path = thumbnails_dir.join(format!("art_{}.jpg", song.id));
+            if !album_art_path.exists() {
+                if let Some(ref art_bytes) = album_art {
+                    if let Err(e) = std::fs::write(&album_art_path, art_bytes) {
+                        eprintln!("Failed to write artwork for song {}: {}", song.id, e);
                     }
-                    let _ = sink.add(StreamEvent::Song(song));
-                };
+                }
+            }
+
+            let _ = sink.add(StreamEvent::Song(song.clone()));
+            songs_to_add.push((song, album_art));
+        }
+        if !songs_to_add.is_empty() {
+            let mut collection = locked_song_collection();
+            for (song, art) in songs_to_add {
+                if let Err(e) = collection.add_song(song, art) {
+                    let _ = sink.add(StreamEvent::Error(e.to_string()));
+                }
             }
         }
 

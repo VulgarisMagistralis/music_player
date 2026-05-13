@@ -114,19 +114,21 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     );
   }
 
-  void _listenToInterruptions() async => _subscriptionList.add(
-    (await _session).interruptionEventStream.listen((AudioInterruptionEvent event) async {
-      if (event.begin) {
-        if (event.type == AudioInterruptionType.pause || event.type == AudioInterruptionType.duck) {
-          _pausedForInterruption = true;
-          await _handlePlayPause(shouldPause: true);
+  void _listenToInterruptions() {
+    _session.then((session) {
+      session.interruptionEventStream.listen((AudioInterruptionEvent event) async {
+        if (event.begin) {
+          if (event.type == AudioInterruptionType.pause || event.type == AudioInterruptionType.duck) {
+            _pausedForInterruption = true;
+            await _handlePlayPause(shouldPause: true);
+          }
+        } else if (_pausedForInterruption) {
+          _pausedForInterruption = false;
+          await _handlePlayPause(shouldPause: false);
         }
-      } else if (_pausedForInterruption) {
-        _pausedForInterruption = false;
-        await _handlePlayPause(shouldPause: false);
-      }
-    }),
-  );
+      });
+    });
+  }
 
   void _listenToDevicesChanged() async => _subscriptionList.add(
     (await _session).devicesChangedEventStream.listen((AudioDevicesChangedEvent event) async {
@@ -182,7 +184,7 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
         mediaItem.add(newMediaItem);
       }
     } catch (e) {
-      print(e);
+      ToastManager().showErrorToast('Error restoring previous session: $e');
     }
   }
 
@@ -370,6 +372,22 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     if (wasPlaying) {
       await _player.play();
     }
+  }
+
+  @override
+  Future<void> rewind() async {
+    final int newRewindValue = _container.read(rewindIntervalInSecondsProvider);
+    final currentPosition = _player.position;
+    final newPosition = currentPosition - Duration(seconds: newRewindValue);
+    await seek(newPosition);
+  }
+
+  @override
+  Future<void> fastForward() async {
+    final int newFastForwardValue = _container.read(fastForwardIntervalInSecondsProvider);
+    final currentPosition = _player.position;
+    final newPosition = currentPosition + Duration(seconds: newFastForwardValue);
+    await seek(newPosition);
   }
 
   @override

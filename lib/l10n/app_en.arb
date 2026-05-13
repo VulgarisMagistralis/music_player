@@ -1,6 +1,14 @@
 {
   "@@locale": "en",
 
+  "button_settings": "Settings",
+  "button_play": "Play",
+  "error_loading_library": "Failed to load library",
+  "playlist_create_title": "Create Playlist",
+  "settings_folder_error": "Failed to load folders",
+  "menu_add_to_playlist": "Add to playlist",
+  "menu_ignore_song": "Ignore song",
+  "menu_details": "Details",
   "toast_audio_start_failed": "Failed to start audio services",
   "toast_favourite_unknown": "Favourite status is unknown",
   "toast_folder_load_error": "Encountered loading error from this folder. Reloading...",
@@ -100,5 +108,32 @@
         "type": "String"
       }
     }
-  }
+  },
+  "search_hint": "Search songs...",
+  "search_placeholder": "Type to search by title, artist, or album",
+  "search_error": "Error searching",
+  "search_no_results": "No songs found",
+  "settings_folder_title": "Folders",
+  "settings_version_title": "Version",
+  "settings_appearance_background_color": "Background Color",
+  "settings_appearance_main_text_color": "Main Text Color",
+  "settings_appearance_accent_color": "Accent Color",
+  "settings_appearance_font_size": "Font Size",
+  "settings_appearance_icon_size": "Icon Size",
+  "settings_behaviour_show_song_icons": "Show song icons on lists",
+  "settings_behaviour_play_on_launch": "Play on launch",
+  "settings_behaviour_play_on_connect": "Play when connected",
+  "settings_behaviour_pause_when_muted": "Pause when muted",
+  "settings_behaviour_pause_when_hidden": "Pause when hidden",
+  "settings_behaviour_resume_after_disconnect": "Resume after disconnected",
+  "settings_behaviour_show_nav_buttons": "Show navigation buttons",
+  "settings_playback_rewind_interval": "Rewind Interval",
+  "settings_playback_fast_forward_interval": "Fast Forward Interval",
+  "songs_no_music_title": "Couldn't find any music",
+  "songs_no_music_action": "Settings",
+  "playlists_create_title": "Create Playlist",
+  "playlists_new_default_name": "New Playlist Name",
+  "playlists_failed_title": "Failed!!!",
+  "loading_still_loading": "still loading",
+  "settings_folder_loading":"Trying to read folder"
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/l10n/app_localizations.dart';
 import 'package:music_player/menu/nav_bar.dart';
 import 'package:music_player/widgets/header.dart';
 import 'package:music_player/utilities/providers.dart';
@@ -31,9 +32,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   @override
   Widget build(BuildContext context) {
     final isSearching = _currentQuery.trim().isNotEmpty;
-    final searchResults = isSearching
-        ? ref.watch(searchSongsProvider(query: _currentQuery))
-        : null;
+    final searchResults = isSearching ? ref.watch(searchSongsProvider(query: _currentQuery)) : null;
 
     return Scaffold(
       bottomNavigationBar: const PlayerNavigationBar(),
@@ -49,7 +48,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 controller: _searchController,
                 onChanged: _onQueryChanged,
                 decoration: InputDecoration(
-                  hintText: 'Search songs...',
+                  hintText: GeneratedLocalization.of(context).search_hint,
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: _currentQuery.isNotEmpty
                       ? IconButton(
@@ -59,38 +58,27 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           },
                         )
                       : null,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
               const SizedBox(height: 12),
               if (!isSearching)
-                const Expanded(
+                Expanded(
                   child: Center(
-                    child: Text(
-                      'Type to search by title, artist, or album',
-                      style: TextStyle(color: Colors.grey, fontSize: 16),
-                    ),
+                    child: Text(GeneratedLocalization.of(context).search_placeholder, style: const TextStyle(color: Colors.grey, fontSize: 16)),
                   ),
                 )
               else
                 Expanded(
                   child: searchResults!.when(
                     loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (_, _) => const Center(
-                      child: Text(
-                        'Error searching',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
-                      ),
+                    error: (_, _) => Center(
+                      child: Text(GeneratedLocalization.of(context).search_error, style: const TextStyle(color: Colors.grey, fontSize: 16)),
                     ),
                     data: (songs) {
                       if (songs.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            'No songs found',
-                            style: TextStyle(color: Colors.grey, fontSize: 16),
-                          ),
+                        return Center(
+                          child: Text(GeneratedLocalization.of(context).search_no_results, style: const TextStyle(color: Colors.grey, fontSize: 16)),
                         );
                       }
                       return ListView.builder(
@@ -101,9 +89,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                             song: song,
                             index: index,
                             onTap: (int idx) async {
-                              await ref
-                                  .read(audioHandlerSyncProvider)
-                                  .setPlaylist('search', songs, index: idx);
+                              await ref.read(audioHandlerSyncProvider).setPlaylist('search', songs, index: idx);
                             },
                           );
                         },

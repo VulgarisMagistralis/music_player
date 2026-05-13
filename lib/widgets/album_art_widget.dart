@@ -19,7 +19,7 @@ class AlbumArtWidget extends ConsumerWidget {
           child: albumArtOrNull == null ? Image.asset('assets/icons/note_2.png', fit: BoxFit.cover) : Image.memory(albumArtOrNull, cacheWidth: 50, cacheHeight: 50, fit: BoxFit.cover),
         ),
         error: (_, __) {
-          ToastManager().showErrorToast(AppLocalizations.of(context).toast_album_art_failed);
+          ToastManager().showErrorToast(GeneratedLocalization.of(context).toast_album_art_failed);
           return const SizedBox.shrink();
         },
         loading: () => const SizedBox.shrink(),

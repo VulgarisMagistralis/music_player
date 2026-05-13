@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music_player/common/common.dart' show HiddenThumbComponentShape;
 
-/// font size -2, 0, +2?
-/// icon size -3, 0, +3?
-
 ///Large icons, small icons
 ///Headers, default text, subtitles
 ///
@@ -11,7 +8,9 @@ class CustomAppTheme {
   final Color primaryTextColor;
   final Color accentColor;
   final Color mainBackgroundColor;
-  CustomAppTheme({required this.mainBackgroundColor, required this.primaryTextColor, required this.accentColor});
+  final double fontSizeAdjustment;
+  final double iconSizeAdjustment;
+  CustomAppTheme({required this.mainBackgroundColor, required this.primaryTextColor, required this.accentColor, required this.fontSizeAdjustment, required this.iconSizeAdjustment});
   ThemeData get materialTheme => ThemeData(
     colorScheme: ColorScheme.fromSeed(seedColor: primaryTextColor, secondary: accentColor),
     highlightColor: Colors.transparent,
@@ -41,11 +40,11 @@ class CustomAppTheme {
     listTileTheme: ListTileThemeData(
       iconColor: primaryTextColor,
       style: ListTileStyle.list,
-      titleTextStyle: TextStyle(color: primaryTextColor, fontSize: 20),
+      titleTextStyle: TextStyle(color: primaryTextColor, fontSize: 20 + fontSizeAdjustment),
     ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: primaryTextColor,
-      iconTheme: WidgetStateProperty.all(IconThemeData(color: primaryTextColor, size: 20, shadows: const [Shadow(blurRadius: 2)])),
+      iconTheme: WidgetStateProperty.all(IconThemeData(color: primaryTextColor, size: 20 + iconSizeAdjustment, shadows: const [Shadow(blurRadius: 2)])),
     ),
     dropdownMenuTheme: DropdownMenuThemeData(
       inputDecorationTheme: InputDecorationTheme(
@@ -55,16 +54,16 @@ class CustomAppTheme {
         activeIndicatorBorder: const BorderSide(width: 0),
         contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
         enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
-        suffixStyle: TextStyle(color: primaryTextColor, fontSize: 20),
+        suffixStyle: TextStyle(color: primaryTextColor, fontSize: 20 + fontSizeAdjustment),
         border: const UnderlineInputBorder(borderRadius: BorderRadius.all(Radius.zero)),
       ),
       menuStyle: MenuStyle(backgroundColor: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Color?>{WidgetState.any: mainBackgroundColor})),
-      textStyle: TextStyle(color: accentColor, fontSize: 20),
+      textStyle: TextStyle(color: accentColor, fontSize: 20 + fontSizeAdjustment),
     ),
 
     /// Seek bar
     sliderTheme: SliderThemeData(inactiveTrackColor: accentColor, thumbShape: HiddenThumbComponentShape(), activeTrackColor: primaryTextColor),
-    iconTheme: IconThemeData(color: primaryTextColor, size: 27),
+    iconTheme: IconThemeData(color: primaryTextColor, size: 27 + iconSizeAdjustment),
     extensions: const [_CustomAppThemeExtension()],
     switchTheme: SwitchThemeData(
       splashRadius: 0.0,

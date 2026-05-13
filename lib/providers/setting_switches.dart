@@ -99,7 +99,7 @@ class FastForwardIntervalInSeconds extends _$FastForwardIntervalInSeconds {
 @Riverpod(keepAlive: true)
 class CurrentLocale extends _$CurrentLocale {
   static const String _sharedPrefKey = 'app.locale.language_tag';
-  static const Locale _defaultState = Locale('en', 'US');
+  static const Locale _defaultState = Locale('en');
 
   @override
   Locale build() => _loadLocale() ?? _defaultState;

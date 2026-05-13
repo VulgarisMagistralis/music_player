@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
+import 'package:music_player/providers/ui_elements.dart';
 import 'package:music_player/utilities/settings_data.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:music_player/theme/theme_data.dart' show CustomAppTheme;
@@ -19,8 +20,13 @@ part 'theme_colors.g.dart';
 @Riverpod(keepAlive: true)
 class PlayerTheme extends _$PlayerTheme {
   @override
-  ThemeData build() =>
-      CustomAppTheme(primaryTextColor: ref.watch(primaryTextColorProvider), mainBackgroundColor: ref.watch(primaryBackgroundColorProvider), accentColor: ref.watch(primaryAccentColorProvider)).materialTheme;
+  ThemeData build() => CustomAppTheme(
+    primaryTextColor: ref.watch(primaryTextColorProvider),
+    mainBackgroundColor: ref.watch(primaryBackgroundColorProvider),
+    accentColor: ref.watch(primaryAccentColorProvider),
+    fontSizeAdjustment: ref.watch(fontSizeAdjustmentProvider).toDouble(),
+    iconSizeAdjustment: ref.watch(iconSizeAdjustmentProvider).toDouble(),
+  ).materialTheme;
 }
 
 @Riverpod(keepAlive: true)

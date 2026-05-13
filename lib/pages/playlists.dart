@@ -57,7 +57,7 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
               const PlayerHeader(),
               Expanded(
                 child: switch (playlists) {
-                  AsyncError<List<Playlist>>() => const Text('Failed!!!'),
+                  AsyncError<List<Playlist>>() => Text(GeneratedLocalization.of(context).error_loading_library),
                   AsyncLoading<List<Playlist>>() => const WaveformLoading(),
                   AsyncData<List<Playlist>>() => Column(
                     children: [
@@ -78,11 +78,11 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
                                     try {
                                       await ref.read(deletePlaylistFromCollectionProvider(playlistId: playlist.id).future);
                                       if (context.mounted) {
-                                        ToastManager().showInfoToast(AppLocalizations.of(context).toast_playlist_deleted(playlist.name));
+                                        ToastManager().showInfoToast(GeneratedLocalization.of(context).toast_playlist_deleted(playlist.name));
                                       }
                                     } catch (e) {
                                       if (context.mounted) {
-                                        ToastManager().showErrorToast(AppLocalizations.of(context).toast_add_to_playlist_failed(playlist.name));
+                                        ToastManager().showErrorToast(GeneratedLocalization.of(context).toast_add_to_playlist_failed(playlist.name));
                                       }
                                     }
                                     ref.invalidate(playlistCollectionProvider);
@@ -103,7 +103,7 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
                                           )
                                           .toList(),
                                       error: (_, _) {
-                                        ToastManager().showErrorToast(AppLocalizations.of(context).toast_load_songs_failed);
+                                        ToastManager().showErrorToast(GeneratedLocalization.of(context).toast_load_songs_failed);
                                         return [const SizedBox.shrink()];
                                       },
                                       loading: () => [const CircularProgressIndicator()],
@@ -112,7 +112,7 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
                             ),
                             const Divider(),
                             ExpansionTile(
-                              title: const Text('Create Playlist'),
+                              title: Text(GeneratedLocalization.of(context).playlist_create_title),
                               children: [
                                 Padding(
                                   padding: const EdgeInsetsGeometry.only(right: 15),
@@ -124,11 +124,11 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
                                       try {
                                         await ref.read(addPlaylistProvider(newPlaylistName: newPlaylistName).future);
                                         if (context.mounted) {
-                                          ToastManager().showInfoToast(AppLocalizations.of(context).toast_playlist_created(newPlaylistName));
+                                          ToastManager().showInfoToast(GeneratedLocalization.of(context).toast_playlist_created(newPlaylistName));
                                         }
                                       } catch (e) {
                                         if (context.mounted) {
-                                          ToastManager().showErrorToast(AppLocalizations.of(context).toast_playlist_create_failed(newPlaylistName));
+                                          ToastManager().showErrorToast(GeneratedLocalization.of(context).toast_playlist_create_failed(newPlaylistName));
                                         }
                                       }
                                       ref.invalidate(playlistCollectionProvider);

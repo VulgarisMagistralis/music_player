@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/l10n/app_localizations.dart';
 import 'package:music_player/src/rust/api/data/song.dart';
 import 'package:music_player/widgets/album_art_widget.dart';
 import 'package:music_player/utilities/providers.dart';
@@ -87,7 +88,7 @@ class SongInfoSheet extends ConsumerWidget {
                   ref.read(audioHandlerSyncProvider).setPlaylist('song info', [song], index: 0);
                 },
                 icon: const Icon(Icons.play_arrow),
-                label: const Text('Play'),
+                label: Text(GeneratedLocalization.of(context).button_play),
                 style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), textStyle: const TextStyle(fontSize: 16)),
               ),
             ),

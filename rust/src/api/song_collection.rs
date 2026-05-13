@@ -46,7 +46,7 @@ pub fn get_sorted_songs(sort: SortBy) -> Vec<Song> {
     song_collection.get_all_sorted(sort)
 }
 
-#[flutter_rust_bridge::frb]
+#[flutter_rust_bridge::frb(sync)]
 pub fn get_song_album_art_file_path(id: u64) -> String {
     let song_collection = locked_song_collection();
     song_collection.get_album_art_file_path(id)
@@ -54,7 +54,8 @@ pub fn get_song_album_art_file_path(id: u64) -> String {
 
 #[flutter_rust_bridge::frb]
 pub fn get_song_album_art(id: u64) -> Option<Vec<u8>> {
-    let song_collection = locked_song_collection();
+    // needs mut for lazy DB load on cache miss
+    let mut song_collection = locked_song_collection();
     song_collection.get_album_art(id)
 }
 
@@ -75,27 +76,43 @@ pub fn get_song_list(id_list: Vec<u64>) -> Vec<Song> {
 
 impl SongCollection {
     pub fn new() -> Result<Self, CustomError> {
-        let mut art_map: HashMap<u64, Vec<u8>> = HashMap::new();
+        // CHANGE: art_map starts empty — art is loaded lazily on first request.
+        // Previously new() called get_song_art_from_db() for every song at
+        // startup: O(n) DB reads before the app shows anything. Now startup
+        // is a single get_all_songs_from_db() call, and art is fetched from
+        // DB on demand and cached. AA still gets art — just on first request
+        // per song rather than all at once at boot.
         let song_map: HashMap<u64, Song> = get_all_songs_from_db()?
             .into_iter()
             .filter(|song| Path::new(&song.path).exists())
-            .map(|song| {
-                let id = song.id;
-                if let Ok(Some(bytes)) = get_song_art_from_db(id) {
-                    art_map.insert(id, bytes);
-                }
-                (id, song)
-            })
+            .map(|song| (song.id, song))
             .collect();
-        Ok(Self { song_map, art_map })
+
+        Ok(Self {
+            song_map,
+            art_map: HashMap::new(), // populated lazily in get_album_art()
+        })
     }
 
     pub fn get_song(&self, id: u64) -> Option<Song> {
         self.song_map.get(&id).cloned()
     }
 
-    pub fn get_album_art(&self, song_id: u64) -> Option<Vec<u8>> {
-        self.art_map.get(&song_id).cloned()
+    /// CHANGE: &mut self for lazy DB load on cache miss.
+    /// Art is fetched from DB once and cached in art_map on first request.
+    /// Subsequent calls for the same id return from cache. AA behaviour
+    /// is identical — it just pays one DB read the first time instead of
+    /// loading everything into RAM at startup.
+    pub fn get_album_art(&mut self, song_id: u64) -> Option<Vec<u8>> {
+        if self.art_map.contains_key(&song_id) {
+            return self.art_map.get(&song_id).cloned();
+        }
+        // Cache miss — load from DB and cache for next time
+        if let Ok(Some(bytes)) = get_song_art_from_db(song_id) {
+            self.art_map.insert(song_id, bytes.clone());
+            return Some(bytes);
+        }
+        None
     }
 
     pub fn get_album_art_file_path(&self, song_id: u64) -> String {
@@ -109,7 +126,7 @@ impl SongCollection {
     }
 
     pub fn add_song(&mut self, song: Song, album_art: Option<Vec<u8>>) -> Result<(), CustomError> {
-        save_song_to_db(song.clone())?;
+        save_song_to_db(&song)?;
         if let (Some(album_art_id), Some(bytes)) = (song.album_art_id, album_art) {
             save_song_art_to_db(album_art_id, bytes.clone())?;
             self.art_map.insert(album_art_id, bytes);
@@ -133,16 +150,17 @@ impl SongCollection {
     pub fn remove_song(&mut self, id: u64) -> Result<(), CustomError> {
         remove_song_from_db(id)?;
         self.song_map.remove(&id);
+        self.art_map.remove(&id); // CHANGE: was missing, causing memory leak
         Ok(())
     }
 
     pub fn remove_all_songs(&mut self) -> Result<(), CustomError> {
         remove_all_songs_from_db()?;
         self.song_map.clear();
+        self.art_map.clear(); // BUG FIX: was missing in original
         Ok(())
     }
 
-    ///! also add to playlist collection
     pub fn get_all_sorted(&self, sort_by: SortBy) -> Vec<Song> {
         let mut list: Vec<Song> = self.song_map.values().cloned().collect();
         match sort_by {

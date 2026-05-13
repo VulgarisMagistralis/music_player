@@ -28,7 +28,7 @@ class FavouritesButton extends ConsumerWidget {
             ? IconButton(icon: const Icon(Icons.favorite_sharp), onPressed: () async => _toggleFavourite(ref, isFavourite))
             : IconButton(icon: const Icon(Icons.favorite_border), onPressed: () async => _toggleFavourite(ref, isFavourite)),
         error: (_, __) {
-          ToastManager().showErrorToast(AppLocalizations.of(context).toast_favourite_unknown);
+          ToastManager().showErrorToast(GeneratedLocalization.of(context).toast_favourite_unknown);
           return IconButton(icon: const Icon(Icons.favorite_border), onPressed: () async => _toggleFavourite(ref, false));
         },
         loading: () => const CircularProgressIndicator(),

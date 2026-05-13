@@ -32,9 +32,9 @@ class ShowAndroidNavigationButtons extends _$ShowAndroidNavigationButtons {
 
 @Riverpod(keepAlive: true)
 class FontSizeAdjustment extends _$FontSizeAdjustment {
-  static const int _minimum = 1;
-  static const int _maximum = 5;
-  static const int _defaultState = 3;
+  static const int _minimum = -3;
+  static const int _maximum = 3;
+  static const int _defaultState = 0;
   static const String _sharedPrefKey = 'behaviour.ui.font_size_adjustment';
   @override
   int build() => SharedPreferenceWithCacheHandler.instance.loadInteger(_sharedPrefKey) ?? _defaultState;
@@ -48,9 +48,9 @@ class FontSizeAdjustment extends _$FontSizeAdjustment {
 
 @Riverpod(keepAlive: true)
 class IconSizeAdjustment extends _$IconSizeAdjustment {
-  static const int _minimum = 1;
-  static const int _maximum = 5;
-  static const int _defaultState = 3;
+  static const int _minimum = -3;
+  static const int _maximum = 3;
+  static const int _defaultState = 0;
   static const String _sharedPrefKey = 'behaviour.ui.icon_size_adjustment';
   @override
   int build() => SharedPreferenceWithCacheHandler.instance.loadInteger(_sharedPrefKey) ?? _defaultState;

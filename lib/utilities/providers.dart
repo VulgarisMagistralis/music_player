@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/providers/setting_switches.dart';
 import 'package:music_player/src/rust/api/playlist_collection.dart';
 import 'package:music_player/utilities/audio_handler.dart';
 import 'package:music_player/utilities/image_resize.dart';
@@ -61,20 +62,18 @@ Future<List<Song>> sortedSongList(Ref ref) async {
 }
 
 @Riverpod(keepAlive: true)
-Future<PlayerAudioHandler> audioHandler(Ref ref) async {
-  return await AudioService.init(
-    builder: () => PlayerAudioHandler(),
-    config: const AudioServiceConfig(
-      androidNotificationOngoing: false,
-      androidStopForegroundOnPause: false,
-      androidNotificationChannelName: 'Audio playback',
-      androidNotificationChannelId: 'com.cenkt.music_player',
-      androidNotificationIcon: 'mipmap/ic_launcher_foreground',
-      rewindInterval: Duration(seconds: 3),
-      fastForwardInterval: Duration(seconds: 3),
-    ),
-  );
-}
+Future<PlayerAudioHandler> audioHandler(Ref ref) async => await AudioService.init(
+  builder: () => PlayerAudioHandler(),
+  config: AudioServiceConfig(
+    // androidNotificationOngoing: false,
+    androidStopForegroundOnPause: false,
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationChannelId: 'com.cenkt.music_player',
+    androidNotificationIcon: 'mipmap/ic_launcher_foreground',
+    rewindInterval: Duration(seconds: ref.read(rewindIntervalInSecondsProvider)),
+    fastForwardInterval: Duration(seconds: ref.read(fastForwardIntervalInSecondsProvider)),
+  ),
+);
 
 @Riverpod(keepAlive: true)
 PlayerAudioHandler audioHandlerSync(Ref ref) {
@@ -133,11 +132,7 @@ Future<List<Song>> searchSongs(Ref ref, {required String query}) async {
   final all = await ref.watch(allSongsProvider.future);
   if (query.trim().isEmpty) return [];
   final lower = query.toLowerCase();
-  return all.where((s) =>
-    s.title.toLowerCase().contains(lower) ||
-    s.artist.toLowerCase().contains(lower) ||
-    s.album.toLowerCase().contains(lower)
-  ).toList();
+  return all.where((s) => s.title.toLowerCase().contains(lower) || s.artist.toLowerCase().contains(lower) || s.album.toLowerCase().contains(lower)).toList();
 }
 
 final favouriteSongsBootstrapProvider = FutureProvider<List<Song>>((ref) async {

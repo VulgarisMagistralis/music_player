@@ -26,7 +26,7 @@ class BasicErrorPageState<T extends BasicErrorPage> extends ConsumerState<T> {
                 const Icon(Icons.music_off, size: 80, color: Colors.redAccent),
                 const SizedBox(height: 20),
                 Text(
-                  widget.message ?? AppLocalizations.of(context).error_lost_beat,
+                  widget.message ?? GeneratedLocalization.of(context).error_lost_beat,
                   style: const TextStyle(color: Color.fromARGB(255, 171, 35, 35), fontSize: 20),
                   overflow: TextOverflow.visible,
                   softWrap: true,
@@ -38,7 +38,7 @@ class BasicErrorPageState<T extends BasicErrorPage> extends ConsumerState<T> {
                     ElevatedButton.icon(
                       onPressed: () => SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
                       icon: const Icon(Icons.exit_to_app),
-                      label: Text(AppLocalizations.of(context).button_exit),
+                      label: Text(GeneratedLocalization.of(context).button_exit),
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
                     ),
                     const SizedBox(height: 10),

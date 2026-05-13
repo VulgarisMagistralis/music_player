@@ -48,7 +48,7 @@ class _SongRowState extends ConsumerState<SongRow> with AutomaticKeepAliveClient
                   items: [
                     PopupMenuItem(
                       value: 1,
-                      child: const Text('Add to playlist'),
+                      child: Text(GeneratedLocalization.of(context).menu_add_to_playlist),
                       onTap: () async {
                         final List<Playlist> playlists = await ref.read(playlistCollectionProvider.future);
                         if (context.mounted) {
@@ -62,11 +62,11 @@ class _SongRowState extends ConsumerState<SongRow> with AutomaticKeepAliveClient
                                       try {
                                         await ref.read(addSongToTargetPlaylistProvider(songId: widget.song.id, playlistId: playlist.id).future);
                                         if (context.mounted) {
-                                          ToastManager().showInfoToast(AppLocalizations.of(context).toast_added_to_playlist(playlist.name));
+                                          ToastManager().showInfoToast(GeneratedLocalization.of(context).toast_added_to_playlist(playlist.name));
                                         }
                                       } catch (e) {
                                         if (context.mounted) {
-                                          ToastManager().showErrorToast(AppLocalizations.of(context).toast_add_to_playlist_failed(playlist.name));
+                                          ToastManager().showErrorToast(GeneratedLocalization.of(context).toast_add_to_playlist_failed(playlist.name));
                                         }
                                       }
                                       ref.invalidate(playlistCollectionProvider);
@@ -81,12 +81,12 @@ class _SongRowState extends ConsumerState<SongRow> with AutomaticKeepAliveClient
                     ),
                     PopupMenuItem(
                       value: 2,
-                      child: const Text('Ignore song'),
+                      child: Text(GeneratedLocalization.of(context).menu_ignore_song),
                       onTap: () {
                         // TODO: implement ignore song
                       },
                     ),
-                    PopupMenuItem(value: 3, child: const Text('Details'), onTap: () => SongInfoSheet.show(context, widget.song)),
+                    PopupMenuItem(value: 3, child: Text(GeneratedLocalization.of(context).menu_details), onTap: () => SongInfoSheet.show(context, widget.song)),
                   ],
                 );
               });

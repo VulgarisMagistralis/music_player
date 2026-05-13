@@ -41,7 +41,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 69325563;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -142562973;
 
 // Section: executor
 
@@ -1704,19 +1704,19 @@ fn wire__crate__api__data__song__SongCollection_get_album_art_impl(
                     let decode_indices_ =
                         flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
                             flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                                &api_that, 0, false,
+                                &api_that, 0, true,
                             ),
                         ]);
                     for i in decode_indices_ {
                         match i {
-                            0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                            0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
                             _ => unreachable!(),
                         }
                     }
-                    let api_that_guard = api_that_guard.unwrap();
+                    let mut api_that_guard = api_that_guard.unwrap();
                     let output_ok = Result::<_, ()>::Ok(
                         crate::api::data::song::SongCollection::get_album_art(
-                            &*api_that_guard,
+                            &mut *api_that_guard,
                             api_song_id,
                         ),
                     )?;
@@ -2300,6 +2300,38 @@ fn wire__crate__api__playlist_collection__delete_playlist_impl(
         },
     )
 }
+fn wire__crate__api__utils__database_ops__flush_db_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "flush_db",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::utils::database_ops::flush_db()?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__api__playlist_collection__get_all_playlists_from_collection_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -2506,16 +2538,15 @@ fn wire__crate__api__song_collection__get_song_album_art_impl(
     )
 }
 fn wire__crate__api__song_collection__get_song_album_art_file_path_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
             debug_name: "get_song_album_art_file_path",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
         },
         move || {
             let message = unsafe {
@@ -2529,14 +2560,12 @@ fn wire__crate__api__song_collection__get_song_album_art_file_path_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_id = <u64>::sse_decode(&mut deserializer);
             deserializer.end();
-            move |context| {
-                transform_result_sse::<_, ()>((move || {
-                    let output_ok = Result::<_, ()>::Ok(
-                        crate::api::song_collection::get_song_album_art_file_path(api_id),
-                    )?;
-                    Ok(output_ok)
-                })())
-            }
+            transform_result_sse::<_, ()>((move || {
+                let output_ok = Result::<_, ()>::Ok(
+                    crate::api::song_collection::get_song_album_art_file_path(api_id),
+                )?;
+                Ok(output_ok)
+            })())
         },
     )
 }
@@ -3669,102 +3698,99 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        47 => wire__crate__api__playlist_collection__get_all_playlists_from_collection_impl(
+        47 => {
+            wire__crate__api__utils__database_ops__flush_db_impl(port, ptr, rust_vec_len, data_len)
+        }
+        48 => wire__crate__api__playlist_collection__get_all_playlists_from_collection_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        48 => wire__crate__api__song_collection__get_all_songs_from_collection_impl(
+        49 => wire__crate__api__song_collection__get_all_songs_from_collection_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        49 => wire__crate__api__playlist_collection__get_favourites_from_collection_impl(
+        50 => wire__crate__api__playlist_collection__get_favourites_from_collection_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        50 => wire__crate__api__music_folder__get_music_folder_list_impl(
+        51 => wire__crate__api__music_folder__get_music_folder_list_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        51 => wire__crate__api__song_collection__get_song_impl(port, ptr, rust_vec_len, data_len),
-        52 => wire__crate__api__song_collection__get_song_album_art_impl(
+        52 => wire__crate__api__song_collection__get_song_impl(port, ptr, rust_vec_len, data_len),
+        53 => wire__crate__api__song_collection__get_song_album_art_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        53 => wire__crate__api__song_collection__get_song_album_art_file_path_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        54 => {
+        55 => {
             wire__crate__api__song_collection__get_song_list_impl(port, ptr, rust_vec_len, data_len)
         }
-        55 => wire__crate__api__song_collection__get_sorted_songs_impl(
+        56 => wire__crate__api__song_collection__get_sorted_songs_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        56 => wire__crate__api__music_folder__get_thumbnails_dir_impl(
+        57 => wire__crate__api__music_folder__get_thumbnails_dir_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        57 => wire__crate__api__init__init_app_impl(port, ptr, rust_vec_len, data_len),
-        58 => wire__crate__api__utils__logger__init_rust_logger_impl(
+        58 => wire__crate__api__init__init_app_impl(port, ptr, rust_vec_len, data_len),
+        59 => wire__crate__api__utils__logger__init_rust_logger_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        59 => wire__crate__api__playlist_collection__is_in_favourites_impl(
+        60 => wire__crate__api__playlist_collection__is_in_favourites_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        60 => wire__crate__api__process_music__read_music_files_impl(
+        61 => wire__crate__api__process_music__read_music_files_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        61 => wire__crate__api__playlist_collection__remove_song_from_favourites_impl(
+        62 => wire__crate__api__playlist_collection__remove_song_from_favourites_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        62 => wire__crate__api__playlist_collection__remove_song_from_playlist_impl(
+        63 => wire__crate__api__playlist_collection__remove_song_from_playlist_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        63 => wire__crate__api__playlist_collection__rename_playlist_impl(
+        64 => wire__crate__api__playlist_collection__rename_playlist_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        64 => wire__crate__api__music_folder__save_music_folder_list_impl(
+        65 => wire__crate__api__music_folder__save_music_folder_list_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        65 => wire__crate__api__music_folder__set_app_directory_impl(
+        66 => wire__crate__api__music_folder__set_app_directory_impl(
             port,
             ptr,
             rust_vec_len,
@@ -3796,6 +3822,7 @@ fn pde_ffi_dispatcher_sync_impl(
 28 => wire__crate__api__data__playlist__Playlist_auto_accessor_set_song_id_list_impl(ptr, rust_vec_len, data_len),
 30 => wire__crate__api__data__song__SongCollection_auto_accessor_get_song_map_impl(ptr, rust_vec_len, data_len),
 31 => wire__crate__api__data__song__SongCollection_auto_accessor_set_song_map_impl(ptr, rust_vec_len, data_len),
+54 => wire__crate__api__song_collection__get_song_album_art_file_path_impl(ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }

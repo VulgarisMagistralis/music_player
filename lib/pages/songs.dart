@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:music_player/l10n/app_localizations.dart';
 import 'package:music_player/menu/nav_bar.dart';
 import 'package:music_player/route/routes.dart';
 import 'package:music_player/widgets/header.dart';
@@ -68,7 +69,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                             actionWidget: ElevatedButton.icon(
                               onPressed: () => ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.settings),
                               icon: const Icon(Icons.settings),
-                              label: const Text('Settings'),
+                              label: Text(GeneratedLocalization.of(context).button_settings),
                               style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
                             ),
                             showNavigation: true,
@@ -100,7 +101,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                       actionWidget: ElevatedButton.icon(
                         onPressed: () => ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.settings),
                         icon: const Icon(Icons.settings),
-                        label: const Text('Settings'),
+                        label: Text(GeneratedLocalization.of(context).button_settings),
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
                       ),
                       showNavigation: true,

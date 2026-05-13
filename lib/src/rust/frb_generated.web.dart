@@ -15,6 +15,7 @@ import 'package:music_player/src/rust/api/music_folder.dart';
 import 'package:music_player/src/rust/api/playlist_collection.dart';
 import 'package:music_player/src/rust/api/process_music.dart';
 import 'package:music_player/src/rust/api/song_collection.dart';
+import 'package:music_player/src/rust/api/utils/database_ops.dart';
 import 'package:music_player/src/rust/api/utils/logger.dart';
 import 'package:music_player/src/rust/api/utils/sort_modes.dart';
 import 'dart:async';

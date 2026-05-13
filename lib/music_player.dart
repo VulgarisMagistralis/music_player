@@ -26,7 +26,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
   Widget build(BuildContext context) => MaterialApp(
     theme: ref.watch(playerThemeProvider),
     locale: ref.watch(currentLocaleProvider),
-    localizationsDelegates: const [AppLocalizations.delegate, GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
+    localizationsDelegates: const [GeneratedLocalization.delegate, GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
     supportedLocales: supportedLocales,
     debugShowCheckedModeBanner: false,
     home: switch (ref.watch(playerRouteProvider)) {

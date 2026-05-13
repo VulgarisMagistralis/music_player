@@ -22,13 +22,17 @@ abstract class SongCollection implements RustOpaqueInterface {
       RustLib.instance.api
           .crateApiDataSongSongCollectionExtractAlbumArtFromFile(path: path);
 
+  /// CHANGE: &mut self for lazy DB load on cache miss.
+  /// Art is fetched from DB once and cached in art_map on first request.
+  /// Subsequent calls for the same id return from cache. AA behaviour
+  /// is identical — it just pays one DB read the first time instead of
+  /// loading everything into RAM at startup.
   Future<Uint8List?> getAlbumArt({required BigInt songId});
 
   Future<String> getAlbumArtFilePath({required BigInt songId});
 
   Future<List<Song>> getAllSongs();
 
-  ///! also add to playlist collection
   Future<List<Song>> getAllSorted({required SortBy sortBy});
 
   Future<Song?> getSong({required BigInt id});
