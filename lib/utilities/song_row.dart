@@ -98,12 +98,24 @@ class _SongRowState extends ConsumerState<SongRow> with AutomaticKeepAliveClient
                 AlbumArtWidget(songId: widget.song.id, width: 50),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: audioState?.songId == widget.song.id
-                      ? ColorFiltered(
-                          colorFilter: const ColorFilter.mode(Colors.pink, BlendMode.srcIn),
-                          child: AnimatedOverflowText(text: widget.song.title),
-                        )
-                      : AnimatedOverflowText(text: widget.song.title),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      audioState?.songId == widget.song.id
+                    ? ColorFiltered(
+                      colorFilter: const ColorFilter.mode(Colors.pink, BlendMode.srcIn),
+                      child: AnimatedOverflowText(text: widget.song.title),
+                      )
+                    : AnimatedOverflowText(text: widget.song.title),
+                      const SizedBox(height: 2),
+                      Text(
+                        widget.song.artist,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
                 ),
                 FavouritesButton(songId: widget.song.id),
               ],

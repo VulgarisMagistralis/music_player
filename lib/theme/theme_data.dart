@@ -19,7 +19,7 @@ class CustomAppTheme {
     textTheme: TextTheme(
       bodyLarge: TextStyle(color: accentColor),
       bodyMedium: TextStyle(color: primaryTextColor, fontSize: 20),
-      bodySmall: TextStyle(color: primaryTextColor),
+      bodySmall: TextStyle(color: primaryTextColor.withAlpha(90), fontWeight: FontWeight.bold),
       labelMedium: TextStyle(color: primaryTextColor, fontSize: 20),
       headlineMedium: TextStyle(color: primaryTextColor, fontWeight: FontWeight.w700),
       displayMedium: TextStyle(color: primaryTextColor, fontWeight: FontWeight.w700),
