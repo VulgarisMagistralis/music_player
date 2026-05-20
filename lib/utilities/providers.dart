@@ -52,7 +52,8 @@ Future<Uint8List?> albumArt(Ref ref, BigInt id) async {
 
 @Riverpod(keepAlive: true)
 Stream<StreamEvent> processMusicFiles(Ref ref) async* {
-  yield* readMusicFiles();
+  final threshold = ref.watch(ignoredDurationThresholdProvider);
+  yield* readMusicFiles(minDurationS: threshold);
 }
 
 @Riverpod(keepAlive: true)

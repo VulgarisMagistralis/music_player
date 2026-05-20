@@ -114,6 +114,7 @@
   "settings_behaviour_show_song_icons": "在列表中显示歌曲图标",
   "settings_behaviour_pause_when_muted": "静音时暂停",
   "settings_behaviour_pause_when_hidden": "隐藏时暂停",
+  "settings_behaviour_ignored_duration_threshold": "忽略短曲目",
   "settings_behaviour_show_nav_buttons": "显示导航按钮",
   "settings_playback_rewind_interval": "倒带间隔",
   "settings_playback_fast_forward_interval": "快进间隔",

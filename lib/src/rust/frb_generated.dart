@@ -339,7 +339,9 @@ abstract class RustLibApi extends BaseApi {
     required BigInt songId,
   });
 
-  Stream<StreamEvent> crateApiProcessMusicReadMusicFiles();
+  Stream<StreamEvent> crateApiProcessMusicReadMusicFiles({
+    required int minDurationS,
+  });
 
   Future<void> crateApiPlaylistCollectionRemoveSongFromFavourites({
     required BigInt songId,
@@ -2482,7 +2484,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: 'is_in_favourites', argNames: ['songId']);
 
   @override
-  Stream<StreamEvent> crateApiProcessMusicReadMusicFiles() {
+  Stream<StreamEvent> crateApiProcessMusicReadMusicFiles({
+    required int minDurationS,
+  }) {
     final sink = RustStreamSink<StreamEvent>();
     unawaited(
       handler.executeNormal(
@@ -2490,6 +2494,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           callFfi: (port_) {
             final serializer = SseSerializer(generalizedFrbRustBinding);
             sse_encode_StreamSink_stream_event_Sse(sink, serializer);
+            sse_encode_u_32(minDurationS, serializer);
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
@@ -2502,7 +2507,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             decodeErrorData: null,
           ),
           constMeta: kCrateApiProcessMusicReadMusicFilesConstMeta,
-          argValues: [sink],
+          argValues: [sink, minDurationS],
           apiImpl: this,
         ),
       ),
@@ -2511,7 +2516,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiProcessMusicReadMusicFilesConstMeta =>
-      const TaskConstMeta(debugName: 'read_music_files', argNames: ['sink']);
+      const TaskConstMeta(
+        debugName: 'read_music_files',
+        argNames: ['sink', 'minDurationS'],
+      );
 
   @override
   Future<void> crateApiPlaylistCollectionRemoveSongFromFavourites({

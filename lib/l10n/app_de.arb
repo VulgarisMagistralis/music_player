@@ -114,6 +114,7 @@
   "settings_behaviour_show_song_icons": "Song-Symbole in Listen anzeigen",
   "settings_behaviour_pause_when_muted": "Bei Stummschaltung pausieren",
   "settings_behaviour_pause_when_hidden": "Bei versteckter App pausieren",
+  "settings_behaviour_ignored_duration_threshold": "Kurze Songs ignorieren",
   "settings_behaviour_show_nav_buttons": "Navigationsknöpfe anzeigen",
   "settings_playback_rewind_interval": "Zurückspul-Intervall",
   "settings_playback_fast_forward_interval": "Vorspul-Intervall",

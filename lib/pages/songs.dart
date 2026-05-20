@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:music_player/l10n/app_localizations.dart';
 import 'package:music_player/menu/nav_bar.dart';
 import 'package:music_player/route/routes.dart';
+import 'package:music_player/src/rust/api/data/stream_event.dart';
 import 'package:music_player/widgets/header.dart';
 import 'package:music_player/widgets/song_card.dart';
 import 'package:music_player/utilities/song_row.dart';
@@ -9,8 +10,8 @@ import 'package:music_player/utilities/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/src/rust/api/data/song.dart';
 import 'package:music_player/widgets/loading_animation.dart';
-import 'package:music_player/src/rust/api/data/stream_event.dart';
 import 'package:music_player/pages/error_pages/generic_error_page.dart';
+import 'package:music_player/utilities/songs_loading_provider.dart';
 
 class SongsPage extends ConsumerStatefulWidget {
   const SongsPage({super.key});
@@ -25,13 +26,14 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
   void initState() {
     super.initState();
     _scrollController = ScrollController(
-      onAttach: (position) => WidgetsBinding.instance.addPostFrameCallback(
-        (_) => position.animateTo(
-          ref.read(songsPageScrollOffsetProvider.notifier).value,
-          curve: Curves.fastOutSlowIn,
-          duration: Duration(milliseconds: (ref.read(songsPageScrollOffsetProvider.notifier).value * 0.55 + 0.2).floor()),
-        ),
-      ),
+      // needs rework: when songs are removed(e.g. ignored by time later on)- old position may overflow
+      // onAttach: (position) => WidgetsBinding.instance.addPostFrameCallback(
+      //   (_) => position.animateTo(
+      //     ref.read(songsPageScrollOffsetProvider.notifier).value,
+      //     curve: Curves.fastOutSlowIn,
+      //     duration: Duration(milliseconds: (ref.read(songsPageScrollOffsetProvider.notifier).value * 0.55 + 0.2).floor()),
+      //   ),
+      // ),
     );
     _scrollController.addListener(() => ref.read(songsPageScrollOffsetProvider.notifier).updateOffset(_scrollController.offset));
     WidgetsBinding.instance.addObserver(this);

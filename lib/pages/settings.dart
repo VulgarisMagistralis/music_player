@@ -11,6 +11,7 @@ import 'package:music_player/providers/theme_colors.dart';
 import 'package:music_player/widgets/setting_number.dart';
 import 'package:music_player/widgets/setting_switch.dart';
 import 'package:music_player/widgets/setting_locale_selector.dart';
+import 'package:music_player/widgets/setting_dropdown_selector.dart';
 import 'package:music_player/utilities/color_selector.dart';
 import 'package:music_player/providers/setting_switches.dart';
 import 'package:music_player/utilities/string_extension.dart';
@@ -148,15 +149,23 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       provider: showAndroidNavigationButtonsProvider,
                       onToggle: ref.read(showAndroidNavigationButtonsProvider.notifier).setFlag,
                     ),
-                    SettingNumberSelector(
+                    SettingDropdownSelector<int>(
                       label: GeneratedLocalization.of(context).settings_playback_rewind_interval,
                       provider: rewindIntervalInSecondsProvider,
-                      onUpdate: ref.watch(rewindIntervalInSecondsProvider.notifier).update,
+                      items: const [1, 2, 3, 5, 10].map((v) => DropdownMenuItem<int>(value: v, child: Text('$v s'))).toList(),
+                      onSelect: ref.read(rewindIntervalInSecondsProvider.notifier).update,
                     ),
-                    SettingNumberSelector(
+                    SettingDropdownSelector<int>(
                       label: GeneratedLocalization.of(context).settings_playback_fast_forward_interval,
                       provider: fastForwardIntervalInSecondsProvider,
-                      onUpdate: ref.read(fastForwardIntervalInSecondsProvider.notifier).update,
+                      items: const [1, 2, 3, 5, 10].map((v) => DropdownMenuItem<int>(value: v, child: Text('$v s'))).toList(),
+                      onSelect: ref.read(fastForwardIntervalInSecondsProvider.notifier).update,
+                    ),
+                    SettingDropdownSelector<int>(
+                      label: GeneratedLocalization.of(context).settings_behaviour_ignored_duration_threshold,
+                      provider: ignoredDurationThresholdProvider,
+                      items: const [0, 15, 30, 60, 120].map((v) => DropdownMenuItem<int>(value: v, child: Text(v == 0 ? 'Off' : '$v s'))).toList(),
+                      onSelect: ref.read(ignoredDurationThresholdProvider.notifier).update,
                     ),
                     SettingLocaleSelector(label: GeneratedLocalization.of(context).settings_appearance_language),
 
@@ -165,12 +174,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     /// confirm deletion of playlists
                     const SizedBox(height: 10),
                     Row(
-                      children: [
-                        Text(GeneratedLocalization.of(context).settings_version_title),
-                        ref.watch(storeVersionInfoProvider).when(data: (storeVersion) => Text(storeVersion ?? ''), error: (_, __) => const SizedBox.shrink(), loading: () => const SizedBox.shrink()),
-                        const Spacer(),
-                        Text(ref.watch(localPackageInfoProvider).when(data: (data) => data, error: (_, __) => '', loading: () => GeneratedLocalization.of(context).loading_still_loading)),
-                      ],
+                      children: [Text(ref.watch(localPackageInfoProvider).when(data: (data) => data, error: (_, __) => '', loading: () => GeneratedLocalization.of(context).loading_still_loading))],
                     ),
                   ],
                 ),

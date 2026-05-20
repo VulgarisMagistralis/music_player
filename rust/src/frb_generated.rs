@@ -2802,12 +2802,17 @@ fn wire__crate__api__process_music__read_music_files_impl(
                 crate::api::data::stream_event::StreamEvent,
                 flutter_rust_bridge::for_generated::SseCodec,
             >>::sse_decode(&mut deserializer);
+            let api_min_duration_s = <u32>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, ()>(
                     (move || async move {
                         let output_ok = Result::<_, ()>::Ok({
-                            crate::api::process_music::read_music_files(api_sink).await;
+                            crate::api::process_music::read_music_files(
+                                api_sink,
+                                api_min_duration_s,
+                            )
+                            .await;
                         })?;
                         Ok(output_ok)
                     })()

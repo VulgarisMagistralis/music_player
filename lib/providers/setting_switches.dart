@@ -97,6 +97,18 @@ class FastForwardIntervalInSeconds extends _$FastForwardIntervalInSeconds {
 }
 
 @Riverpod(keepAlive: true)
+class IgnoredDurationThreshold extends _$IgnoredDurationThreshold {
+  static const int _defaultState = 0;
+  static const String _sharedPrefKey = 'behaviour.filter.ignored_duration_threshold_seconds';
+  @override
+  int build() => SharedPreferenceWithCacheHandler.instance.loadInteger(_sharedPrefKey) ?? _defaultState;
+  Future<void> update(int newValue) async {
+    await SharedPreferenceWithCacheHandler.instance.saveInteger(_sharedPrefKey, newValue);
+    state = newValue;
+  }
+}
+
+@Riverpod(keepAlive: true)
 class CurrentLocale extends _$CurrentLocale {
   static const String _sharedPrefKey = 'app.locale.language_tag';
   static const Locale _defaultState = Locale('en');

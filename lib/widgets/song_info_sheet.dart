@@ -60,7 +60,7 @@ class SongInfoSheet extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.album, size: 20),
+                  const Icon(Icons.album),
                   const SizedBox(width: 6),
                   Text(song.album, style: TextStyle(fontSize: 16, color: Colors.grey.shade700)),
                 ],
@@ -70,11 +70,11 @@ class SongInfoSheet extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.schedule, size: 18),
+                const Icon(Icons.schedule),
                 const SizedBox(width: 6),
                 Text(_formatDuration(song.duration)),
                 const SizedBox(width: 16),
-                const Icon(Icons.update, size: 18),
+                const Icon(Icons.update),
                 const SizedBox(width: 6),
                 Text(song.lastModifiedAt.toString(), style: TextStyle(fontSize: 14, color: Colors.grey.shade600)),
               ],

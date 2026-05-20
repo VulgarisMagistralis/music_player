@@ -90,11 +90,65 @@ Built with performance in mind and powered by Flutter and Rust.
 
 ### 🛠 Architecture
 
-- Flutter (Riverpod for state management)
-- Rust core via FFI (media indexing, database operations)
-- SQLite for song and playlist storage
-- `just_audio` / `audio_service` for playback and background audio
-- Shared preferences with caching for settings
+```text
+┌─────────────────────────────────────────────────────┐
+│                   Flutter UI Layer                   │
+│  ┌─────────────┐ ┌──────────────┐ ┌──────────────┐ │
+│  │  Pages      │ │   Providers  │ │ Audio Handler │ │
+│  └──────┬──────┘ └──────┬───────┘ └──────┬───────┘ │
+└─────────┼───────────────┼────────────────┼──────────┘
+          │               │                │
+┌─────────▼───────────────▼────────────────▼──────────┐
+│              Riverpod Provider Container              │
+└──────┬────────────────────┬──────────────────┬───────┘
+       │                    │                  │
+┌──────▼──────┐   ┌─────────▼───────┐  ┌───────▼──────┐
+│ SharedPrefs │   │  Low-Level      │  │  Just Audio  │
+│ (Settings)  │   │  Wrapper        │  │  AudioSessn  │
+└─────────────┘   └────────┬────────┘  └──────────────┘
+                           │
+                 ┌─────────▼──────────┐
+                 │   Rust Library     │
+                 │ (SongCollection,   │
+                 │  PlaylistColl,     │
+                 │  ProcessMusic)     │
+                 └────────────────────┘
+```
+
+A lightweight, offline MP3 player for Android.
+Built with performance in mind and powered by Flutter and Rust.
+
+- **Flutter (Riverpod for state management)**: Reactive, scalable state management for playback, library, and settings.
+- **Rust core via FFI (`flutter_rust_bridge 2.x`)**: High-performance file indexing, metadata extraction, and playlist persistence.
+- **Just Audio / Audio Service**: Foreground media session, background playback, interrupt handling, and Android Auto / notification controls.
+- **Shared preferences with caching**: Fast, low-latency setting access with a singleton cache wrapper.
+- **Optimistic UI updates**: Instant feedback for playlist/favourites changes with rollback on failure.
+
+---
+
+### 📖 Architecture Deep Dive
+
+| Layer | Description |
+|---|---|
+| **Pages** | Feature screens: songs, favourites, playlists, search, settings, and shell navigation |
+| **Providers** | Riverpod providers for songs, playlists, theme, settings, shuffle/repeat modes, and UI flags |
+| **Audio Handler** | `PlayerAudioHandler` extending `BaseAudioHandler` with session restoration, custom actions (`toggle_shuffle`, `toggle_repeat`), and media browsing support |
+| **Low-Level Wrapper** | Clean-architecture adapters over Rust calls for data sources and repositories |
+| **Rust FFI** | Core library for media file scanning, song collection, playlist CRUD, and process music tasks |
+
+---
+
+### 🚀 Quick Start Checklist
+
+- Run `dart run build_runner build --delete-conflicting-outputs` after modifying providers
+- Run `dart run flutter_rust_bridge` after modifying Rust source files or `#[flutter_rust_bridge::frb()]` annotations
+- Ensure `LowLevelInitializer.init()` is called before any Rust-bound provider is accessed
+- Use `ref.read(provider.future)` in `initState`-like flows; prefer `ref.watch()` in widgets
+- Always wrap Rust calls in `try/catch` or Riverpod error handling due to potential FFI boundary failures
+- IDs from Rust are `BigInt` — never cast to `int`; use `BigInt.parse()` / `.toString()` carefully
+- Keep Alive (`keepAlive: true`) on library/audio providers to prevent cold-start re-fetching
+
+---
 
 ### 🧪 Testing & Quality
 

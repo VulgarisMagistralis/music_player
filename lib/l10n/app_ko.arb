@@ -114,6 +114,7 @@
   "settings_behaviour_show_song_icons": "목록에 노래 아이콘 표시",
   "settings_behaviour_pause_when_muted": "음소거 시 일시 중단",
   "settings_behaviour_pause_when_hidden": "숨겨진 시 일시 중단",
+  "settings_behaviour_ignored_duration_threshold": "짧은 트랙 무시",
   "settings_behaviour_show_nav_buttons": "네비게이션 버튼 표시",
   "settings_playback_rewind_interval": "되감기 간격",
   "settings_playback_fast_forward_interval": "빨리 감기 간격",

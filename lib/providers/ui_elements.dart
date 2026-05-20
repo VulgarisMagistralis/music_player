@@ -1,3 +1,4 @@
+import 'package:audio_service/audio_service.dart' show AudioServiceShuffleMode, AudioServiceRepeatMode;
 import 'package:music_player/utilities/settings_data.dart' show SharedPreferenceWithCacheHandler;
 import 'package:flutter/services.dart' show SystemChrome, SystemUiMode, SystemUiOverlay;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -32,8 +33,8 @@ class ShowAndroidNavigationButtons extends _$ShowAndroidNavigationButtons {
 
 @Riverpod(keepAlive: true)
 class FontSizeAdjustment extends _$FontSizeAdjustment {
-  static const int _minimum = -3;
-  static const int _maximum = 3;
+  static const int _minimum = -5;
+  static const int _maximum = 5;
   static const int _defaultState = 0;
   static const String _sharedPrefKey = 'behaviour.ui.font_size_adjustment';
   @override
@@ -48,8 +49,8 @@ class FontSizeAdjustment extends _$FontSizeAdjustment {
 
 @Riverpod(keepAlive: true)
 class IconSizeAdjustment extends _$IconSizeAdjustment {
-  static const int _minimum = -3;
-  static const int _maximum = 3;
+  static const int _minimum = -5;
+  static const int _maximum = 5;
   static const int _defaultState = 0;
   static const String _sharedPrefKey = 'behaviour.ui.icon_size_adjustment';
   @override
@@ -59,5 +60,41 @@ class IconSizeAdjustment extends _$IconSizeAdjustment {
     if (newValue < _minimum || newValue > _maximum) return;
     await SharedPreferenceWithCacheHandler.instance.saveInteger(_sharedPrefKey, newValue);
     state = newValue;
+  }
+}
+
+@Riverpod(keepAlive: true)
+class ShuffleModeNotifier extends _$ShuffleModeNotifier {
+  static const AudioServiceShuffleMode _defaultState = AudioServiceShuffleMode.none;
+  static const String _sharedPrefKey = 'behaviour.playback.shuffle_mode';
+
+  @override
+  AudioServiceShuffleMode build() {
+    final String? savedValue = SharedPreferenceWithCacheHandler.instance.loadString(_sharedPrefKey);
+    if (savedValue == null) return _defaultState;
+    return AudioServiceShuffleMode.values.firstWhere((mode) => mode.name == savedValue);
+  }
+
+  Future<void> setShuffleMode(AudioServiceShuffleMode shuffleMode) async {
+    await SharedPreferenceWithCacheHandler.instance.saveString(_sharedPrefKey, shuffleMode.name);
+    state = shuffleMode;
+  }
+}
+
+@Riverpod(keepAlive: true)
+class RepeatModeNotifier extends _$RepeatModeNotifier {
+  static const AudioServiceRepeatMode _defaultState = AudioServiceRepeatMode.none;
+  static const String _sharedPrefKey = 'behaviour.playback.repeat_mode';
+
+  @override
+  AudioServiceRepeatMode build() {
+    final String? savedValue = SharedPreferenceWithCacheHandler.instance.loadString(_sharedPrefKey);
+    if (savedValue == null) return _defaultState;
+    return AudioServiceRepeatMode.values.firstWhere((mode) => mode.name == savedValue, orElse: () => _defaultState);
+  }
+
+  Future<void> setRepeatMode(AudioServiceRepeatMode mode) async {
+    await SharedPreferenceWithCacheHandler.instance.saveString(_sharedPrefKey, mode.name);
+    state = mode;
   }
 }

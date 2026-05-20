@@ -114,6 +114,7 @@
   "settings_behaviour_show_song_icons": "リストに曲のアイコンを表示",
   "settings_behaviour_pause_when_muted": "ミュート時に一時停止",
   "settings_behaviour_pause_when_hidden": "非表示時に一時停止",
+  "settings_behaviour_ignored_duration_threshold": "短い曲を無視",
   "settings_behaviour_show_nav_buttons": "ナビゲーションボタンを表示",
   "settings_playback_rewind_interval": "巻き戻し間隔",
   "settings_playback_fast_forward_interval": "早送り間隔",

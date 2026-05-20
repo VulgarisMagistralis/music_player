@@ -44,7 +44,7 @@ class _AnimatedOverflowTextState extends State<AnimatedOverflowText> with Single
     child: LayoutBuilder(
       builder: (_, constraints) {
         final String cleanedText = widget.text.trim();
-        const TextStyle textStyle = TextStyle(fontSize: 20);
+        final TextStyle textStyle = Theme.of(context).textTheme.bodyMedium!;
         final TextPainter textPainter = TextPainter(
           text: TextSpan(text: cleanedText, style: textStyle),
           maxLines: 1,

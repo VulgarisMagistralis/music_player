@@ -114,6 +114,7 @@
   "settings_behaviour_show_song_icons": "Показать значки треков",
   "settings_behaviour_pause_when_muted": "Пауза при отключении звука",
   "settings_behaviour_pause_when_hidden": "Пауза при скрытии",
+  "settings_behaviour_ignored_duration_threshold": "Игнорировать короткие треки",
   "settings_behaviour_show_nav_buttons": "Показать кнопки навигации",
   "settings_playback_rewind_interval": "Интервал перемотки назад",
   "settings_playback_fast_forward_interval": "Интервал перемотки вперед",

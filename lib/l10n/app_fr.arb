@@ -114,6 +114,7 @@
   "settings_behaviour_show_song_icons": "Afficher les icônes de chansons",
   "settings_behaviour_pause_when_muted": "Pause quand muet",
   "settings_behaviour_pause_when_hidden": "Pause quand masqué",
+  "settings_behaviour_ignored_duration_threshold": "Ignorer les courts morceaux",
   "settings_behaviour_show_nav_buttons": "Afficher les boutons de navigation",
   "settings_playback_rewind_interval": "Intervalle de rebobinage",
   "settings_playback_fast_forward_interval": "Intervalle d'avance rapide",

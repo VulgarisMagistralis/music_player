@@ -126,6 +126,7 @@
   "settings_behaviour_pause_when_muted": "Pause when muted",
   "settings_behaviour_pause_when_hidden": "Pause when hidden",
   "settings_behaviour_resume_after_disconnect": "Resume after disconnected",
+  "settings_behaviour_ignored_duration_threshold": "Ignore short tracks",
   "settings_behaviour_show_nav_buttons": "Show navigation buttons",
   "settings_playback_rewind_interval": "Rewind Interval",
   "settings_playback_fast_forward_interval": "Fast Forward Interval",

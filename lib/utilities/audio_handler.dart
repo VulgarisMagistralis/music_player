@@ -4,16 +4,21 @@ import 'package:rxdart/rxdart.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:volume_controller/volume_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:music_player/common/toast.dart';
 import 'package:music_player/data/position.dart';
 import 'package:music_player/utilities/providers.dart';
+import 'package:music_player/providers/ui_elements.dart';
 import 'package:music_player/src/rust/api/data/song.dart';
+import 'package:music_player/data/custom_action_mode.dart';
 import 'package:music_player/utilities/song_to_media.dart';
 import 'package:music_player/data/audio_session_state.dart';
 import 'package:music_player/providers/setting_switches.dart';
 import 'package:music_player/src/rust/api/song_collection.dart';
+import 'package:music_player/tools/conversion/shuffle_mode.dart';
 import 'package:music_player/utilities/audio_session_manager.dart';
+import 'package:music_player/tools/conversion/loop_mode_conversion.dart';
 
 class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   late ProviderContainer _container;
@@ -25,16 +30,15 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   Stream<PlayerState> get playerStateStream => _player.playerStateStream;
   bool _pausedForInterruption = false;
 
-  /// _______________ Life Cycle _______________
   Future<void> init(ProviderContainer provider) async {
     _container = provider;
     await _configureAudioSession();
     await _configurePlayerAttributes();
     _listenToPlayerState();
+    _listenToSystemVolume();
     _listenToCurrentIndex();
     _listenToInterruptions();
     _listenToNoisyEvents();
-    _listenToVolume();
     _listenToDevicesChanged();
   }
 
@@ -44,55 +48,51 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     await session.setActive(true);
   }
 
-  void _listenToPlayerState() {
-    const systemActions = {
-      MediaAction.seek,
-      MediaAction.pause,
-      MediaAction.setRepeatMode,
-      MediaAction.setShuffleMode,
-      MediaAction.rewind,
-      MediaAction.fastForward,
-      MediaAction.play,
-      MediaAction.seekForward,
-      MediaAction.seekBackward,
-    };
-    _subscriptionList.add(
-      _player.playerStateStream.listen((PlayerState playerState) {
-        final bool isShuffled = _player.shuffleModeEnabled;
-        final bool isRepeatOne = _player.loopMode == LoopMode.one;
-        final bool isRepeatAll = _player.loopMode == LoopMode.all;
+  List<MediaControl> _buildAndroidNotificationControls({CustomActionMode? customActionName}) {
+    final currentShuffleMode = _container.read(shuffleModeProvider);
+    final currentRepeatMode = _container.read(repeatModeProvider);
+    MediaControl repeatButton = MediaControl(
+      androidIcon: currentRepeatMode.androidIcon,
+      label: currentRepeatMode.label,
+      action: MediaAction.custom,
+      customAction: CustomMediaAction(name: CustomActionMode.repeatMode.name, extras: {'isPlaying': _player.playerState.playing}),
+    );
+    MediaControl shuffleButton = MediaControl(
+      androidIcon: currentShuffleMode.androidIcon,
+      label: currentShuffleMode.label,
+      action: MediaAction.custom,
+      customAction: CustomMediaAction(name: CustomActionMode.shuffleMode.name, extras: {'isPlaying': _player.playerState.playing}),
+    );
+    switch (customActionName) {
+      case CustomActionMode.shuffleMode:
+        shuffleButton = MediaControl(
+          androidIcon: currentShuffleMode.androidIcon,
+          label: currentShuffleMode.label,
+          action: MediaAction.custom,
+          customAction: CustomMediaAction(name: CustomActionMode.shuffleMode.name, extras: {'isPlaying': _player.playerState.playing}),
+        );
+        break;
+      case CustomActionMode.repeatMode:
+        repeatButton = MediaControl(
+          androidIcon: currentRepeatMode.androidIcon,
+          label: currentRepeatMode.label,
+          action: MediaAction.custom,
+          customAction: CustomMediaAction(name: CustomActionMode.repeatMode.name, extras: {'isPlaying': _player.playerState.playing}),
+        );
+        break;
+      case null:
+        break;
+    }
+    return [repeatButton, MediaControl.skipToPrevious, _player.playerState.playing ? MediaControl.pause : MediaControl.play, MediaControl.skipToNext, shuffleButton];
+  }
 
+  void _listenToPlayerState() {
+    _subscriptionList.add(
+      _player.playerStateStream.distinct().listen((PlayerState playerState) {
         playbackState.add(
           playbackState.value.copyWith(
-            controls: [
-              MediaControl.rewind,
-              MediaControl.skipToPrevious,
-              playerState.playing ? MediaControl.pause : MediaControl.play,
-              MediaControl.skipToNext,
-              MediaControl.fastForward,
-              MediaControl(androidIcon: isShuffled ? 'drawable/ic_shuffle_active' : 'drawable/ic_shuffle', label: isShuffled ? 'Shuffle on' : 'Shuffle off', action: MediaAction.setShuffleMode),
-              MediaControl(
-                androidIcon: isRepeatOne
-                    ? 'drawable/ic_repeat_one_active'
-                    : isRepeatAll
-                    ? 'drawable/ic_repeat_active'
-                    : 'drawable/ic_repeat',
-                label: isRepeatOne
-                    ? 'Repeat one'
-                    : isRepeatAll
-                    ? 'Repeat all'
-                    : 'Repeat off',
-                action: MediaAction.setRepeatMode,
-              ),
-            ],
-            systemActions: systemActions,
+            controls: _buildAndroidNotificationControls(),
             playing: playerState.playing,
-            shuffleMode: isShuffled ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none,
-            repeatMode: switch (_player.loopMode) {
-              LoopMode.off => AudioServiceRepeatMode.none,
-              LoopMode.one => AudioServiceRepeatMode.one,
-              LoopMode.all => AudioServiceRepeatMode.all,
-            },
             updatePosition: _player.position,
             bufferedPosition: _player.bufferedPosition,
             processingState: switch (playerState.processingState) {
@@ -113,6 +113,13 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
       }),
     );
   }
+
+  @override
+  Future<dynamic> customAction(String name, [Map<String, dynamic>? extras]) async => switch (CustomActionMode.getCustomActionOrNull(name)) {
+    CustomActionMode.shuffleMode => await setShuffleMode(_container.read(shuffleModeProvider).next),
+    CustomActionMode.repeatMode => await setRepeatMode(_container.read(repeatModeProvider).next),
+    _ => null,
+  };
 
   void _listenToInterruptions() {
     _session.then((session) {
@@ -142,14 +149,11 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     }),
   );
 
-  void _listenToNoisyEvents() async =>
-      _subscriptionList.add((await _session).becomingNoisyEventStream.listen((_) async => !_container.read(resumeAfterDisconnectProvider) ? await _handlePlayPause(shouldPause: true) : null));
-
-  void _listenToVolume() => _subscriptionList.add(
-    _player.volumeStream.listen((double v) async {
-      v <= 0 && _container.read(pauseWhenMutedProvider) ? await _handlePlayPause(shouldPause: true) : null;
-    }),
+  void _listenToNoisyEvents() async => _subscriptionList.add(
+    (await _session).becomingNoisyEventStream.listen((_) async => !_container.read(resumeAfterDisconnectProvider) ? await _handlePlayPause(shouldPause: true) : await _handlePlayPause(shouldPause: false)),
   );
+
+  void _listenToSystemVolume() => _subscriptionList.add(VolumeController.instance.addListener((double v) async => v <= 0 && _container.read(pauseWhenMutedProvider) ? await _handlePlayPause(shouldPause: true) : null));
 
   void _listenToCurrentIndex() => _subscriptionList.add(
     _player.currentIndexStream.listen((index) async {
@@ -184,6 +188,7 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
         mediaItem.add(newMediaItem);
       }
     } catch (e) {
+      // happens on reconnect + continue
       ToastManager().showErrorToast('Error restoring previous session: $e');
     }
   }
@@ -219,6 +224,7 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     await clearAudioSources();
     await _player.dispose();
     final session = await _session;
+    VolumeController.instance.removeListener();
     await session.setActive(false);
   }
 
@@ -358,11 +364,10 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
 
   @override
   Future<void> skipToNext() async {
-    final wasPlaying = playbackState.value.playing;
+    final currentRepeatMode = _container.read(repeatModeProvider);
+    if (currentRepeatMode == AudioServiceRepeatMode.one) await setRepeatMode(AudioServiceRepeatMode.all);
     await _player.seekToNext();
-    if (wasPlaying) {
-      await _player.play();
-    }
+    if (playbackState.value.playing) await _player.play();
   }
 
   @override
@@ -415,7 +420,9 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     try {
       final uri = Uri.parse(id);
       if (uri.isAbsolute) return uri;
-    } catch (_) {}
+    } catch (_) {
+      // should bubble up?
+    }
     // If that fails, try as a file path
     try {
       return Uri.file(id);
@@ -426,22 +433,15 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
 
   @override
   Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {
-    // Accept the repeat mode from the caller instead of cycling
-    final LoopMode loopMode = switch (repeatMode) {
-      AudioServiceRepeatMode.none => LoopMode.off,
-      AudioServiceRepeatMode.all => LoopMode.all,
-      AudioServiceRepeatMode.one => LoopMode.one,
-      AudioServiceRepeatMode.group => LoopMode.all,
-    };
-    await _player.setLoopMode(loopMode);
-    playbackState.add(playbackState.value.copyWith(repeatMode: repeatMode));
+    await _player.setLoopMode(repeatMode.toLoopMode());
+    await _container.read(repeatModeProvider.notifier).setRepeatMode(repeatMode);
+    playbackState.add(playbackState.value.copyWith(controls: _buildAndroidNotificationControls(customActionName: CustomActionMode.repeatMode)));
   }
 
   @override
   Future<void> setShuffleMode(AudioServiceShuffleMode shuffleMode) async {
-    // Use the shuffle mode from the caller instead of ignoring it
-    final bool enabled = shuffleMode != AudioServiceShuffleMode.none;
-    await _player.setShuffleModeEnabled(enabled);
-    playbackState.add(playbackState.value.copyWith(shuffleMode: shuffleMode));
+    await _player.setShuffleModeEnabled(shuffleMode != AudioServiceShuffleMode.none);
+    await _container.read(shuffleModeProvider.notifier).setShuffleMode(shuffleMode);
+    playbackState.add(playbackState.value.copyWith(controls: _buildAndroidNotificationControls(customActionName: CustomActionMode.shuffleMode)));
   }
 }

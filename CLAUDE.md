@@ -14,6 +14,9 @@
 
 ## ADB / Android Debug
 
+### Flutter Rust Bridge Generator
+- After modifying Rust source files or their `#[flutter_rust_bridge::frb()]` annotations, regenerate the Dart bindings with: `dart run flutter_rust_bridge`
+
 ### Proven tap-and-verify workflow
 The tested method for interacting with UI on the connected device:
 
