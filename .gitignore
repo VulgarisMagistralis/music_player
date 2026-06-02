@@ -86,3 +86,8 @@ CLAUDE.md
 **/*.g.dart
 **/*.freezed.dart
 app_localizations**
+
+# MemPalace per-project files (issue #185)
+mempalace.yaml
+entities.json
+opencode.json
