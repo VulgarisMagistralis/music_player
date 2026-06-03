@@ -11,7 +11,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/src/rust/api/data/song.dart';
 import 'package:music_player/widgets/loading_animation.dart';
 import 'package:music_player/pages/error_pages/generic_error_page.dart';
-import 'package:music_player/utilities/songs_loading_provider.dart';
 
 class SongsPage extends ConsumerStatefulWidget {
   const SongsPage({super.key});
@@ -80,7 +79,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                             padding: const EdgeInsetsGeometry.fromLTRB(10, 10, 10, 0),
                             child: Column(
                               children: [
-                                const PlayerHeader(showExtraButtons: true),
+                                 const PlayerHeader(showExtraButtons: true, showRescan: true),
                                 const SizedBox(height: 10),
                                 Expanded(
                                   child: ListView.builder(

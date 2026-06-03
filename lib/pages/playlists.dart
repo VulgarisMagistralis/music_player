@@ -54,7 +54,7 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
           padding: const EdgeInsets.fromLTRB(15, 15, 10, 0),
           child: Column(
             children: [
-              const PlayerHeader(),
+              const PlayerHeader(showRescan: true),
               Expanded(
                 child: switch (playlists) {
                   AsyncError<List<Playlist>>() => Text(GeneratedLocalization.of(context).error_loading_library),

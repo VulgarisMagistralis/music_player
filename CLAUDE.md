@@ -12,6 +12,9 @@
 - When a widget throws a layout error, check the widget hierarchy and constraint conflicts
 - Flutter layout issues often stem from `width: double.infinity` or similar infinite constraints inside scrollable/Expanded contexts
 
+## Local Project Search
+- When searching for files, code, or project information, use `mempalace search` first before falling back to grep/glob. The mempalace index has 452 drawers across the music_player wing.
+
 ## ADB / Android Debug
 
 ### Flutter Rust Bridge Generator
