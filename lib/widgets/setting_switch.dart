@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/common/animated_overflow_text.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 class SettingSwitch extends ConsumerStatefulWidget {
@@ -14,15 +15,18 @@ class SettingSwitch extends ConsumerStatefulWidget {
 
 class _SettingsGroupState extends ConsumerState<SettingSwitch> {
   @override
-  Widget build(BuildContext context) => Column(
-    children: [
-      Row(
-        children: [
-          Text(widget.label),
-          const Spacer(),
-          Switch(value: ref.watch(widget.provider), onChanged: widget.onToggle),
-        ],
-      ),
-    ],
+  Widget build(BuildContext context) => SizedBox(
+    child: Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: AnimatedOverflowText(text: widget.label)),
+            const SizedBox(width: 10),
+            Switch(value: ref.watch(widget.provider), onChanged: widget.onToggle),
+          ],
+        ),
+      ],
+    ),
   );
 }

@@ -38,7 +38,7 @@ class _FavouritesPageState extends ConsumerState<FavouritesPage> {
                     key: ValueKey(songList[index].id),
                     song: songList[index],
                     index: index,
-                    onTap: (int i) async => await ref.read(audioHandlerProvider).setPlaylist('favs', songList, index: i),
+                    onTap: (int i) async => await ref.read(audioHandlerSyncProvider).setPlaylist('favourites', songList, index: i),
                   ),
                 ),
               ),

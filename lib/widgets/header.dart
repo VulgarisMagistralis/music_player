@@ -5,10 +5,12 @@ import 'package:music_player/utilities/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/utilities/sort_extensions.dart';
 import 'package:music_player/src/rust/api/utils/sort_modes.dart';
+import 'package:music_player/utilities/songs_loading_provider.dart';
 
 class PlayerHeader extends ConsumerStatefulWidget {
+  final bool showRescan;
   final bool showExtraButtons;
-  const PlayerHeader({super.key, this.showExtraButtons = false});
+  const PlayerHeader({super.key, this.showExtraButtons = false, this.showRescan = false});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _PlayerHeaderState();
@@ -16,6 +18,22 @@ class PlayerHeader extends ConsumerStatefulWidget {
 
 class _PlayerHeaderState extends ConsumerState<PlayerHeader> {
   bool _showFilterView = false;
+
+  void _rescan() => ref.invalidate(processMusicFilesProvider);
+
+  Widget _buildRescanIcon() {
+    final scanning = ref.watch(songsLoadingProvider.select((s) => s.scanning));
+
+    return GestureDetector(
+      onTap: _rescan,
+      child: scanning
+          ? const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+            )
+          : const Icon(Icons.refresh, size: 24),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +45,7 @@ class _PlayerHeaderState extends ConsumerState<PlayerHeader> {
           children: [
             Text(ref.watch(playerRouteProvider).toTitle(), style: Theme.of(context).textTheme.headlineMedium),
             const Spacer(),
+            if (widget.showRescan) _buildRescanIcon(),
             if (widget.showExtraButtons)
               Row(
                 children: [

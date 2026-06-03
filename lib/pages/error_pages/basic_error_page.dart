@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/l10n/app_localizations.dart';
 import 'package:music_player/providers/theme_colors.dart' show playerThemeProvider;
 
 abstract class BasicErrorPage extends ConsumerStatefulWidget {
-  final String message;
+  final String? message;
   final bool showNavigation;
   final Widget? actionWidget;
-  const BasicErrorPage({super.key, this.message = 'We lost the beat...', this.actionWidget, this.showNavigation = false});
+  const BasicErrorPage({super.key, this.message, this.actionWidget, this.showNavigation = false});
 }
 
 class BasicErrorPageState<T extends BasicErrorPage> extends ConsumerState<T> {
@@ -25,7 +26,7 @@ class BasicErrorPageState<T extends BasicErrorPage> extends ConsumerState<T> {
                 const Icon(Icons.music_off, size: 80, color: Colors.redAccent),
                 const SizedBox(height: 20),
                 Text(
-                  widget.message,
+                  widget.message ?? GeneratedLocalization.of(context).error_lost_beat,
                   style: const TextStyle(color: Color.fromARGB(255, 171, 35, 35), fontSize: 20),
                   overflow: TextOverflow.visible,
                   softWrap: true,
@@ -37,7 +38,7 @@ class BasicErrorPageState<T extends BasicErrorPage> extends ConsumerState<T> {
                     ElevatedButton.icon(
                       onPressed: () => SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
                       icon: const Icon(Icons.exit_to_app),
-                      label: const Text('Exit'),
+                      label: Text(GeneratedLocalization.of(context).button_exit),
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
                     ),
                     const SizedBox(height: 10),

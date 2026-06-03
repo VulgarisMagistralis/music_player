@@ -75,6 +75,19 @@ app.*.symbols
 # FVM Version Cache
 .fvm/
 
-# Remove generated 
+# Ralph AI Agent config (contains API keys)
+.ralphrc
+.ralph/
+
+.claude/**
+CLAUDE.md
+
+# Remove generated
 **/*.g.dart
 **/*.freezed.dart
+app_localizations**
+
+# MemPalace per-project files (issue #185)
+mempalace.yaml
+entities.json
+opencode.json

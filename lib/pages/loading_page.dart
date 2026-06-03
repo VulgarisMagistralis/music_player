@@ -26,11 +26,6 @@ class LoadingPage extends ConsumerWidget {
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 15, color: Color.fromARGB(106, 122, 122, 122)),
               ),
-              Text(
-                ref.watch(storeVersionInfoProvider).when(data: (data) => 'New Version Available: $data', error: (_, __) => '', loading: () => ''),
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 15, color: Color.fromARGB(106, 122, 122, 122)),
-              ),
             ],
           ),
         ),

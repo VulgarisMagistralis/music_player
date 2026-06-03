@@ -1,0 +1,129 @@
+{
+  "button_settings": "設定",
+  "button_play": "再生",
+  "error_loading_library": "ライブラリの読み込みに失敗しました",
+  "playlist_create_title": "プレイリストを作成",
+  "settings_folder_error": "フォルダーの読み込みに失敗しました",
+  "menu_add_to_playlist": "プレイリストに追加",
+  "menu_ignore_song": "曲を無視",
+  "menu_details": "詳細",
+  "toast_audio_start_failed": "オーディオサービスの起動に失敗しました",
+  "toast_favourite_unknown": "お気に入り状態が不明です",
+  "toast_folder_load_error": "このフォルダーの読み込みに失敗しました。再読み込み中...",
+  "toast_playlist_deleted": "{name}を削除しました",
+  "@toast_playlist_deleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_delete_failed": "{name}の削除に失敗しました",
+  "@toast_playlist_delete_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_load_songs_failed": "曲の読み込みに失敗しました",
+  "toast_playlist_created": "{name}を作成しました",
+  "@toast_playlist_created": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_create_failed": "{name}の作成に失敗しました",
+  "@toast_playlist_create_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_added_to_playlist": "{name}に追加しました",
+  "@toast_added_to_playlist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_add_to_playlist_failed": "{name}への追加に失敗しました",
+  "@toast_add_to_playlist_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_skipped_not_found": "{title}をスキップしました\nファイルが見つかりません",
+  "@toast_skipped_not_found": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_audio_session_failed": "オーディオセッションを有効にできませんでした",
+  "toast_audio_play_error": "再生エラー: {error}",
+  "@toast_audio_play_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_could_not_open_settings": "設定を開くことができませんでした",
+  "toast_album_art_failed": "アルバムのアートワークの取得に失敗しました",
+  "settings_page_title": "プレーヤー",
+  "settings_behaviour_title": "動作",
+  "settings_behaviour_play_on_launch": "起動時自動再生",
+  "settings_behaviour_play_on_connect": "デバイス接続時自動再生",
+  "settings_behaviour_resume_after_disconnect": "デバイス切断後再開",
+  "settings_behaviour_paused_on_hidden": "アプリ非表示時に一時停止",
+  "settings_behaviour_paused_when_muted": "ミュート時に一時停止",
+  "settings_playback_title": "再生",
+  "settings_appearance_title": "外観",
+  "settings_appearance_theme_mode": "テーマモード",
+  "settings_appearance_theme_color": "テーマカラー",
+  "settings_appearance_language": "言語",
+  "dialog_playlist_new_name": "プレイリスト名",
+  "dialog_save": "保存",
+  "dialog_cancel": "キャンセル",
+  "error_lost_beat": "リズムが途切れました...",
+  "button_exit": "終了",
+  "button_open_settings": "設定を開く",
+  "permission_required_title": "続行には権限が必要です",
+  "permission_required_body": "アクセスが拒否されたようです。設定に移動して必要な権限を付与してください。",
+  "loading_version": "バージョン情報を読み込み中",
+  "loading_new_version": "新しいバージョンが利用可能です: {version}",
+  "search_hint": "曲を検索...",
+  "search_placeholder": "タイトル、アーティスト、またはアルバムで検索",
+  "search_error": "検索エラー",
+  "search_no_results": "曲が見つかりません",
+  "settings_folder_title": "フォルダー",
+  "settings_version_title": "バージョン",
+  "settings_appearance_background_color": "背景色",
+  "settings_appearance_main_text_color": "テキスト色",
+  "settings_appearance_accent_color": "アクセントカラー",
+  "settings_appearance_font_size": "フォントサイズ",
+  "settings_appearance_icon_size": "アイコンサイズ",
+  "settings_behaviour_show_song_icons": "リストに曲のアイコンを表示",
+  "settings_behaviour_pause_when_muted": "ミュート時に一時停止",
+  "settings_behaviour_pause_when_hidden": "非表示時に一時停止",
+  "settings_behaviour_ignored_duration_threshold": "短い曲を無視",
+  "settings_behaviour_show_nav_buttons": "ナビゲーションボタンを表示",
+  "settings_playback_rewind_interval": "巻き戻し間隔",
+  "settings_playback_fast_forward_interval": "早送り間隔",
+  "songs_no_music_title": "音楽が見つかりませんでした",
+  "songs_no_music_action": "設定",
+  "playlists_create_title": "プレイリストを作成",
+  "playlists_new_default_name": "プレイリスト名",
+  "playlists_failed_title": "失敗しました",
+  "loading_still_loading": "まだ読み込み中",
+  "settings_folder_loading": "フォルダーの読み込み中",
+  "@@locale": "ja"
+}

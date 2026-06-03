@@ -44,7 +44,7 @@ class _AnimatedOverflowTextState extends State<AnimatedOverflowText> with Single
     child: LayoutBuilder(
       builder: (_, constraints) {
         final String cleanedText = widget.text.trim();
-        const TextStyle textStyle = TextStyle(fontSize: 20);
+        final TextStyle textStyle = Theme.of(context).textTheme.bodyMedium!;
         final TextPainter textPainter = TextPainter(
           text: TextSpan(text: cleanedText, style: textStyle),
           maxLines: 1,
@@ -54,7 +54,6 @@ class _AnimatedOverflowTextState extends State<AnimatedOverflowText> with Single
         final bool willOverflow = textPainter.width > constraints.maxWidth;
         if (willOverflow) WidgetsBinding.instance.addPostFrameCallback((_) => mounted && _scrollController.hasClients ? _startLoopScroll() : null);
         return Container(
-          width: double.infinity,
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
           child: willOverflow

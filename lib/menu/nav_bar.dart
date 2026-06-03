@@ -3,7 +3,6 @@ import 'package:music_player/route/routes.dart';
 import 'package:music_player/utilities/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Songs, PLaylists, Favourites, Search Settings
 class PlayerNavigationBar extends ConsumerStatefulWidget {
   const PlayerNavigationBar({super.key});
 
@@ -22,7 +21,7 @@ class _NavigationBarState extends ConsumerState<PlayerNavigationBar> {
           ...ref
               .watch(getFavouritesPlaylistProvider)
               .when(
-                error: (__, _) => [const SizedBox.shrink()],
+                error: (_, _) => [const SizedBox.shrink()],
                 loading: () => [const SizedBox.shrink()],
                 data: (playlist) => playlist.songIdList.isEmpty
                     ? []

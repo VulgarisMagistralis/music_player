@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:music_player/common/common.dart' show HiddenThumbComponentShape;
 
-/// font size -2, 0, +2?
-/// icon size -3, 0, +3?
-
-///Large icons, small icons
-///Headers, default text, subtitles
-///
 class CustomAppTheme {
   final Color primaryTextColor;
   final Color accentColor;
   final Color mainBackgroundColor;
-  CustomAppTheme({required this.mainBackgroundColor, required this.primaryTextColor, required this.accentColor});
+  final double fontSizeAdjustment;
+  final double iconSizeAdjustment;
+  final int baseFontSize = 20;
+  final int baseLargeFontSize = 23;
+  final int baseIconSize = 20;
+  final int baseLargeIconSize = 27;
+  CustomAppTheme({required this.mainBackgroundColor, required this.primaryTextColor, required this.accentColor, required this.fontSizeAdjustment, required this.iconSizeAdjustment});
   ThemeData get materialTheme => ThemeData(
     colorScheme: ColorScheme.fromSeed(seedColor: primaryTextColor, secondary: accentColor),
     highlightColor: Colors.transparent,
@@ -19,13 +19,13 @@ class CustomAppTheme {
     hoverColor: Colors.transparent,
     textTheme: TextTheme(
       bodyLarge: TextStyle(color: accentColor),
-      bodyMedium: TextStyle(color: primaryTextColor, fontSize: 20),
-      bodySmall: TextStyle(color: primaryTextColor),
-      labelMedium: TextStyle(color: primaryTextColor, fontSize: 20),
+      bodyMedium: TextStyle(color: primaryTextColor, fontSize: baseFontSize + fontSizeAdjustment),
+      bodySmall: TextStyle(color: primaryTextColor.withAlpha(90), fontWeight: FontWeight.bold),
+      labelMedium: TextStyle(color: primaryTextColor, fontSize: baseFontSize + fontSizeAdjustment),
       headlineMedium: TextStyle(color: primaryTextColor, fontWeight: FontWeight.w700),
       displayMedium: TextStyle(color: primaryTextColor, fontWeight: FontWeight.w700),
       titleMedium: const TextStyle(color: Colors.lime),
-      titleLarge: const TextStyle(color: Colors.lime),
+      titleLarge: TextStyle(color: primaryTextColor, fontSize: baseLargeFontSize + fontSizeAdjustment),
       titleSmall: const TextStyle(color: Colors.lime),
     ),
     scaffoldBackgroundColor: mainBackgroundColor,
@@ -41,16 +41,31 @@ class CustomAppTheme {
     listTileTheme: ListTileThemeData(
       iconColor: primaryTextColor,
       style: ListTileStyle.list,
-      titleTextStyle: TextStyle(color: primaryTextColor, fontSize: 20),
+      titleTextStyle: TextStyle(color: primaryTextColor, fontSize: baseFontSize + fontSizeAdjustment),
     ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: primaryTextColor,
-      iconTheme: WidgetStateProperty.all(IconThemeData(color: primaryTextColor, size: 20, shadows: const [Shadow(blurRadius: 2)])),
+      iconTheme: WidgetStateProperty.all(IconThemeData(color: primaryTextColor, size: baseIconSize + iconSizeAdjustment, shadows: const [Shadow(blurRadius: 2)])),
+    ),
+    iconButtonTheme: IconButtonThemeData(style: ButtonStyle(iconSize: WidgetStateProperty.all(baseLargeIconSize + iconSizeAdjustment))),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        isDense: true,
+        fillColor: mainBackgroundColor,
+        activeIndicatorBorder: const BorderSide(width: 0),
+        contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+        enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
+        suffixStyle: TextStyle(color: primaryTextColor, fontSize: baseFontSize + fontSizeAdjustment),
+        border: const UnderlineInputBorder(borderRadius: BorderRadius.all(Radius.zero)),
+      ),
+      menuStyle: MenuStyle(backgroundColor: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Color?>{WidgetState.any: mainBackgroundColor})),
+      textStyle: TextStyle(color: accentColor, fontSize: baseFontSize + fontSizeAdjustment),
     ),
 
     /// Seek bar
     sliderTheme: SliderThemeData(inactiveTrackColor: accentColor, thumbShape: HiddenThumbComponentShape(), activeTrackColor: primaryTextColor),
-    iconTheme: IconThemeData(color: primaryTextColor, size: 27),
+    iconTheme: IconThemeData(color: primaryTextColor, size: baseLargeIconSize + iconSizeAdjustment),
     extensions: const [_CustomAppThemeExtension()],
     switchTheme: SwitchThemeData(
       splashRadius: 0.0,

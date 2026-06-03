@@ -6,3 +6,4 @@ pub mod playlist_collection;
 pub mod process_music;
 pub mod song_collection;
 pub mod utils;
+pub use std::path::PathBuf;

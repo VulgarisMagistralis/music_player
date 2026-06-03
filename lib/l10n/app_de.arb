@@ -1,0 +1,129 @@
+{
+  "button_settings": "Einstellungen",
+  "button_play": "Abspielen",
+  "error_loading_library": "Bibliothek konnte nicht geladen werden",
+  "playlist_create_title": "Wiedergabeliste erstellen",
+  "settings_folder_error": "Ordner konnten nicht geladen werden",
+  "menu_add_to_playlist": "Zur Wiedergabeliste hinzufügen",
+  "menu_ignore_song": "Song ignorieren",
+  "menu_details": "Details",
+  "toast_audio_start_failed": "Audio-Dienste konnten nicht gestartet werden",
+  "toast_favourite_unknown": "Favoritenstatus ist unbekannt",
+  "toast_folder_load_error": "Fehler beim Laden dieses Ordners. Neu laden...",
+  "toast_playlist_deleted": "Gelöscht {name}",
+  "@toast_playlist_deleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_delete_failed": "{name} konnte nicht gelöscht werden",
+  "@toast_playlist_delete_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_load_songs_failed": "Lieder konnten nicht geladen werden",
+  "toast_playlist_created": "Erstellt {name}",
+  "@toast_playlist_created": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_create_failed": "{name} konnte nicht erstellt werden",
+  "@toast_playlist_create_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_added_to_playlist": "Zu {name} hinzugefügt",
+  "@toast_added_to_playlist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_add_to_playlist_failed": "Lied konnte nicht zu {name} hinzugefügt werden",
+  "@toast_add_to_playlist_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_skipped_not_found": "Übersprungen {title}\nDatei nicht gefunden",
+  "@toast_skipped_not_found": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_audio_session_failed": "Audio-Sitzung konnte nicht aktiviert werden",
+  "toast_audio_play_error": "Wiedergabefehler: {error}",
+  "@toast_audio_play_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_could_not_open_settings": "Einstellungen konnten nicht geöffnet werden",
+  "toast_album_art_failed": "Albumcover konnte nicht abgerufen werden",
+  "settings_page_title": "Player",
+  "settings_behaviour_title": "Verhalten",
+  "settings_behaviour_play_on_launch": "Automatische Wiedergabe beim Start",
+  "settings_behaviour_play_on_connect": "Automatische Wiedergabe bei Verbindung",
+  "settings_behaviour_resume_after_disconnect": "Nach Trennung fortsetzen",
+  "settings_behaviour_paused_on_hidden": "Pause bei verborgener App",
+  "settings_behaviour_paused_when_muted": "Pause bei Stumm schaltung",
+  "settings_playback_title": "Wiedergabe",
+  "settings_appearance_title": "Erscheinungsbild",
+  "settings_appearance_theme_mode": "Designmodus",
+  "settings_appearance_theme_color": "Designfarbe",
+  "settings_appearance_language": "Sprache",
+  "dialog_playlist_new_name": "Wiedergabelistenname",
+  "dialog_save": "Speichern",
+  "dialog_cancel": "Abbrechen",
+  "error_lost_beat": "Wir haben den Takt verloren...",
+  "button_exit": "Beenden",
+  "button_open_settings": "Einstellungen öffnen",
+  "permission_required_title": "Berechtigung erforderlich",
+  "permission_required_body": "Der Zugriff wurde verweigert. Sie können zu den Einstellungen gehen und die benötigten Berechtigungen erteilen.",
+  "loading_version": "Versionsinformationen werden gelesen",
+  "loading_new_version": "Neue Version verfügbar: {version}",
+  "search_hint": "Songs suchen...",
+  "search_placeholder": "Nach Titel, Künstler oder Album suchen",
+  "search_error": "Suchfehler",
+  "search_no_results": "Keine Songs gefunden",
+  "settings_folder_title": "Ordner",
+  "settings_version_title": "Version",
+  "settings_appearance_background_color": "Hintergrundfarbe",
+  "settings_appearance_main_text_color": "Textfarbe",
+  "settings_appearance_accent_color": "Akzentfarbe",
+  "settings_appearance_font_size": "Schriftgröße",
+  "settings_appearance_icon_size": "Symbolgröße",
+  "settings_behaviour_show_song_icons": "Song-Symbole in Listen anzeigen",
+  "settings_behaviour_pause_when_muted": "Bei Stummschaltung pausieren",
+  "settings_behaviour_pause_when_hidden": "Bei versteckter App pausieren",
+  "settings_behaviour_ignored_duration_threshold": "Kurze Songs ignorieren",
+  "settings_behaviour_show_nav_buttons": "Navigationsknöpfe anzeigen",
+  "settings_playback_rewind_interval": "Zurückspul-Intervall",
+  "settings_playback_fast_forward_interval": "Vorspul-Intervall",
+  "songs_no_music_title": "Keine Musik gefunden",
+  "songs_no_music_action": "Einstellungen",
+  "playlists_create_title": "Wiedergabeliste erstellen",
+  "playlists_new_default_name": "Name der neuen Wiedergabeliste",
+  "playlists_failed_title": "Fehler!",
+  "loading_still_loading": "lädt noch",
+  "settings_folder_loading": "Versuche, Ordner zu lesen",
+  "@@locale": "de"
+}

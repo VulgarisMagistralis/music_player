@@ -1,6 +1,8 @@
 import 'dart:typed_data';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/providers/setting_switches.dart';
 import 'package:music_player/src/rust/api/playlist_collection.dart';
 import 'package:music_player/utilities/audio_handler.dart';
 import 'package:music_player/utilities/image_resize.dart';
@@ -14,6 +16,13 @@ import 'package:music_player/src/rust/api/data/song.dart' show Song;
 import 'package:music_player/low_level_wrapper/data/datasource/music_folder.dart';
 import 'package:music_player/low_level_wrapper/data/repository/folder_repo_imp.dart';
 part 'providers.g.dart';
+
+@Riverpod(keepAlive: true)
+class AppReady extends _$AppReady {
+  @override
+  bool build() => false;
+  void setReady() => state = true;
+}
 
 @Riverpod(keepAlive: true)
 class SongsPageScrollOffset extends _$SongsPageScrollOffset {
@@ -43,7 +52,8 @@ Future<Uint8List?> albumArt(Ref ref, BigInt id) async {
 
 @Riverpod(keepAlive: true)
 Stream<StreamEvent> processMusicFiles(Ref ref) async* {
-  yield* readMusicFiles();
+  final threshold = ref.watch(ignoredDurationThresholdProvider);
+  yield* readMusicFiles(minDurationS: threshold);
 }
 
 @Riverpod(keepAlive: true)
@@ -53,7 +63,23 @@ Future<List<Song>> sortedSongList(Ref ref) async {
 }
 
 @Riverpod(keepAlive: true)
-PlayerAudioHandler audioHandler(Ref ref) => PlayerAudioHandler();
+Future<PlayerAudioHandler> audioHandler(Ref ref) async => await AudioService.init(
+  builder: () => PlayerAudioHandler(),
+  config: AudioServiceConfig(
+    // androidNotificationOngoing: false,
+    androidStopForegroundOnPause: false,
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationChannelId: 'com.cenkt.music_player',
+    androidNotificationIcon: 'mipmap/ic_launcher_foreground',
+    rewindInterval: Duration(seconds: ref.read(rewindIntervalInSecondsProvider)),
+    fastForwardInterval: Duration(seconds: ref.read(fastForwardIntervalInSecondsProvider)),
+  ),
+);
+
+@Riverpod(keepAlive: true)
+PlayerAudioHandler audioHandlerSync(Ref ref) {
+  return ref.watch(audioHandlerProvider).requireValue;
+}
 
 @Riverpod(keepAlive: true)
 Future<List<String>> getSavedFolderList(Ref ref) => LowLevelFolderDataSource().loadFolders();
@@ -67,10 +93,10 @@ Future<void> deletePlaylistFromCollection(Ref ref, {required BigInt playlistId})
 @Riverpod(keepAlive: false)
 Future<Playlist> addPlaylist(Ref ref, {required String newPlaylistName}) async => await addPlaylistToCollection(name: newPlaylistName);
 
-@Riverpod(keepAlive: false)
+@Riverpod(keepAlive: true)
 Future<List<Song>> getPlaylistSongs(Ref ref, {required Playlist playlist}) async => await getSongList(idList: playlist.songIdList);
 
-@Riverpod(keepAlive: false)
+@Riverpod(keepAlive: true)
 Future<Playlist> getFavouritesPlaylist(Ref ref) async => await getFavouritesFromCollection();
 
 @Riverpod(keepAlive: false)
@@ -100,6 +126,14 @@ class PlaylistSortedBy extends _$PlaylistSortedBy {
   SortBy build() => state = SortBy.dateModifiedDescending;
   SortBy get value => state;
   void update(SortBy newSortingRule) => state = newSortingRule;
+}
+
+@riverpod
+Future<List<Song>> searchSongs(Ref ref, {required String query}) async {
+  final all = await ref.watch(allSongsProvider.future);
+  if (query.trim().isEmpty) return [];
+  final lower = query.toLowerCase();
+  return all.where((s) => s.title.toLowerCase().contains(lower) || s.artist.toLowerCase().contains(lower) || s.album.toLowerCase().contains(lower)).toList();
 }
 
 final favouriteSongsBootstrapProvider = FutureProvider<List<Song>>((ref) async {

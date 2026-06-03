@@ -1,0 +1,129 @@
+{
+  "button_settings": "Настройки",
+  "button_play": "Воспроизвести",
+  "error_loading_library": "Не удалось загрузить библиотеку",
+  "playlist_create_title": "Создать плейлист",
+  "settings_folder_error": "Не удалось загрузить папки",
+  "menu_add_to_playlist": "Добавить в плейлист",
+  "menu_ignore_song": "Игнорировать трек",
+  "menu_details": "Подробности",
+  "toast_audio_start_failed": "Не удалось запустить аудиослужбы",
+  "toast_favourite_unknown": "Статус избранного неизвестен",
+  "toast_folder_load_error": "Ошибка при загрузке этой папки. Перезагрузка...",
+  "toast_playlist_deleted": "Удалено {name}",
+  "@toast_playlist_deleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_delete_failed": "Не удалось удалить {name}",
+  "@toast_playlist_delete_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_load_songs_failed": "Не удалось загрузить песни",
+  "toast_playlist_created": "Создано {name}",
+  "@toast_playlist_created": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_create_failed": "Не удалось создать {name}",
+  "@toast_playlist_create_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_added_to_playlist": "Добавлено в {name}",
+  "@toast_added_to_playlist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_add_to_playlist_failed": "Не удалось добавить песню в {name}",
+  "@toast_add_to_playlist_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_skipped_not_found": "Пропущено {title}\nФайл не найден",
+  "@toast_skipped_not_found": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_audio_session_failed": "Не удалось активировать аудиосессию",
+  "toast_audio_play_error": "Ошибка воспроизведения: {error}",
+  "@toast_audio_play_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_could_not_open_settings": "Не удалось открыть настройки",
+  "toast_album_art_failed": "Не удалось получить обложку альбома",
+  "settings_page_title": "Плеер",
+  "settings_behaviour_title": "Поведение",
+  "settings_behaviour_play_on_launch": "Автовоспроизведение при запуске",
+  "settings_behaviour_play_on_connect": "Автовоспроизведение при подключении",
+  "settings_behaviour_resume_after_disconnect": "Возобновить после отключения",
+  "settings_behaviour_paused_on_hidden": "Пауза при скрытии приложения",
+  "settings_behaviour_paused_when_muted": "Пауза при отключении звука",
+  "settings_playback_title": "Воспроизведение",
+  "settings_appearance_title": "Внешний вид",
+  "settings_appearance_theme_mode": "Режим темы",
+  "settings_appearance_theme_color": "Цвет темы",
+  "settings_appearance_language": "Язык",
+  "dialog_playlist_new_name": "Имя плейлиста",
+  "dialog_save": "Сохранить",
+  "dialog_cancel": "Отмена",
+  "error_lost_beat": "Мы потеряли ритм...",
+  "button_exit": "Выйти",
+  "button_open_settings": "Открыть настройки",
+  "permission_required_title": "Требуется разрешение для продолжения",
+  "permission_required_body": "Похоже, доступ был запрещён. Вы можете перейти в настройки, чтобы предоставить необходимые разрешения.",
+  "loading_version": "Чтение информации о версии",
+  "loading_new_version": "Доступна новая версия: {version}",
+  "search_hint": "Поиск песен...",
+  "search_placeholder": "Введите для поиска по названию, исполнителю или альбому",
+  "search_error": "Ошибка поиска",
+  "search_no_results": "Песни не найдены",
+  "settings_folder_title": "Папки",
+  "settings_version_title": "Версия",
+  "settings_appearance_background_color": "Цвет фона",
+  "settings_appearance_main_text_color": "Цвет текста",
+  "settings_appearance_accent_color": "Акцентный цвет",
+  "settings_appearance_font_size": "Размер шрифта",
+  "settings_appearance_icon_size": "Размер значка",
+  "settings_behaviour_show_song_icons": "Показать значки треков",
+  "settings_behaviour_pause_when_muted": "Пауза при отключении звука",
+  "settings_behaviour_pause_when_hidden": "Пауза при скрытии",
+  "settings_behaviour_ignored_duration_threshold": "Игнорировать короткие треки",
+  "settings_behaviour_show_nav_buttons": "Показать кнопки навигации",
+  "settings_playback_rewind_interval": "Интервал перемотки назад",
+  "settings_playback_fast_forward_interval": "Интервал перемотки вперед",
+  "songs_no_music_title": "Музыка не найдена",
+  "songs_no_music_action": "Настройки",
+  "playlists_create_title": "Создать плейлист",
+  "playlists_new_default_name": "Имя плейлиста",
+  "playlists_failed_title": "Ошибка!",
+  "loading_still_loading": "все еще загружается",
+  "settings_folder_loading": "Попытка чтения папки",
+  "@@locale": "ru"
+}

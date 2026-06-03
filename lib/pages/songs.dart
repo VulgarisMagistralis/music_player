@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:music_player/l10n/app_localizations.dart';
 import 'package:music_player/menu/nav_bar.dart';
 import 'package:music_player/route/routes.dart';
+import 'package:music_player/src/rust/api/data/stream_event.dart';
 import 'package:music_player/widgets/header.dart';
 import 'package:music_player/widgets/song_card.dart';
 import 'package:music_player/utilities/song_row.dart';
@@ -8,7 +10,6 @@ import 'package:music_player/utilities/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/src/rust/api/data/song.dart';
 import 'package:music_player/widgets/loading_animation.dart';
-import 'package:music_player/src/rust/api/data/stream_event.dart';
 import 'package:music_player/pages/error_pages/generic_error_page.dart';
 
 class SongsPage extends ConsumerStatefulWidget {
@@ -24,13 +25,14 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
   void initState() {
     super.initState();
     _scrollController = ScrollController(
-      onAttach: (position) => WidgetsBinding.instance.addPostFrameCallback(
-        (__) => position.animateTo(
-          ref.read(songsPageScrollOffsetProvider.notifier).value,
-          curve: Curves.fastOutSlowIn,
-          duration: Duration(milliseconds: (ref.read(songsPageScrollOffsetProvider.notifier).value * 0.55 + 0.2).floor()),
-        ),
-      ),
+      // needs rework: when songs are removed(e.g. ignored by time later on)- old position may overflow
+      // onAttach: (position) => WidgetsBinding.instance.addPostFrameCallback(
+      //   (_) => position.animateTo(
+      //     ref.read(songsPageScrollOffsetProvider.notifier).value,
+      //     curve: Curves.fastOutSlowIn,
+      //     duration: Duration(milliseconds: (ref.read(songsPageScrollOffsetProvider.notifier).value * 0.55 + 0.2).floor()),
+      //   ),
+      // ),
     );
     _scrollController.addListener(() => ref.read(songsPageScrollOffsetProvider.notifier).updateOffset(_scrollController.offset));
     WidgetsBinding.instance.addObserver(this);
@@ -49,7 +51,6 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
       next.whenData((event) {
         if (event is StreamEvent_Done) {
           ref.invalidate(playlistSortedByProvider);
-          ref.invalidate(allSongsProvider);
           ref.invalidate(sortedSongListProvider);
         }
       });
@@ -69,7 +70,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                             actionWidget: ElevatedButton.icon(
                               onPressed: () => ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.settings),
                               icon: const Icon(Icons.settings),
-                              label: const Text('Settings'),
+                              label: Text(GeneratedLocalization.of(context).button_settings),
                               style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
                             ),
                             showNavigation: true,
@@ -78,7 +79,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                             padding: const EdgeInsetsGeometry.fromLTRB(10, 10, 10, 0),
                             child: Column(
                               children: [
-                                const PlayerHeader(showExtraButtons: true),
+                                 const PlayerHeader(showExtraButtons: true, showRescan: true),
                                 const SizedBox(height: 10),
                                 Expanded(
                                   child: ListView.builder(
@@ -88,7 +89,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                                       key: ValueKey(sortedSongList[index].id),
                                       song: sortedSongList[index],
                                       index: index,
-                                      onTap: (int i) async => await ref.read(audioHandlerProvider).setPlaylist('songs', sortedSongList, index: i),
+                                      onTap: (int i) async => await ref.read(audioHandlerSyncProvider).setPlaylist('songs', sortedSongList, index: i),
                                     ),
                                   ),
                                 ),
@@ -101,7 +102,7 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
                       actionWidget: ElevatedButton.icon(
                         onPressed: () => ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.settings),
                         icon: const Icon(Icons.settings),
-                        label: const Text('Settings'),
+                        label: Text(GeneratedLocalization.of(context).button_settings),
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
                       ),
                       showNavigation: true,

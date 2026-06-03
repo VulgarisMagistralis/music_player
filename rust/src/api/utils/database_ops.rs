@@ -1,5 +1,6 @@
 use crate::api::data::{playlist::Playlist, song::Song};
 use crate::api::error::custom_error::CustomError;
+use crate::api::playlist_collection::locked_playlist_collection;
 use crate::api::utils::hash::hash_string;
 use bincode::config::{standard, Configuration};
 use bincode::{decode_from_slice, encode_to_vec};
@@ -17,7 +18,6 @@ const FOLDER_PREFIX: &str = "folder";
 const ENCODING_CONFIGURATION: Configuration = standard();
 const PLAYLIST_ID_COUNTER_KEY: &[u8] = b"__playlist_id_counter";
 
-/// Playlist key in DB: playlist::<u64>
 fn song_key(id: u64) -> String {
     format!("{SONG_TREE}::{id}")
 }
@@ -31,22 +31,47 @@ fn folder_key(id: u64) -> String {
 }
 
 pub(crate) fn set_db_dir(db_dir: String) -> Result<(), String> {
+    info!("Opening sled DB at: {}", db_dir);
     let db_path = PathBuf::from(&db_dir);
-    if let Err(_) = DB_INSTANCE_DIR.set(db_path.clone()) {
+    if DB_INSTANCE_DIR.set(db_path.clone()).is_err() {
         info!("DB directory already set (ignoring)");
     }
     std::fs::create_dir_all(&db_path).map_err(|e| {
         error!("Failed to create DB dir: {e}");
         format!("Failed to create DB dir: {e}")
     })?;
+
     let db = sled::open(db_path).map_err(|e| {
-        error!("{}", format!("Failed to open sled DB: {}", e));
+        error!("Failed to open sled DB: {}", e);
         format!("Failed to open sled DB: {}", e)
-    });
-    if let Err(_) = DB_INSTANCE.set(db?) {
+    })?;
+
+    if DB_INSTANCE.set(db).is_err() {
         info!("DB instance already set (ignoring)");
     }
-    info!("{}", DB_INSTANCE.get().is_none());
+
+    // CHANGE: playlist tree logging now after DB_INSTANCE is set.
+    // Previously this ran before set(), so open_or_fetch_tree always
+    // returned Err("DB not initialized") and the block never executed.
+    if let Ok(tree) = open_or_fetch_tree(PLAYLIST_TREE.to_string()) {
+        info!("PLAYLIST TREE CONTENTS ON STARTUP:");
+        for item in tree.iter() {
+            if let Ok((k, v)) = item {
+                info!("  key: {:?}", k);
+                if let Ok((playlist, _)) =
+                    decode_from_slice::<Playlist, _>(&v, ENCODING_CONFIGURATION)
+                {
+                    info!(
+                        "  playlist: id={} name={} songs={:?}",
+                        playlist.id, playlist.name, playlist.song_id_list
+                    );
+                }
+            }
+        }
+    }
+    info!("initializing playlist collection");
+    let _unused = locked_playlist_collection();
+    info!("playlist collection initialized");
     Ok(())
 }
 
@@ -74,7 +99,7 @@ pub(crate) fn get_settings_tree() -> Result<Tree, String> {
     open_or_fetch_tree(SETTINGS_TREE.to_string())
 }
 
-pub(crate) fn save_song_to_db(song: Song) -> Result<(), CustomError> {
+pub(crate) fn save_song_to_db(song: &Song) -> Result<(), CustomError> {
     get_song_tree()
         .map_err(|e| CustomError::TreeError(e.to_string()))?
         .insert(
@@ -85,11 +110,44 @@ pub(crate) fn save_song_to_db(song: Song) -> Result<(), CustomError> {
     Ok(())
 }
 
-pub(crate) fn save_song_art_to_db(id: u64, data: Vec<u8>) -> Result<(), CustomError> {
-    let tree = get_song_art_tree().map_err(|e| CustomError::TreeError(e.to_string()))?;
-    tree.insert(id.to_be_bytes(), data)
+/// Bulk insert with a single DB flush at the end.
+/// CHANGE: flush moved here from per-call save_song_art_to_db.
+/// sled::flush() covers ALL pending writes across all trees — songs and art
+/// are both durable after this single call. Previously each art insert
+/// triggered a synchronous fsync, meaning 500 songs = 500 fsyncs during scan.
+pub(crate) fn save_songs_to_db_bulk(songs: &[&Song]) -> Result<(), CustomError> {
+    let tree = get_song_tree().map_err(|e| CustomError::TreeError(e.to_string()))?;
+
+    let mut batch = sled::Batch::default();
+    for song in songs {
+        let encoded =
+            encode_to_vec(song, ENCODING_CONFIGURATION).map_err(|_| CustomError::EncodeError)?;
+        batch.insert(song_key(song.id).into_bytes(), encoded);
+    }
+    tree.apply_batch(batch)
         .map_err(|e| CustomError::DbError(e.to_string()))?;
-    let _ = tree.flush();
+
+    // Single flush covers songs + art written during the same scan
+    DB_INSTANCE
+        .get()
+        .ok_or(CustomError::DbError("DB not initialized".into()))?
+        .flush()
+        .map(|_| ())
+        .map_err(|e| CustomError::DbError(e.to_string()))?;
+
+    Ok(())
+}
+
+/// CHANGE: flush removed. save_songs_to_db_bulk handles the single flush
+/// at end of scan. save_song_art_to_db is called once per song during scan —
+/// flushing here meant one fsync per song (500 songs = 500 fsyncs = slow).
+/// Art written here is covered by the bulk flush at scan completion.
+/// For one-off art saves outside a scan, call flush_db() explicitly after.
+pub(crate) fn save_song_art_to_db(id: u64, data: Vec<u8>) -> Result<(), CustomError> {
+    get_song_art_tree()
+        .map_err(|e| CustomError::TreeError(e.to_string()))?
+        .insert(id.to_be_bytes(), data)
+        .map_err(|e| CustomError::DbError(e.to_string()))?;
     Ok(())
 }
 
@@ -101,14 +159,18 @@ pub(crate) fn get_song_art_from_db(id: u64) -> Result<Option<Vec<u8>>, CustomErr
         .map(|b| b.to_vec()))
 }
 
+/// Playlist writes keep their flush — these are user-initiated single writes
+/// (not in a scan loop), so durability on each write is correct here.
 pub(crate) fn save_playlist_to_db(playlist: Playlist) -> Result<Option<IVec>, CustomError> {
-    let added = get_playlist_tree()
-        .map_err(|e| CustomError::TreeError(e.to_string()))?
+    let tree = get_playlist_tree().map_err(|e| CustomError::TreeError(e.to_string()))?;
+    let added = tree
         .insert(
             playlist_key(playlist.id),
             encode_to_vec(&playlist, ENCODING_CONFIGURATION)
                 .map_err(|_| CustomError::EncodeError)?,
         )
+        .map_err(|e| CustomError::DbError(e.to_string()))?;
+    tree.flush()
         .map_err(|e| CustomError::DbError(e.to_string()))?;
     info!("adding playlist: {}", playlist.id);
     Ok(added)
@@ -118,12 +180,12 @@ pub(crate) fn get_playlist_from_db(playlist_id: u64) -> Result<Playlist, CustomE
     let encoded_playlist = get_playlist_tree()
         .map_err(|e| CustomError::TreeError(e.to_string()))?
         .get(playlist_key(playlist_id))
-        .map_err(|e| CustomError::DbError(e.to_string()))? // DB error
+        .map_err(|e| CustomError::DbError(e.to_string()))?
         .ok_or(CustomError::DbError("Not found".to_string()))?;
     let (playlist, _): (Playlist, usize) =
         decode_from_slice(&encoded_playlist, ENCODING_CONFIGURATION)
             .map_err(|_| CustomError::DecodeError)?;
-    return Ok(playlist);
+    Ok(playlist)
 }
 
 pub(crate) fn save_playlist_entry_to_db(playlist_id: u64, song_id: u64) -> Result<(), CustomError> {
@@ -205,26 +267,27 @@ pub(crate) fn get_all_songs_from_db() -> Result<Vec<Song>, CustomError> {
     Ok(song_list)
 }
 
+/// CHANGE: get tree once, use it for both insert and flush.
+/// Original fetched the tree twice and called unwrap() on the global DB flush
+/// (panic on error). Now returns a proper error instead.
 pub(crate) fn save_music_folder_to_db(folder_path: &String) -> Result<Option<IVec>, CustomError> {
-    let res: Option<IVec> = get_settings_tree()
-        .map_err(|e| {
-            error!("{}", format!("{}", folder_path));
-            CustomError::TreeError(e.to_string())
-        })?
+    let tree = get_settings_tree().map_err(|e| {
+        error!("Failed to get settings tree for folder: {}", folder_path);
+        CustomError::TreeError(e.to_string())
+    })?;
+
+    let res = tree
         .insert(folder_key(hash_string(folder_path)), folder_path.as_bytes())
         .map_err(|e| {
-            error!("{}", format!("{}", folder_path));
+            error!("Failed to save folder: {}", folder_path);
             CustomError::DbError(e.to_string())
         })?;
-    let _ = get_settings_tree()
-        .map_err(|e| {
-            error!("{}", format!("{}", folder_path));
-            CustomError::TreeError(e.to_string())
-        })?
-        .flush();
-    DB_INSTANCE.get().unwrap().flush().unwrap();
-    info!("DB FLUSHED");
-    info!("SAVED: {}", format!("{}", folder_path));
+
+    // Single flush on the tree — no need to also flush the global DB instance
+    tree.flush()
+        .map_err(|e| CustomError::DbError(e.to_string()))?;
+
+    info!("SAVED: {}", folder_path);
     Ok(res)
 }
 
@@ -237,8 +300,7 @@ pub(crate) fn get_music_folders_from_db() -> Result<Vec<String>, CustomError> {
         let (_, value) = item.map_err(|e| CustomError::DbError(e.to_string()))?;
         folder_list.push(String::from_utf8(value.to_vec()).map_err(|_| CustomError::Utf8Error)?);
     }
-    info!("FETCHING: {}", format!("{:?}", folder_list.first()));
-
+    info!("FETCHING: {:?}", folder_list.first());
     Ok(folder_list)
 }
 
@@ -252,16 +314,18 @@ pub(crate) fn remove_music_folder_from_db(folder_path: String) -> Result<(), Cus
 }
 
 pub(crate) fn remove_song_from_db(id: u64) -> Result<(), CustomError> {
-    let song_tree = get_song_tree().map_err(|e| CustomError::TreeError(e.to_string()))?;
-    let _ = song_tree.remove(song_key(id));
+    get_song_tree()
+        .map_err(|e| CustomError::TreeError(e.to_string()))?
+        .remove(song_key(id))
+        .map_err(|e| CustomError::DbError(e.to_string()))?;
     Ok(())
 }
 
 pub(crate) fn remove_all_songs_from_db() -> Result<(), CustomError> {
-    let song_tree = get_song_tree().map_err(|e| CustomError::TreeError(e.to_string()))?;
-    let _ = song_tree
+    get_song_tree()
+        .map_err(|e| CustomError::TreeError(e.to_string()))?
         .clear()
-        .map_err(|e| CustomError::TreeError(e.to_string()));
+        .map_err(|e| CustomError::TreeError(e.to_string()))?;
     Ok(())
 }
 
@@ -286,4 +350,17 @@ pub(crate) fn next_playlist_id() -> Result<u64, CustomError> {
     let mut arr = [0u8; 8];
     arr.copy_from_slice(&id);
     Ok(u64::from_be_bytes(arr))
+}
+
+/// Call from Flutter's AppLifecycleState.paused to guarantee durability
+/// before Android kills the process. Covers any writes not yet flushed
+/// by a bulk operation.
+#[flutter_rust_bridge::frb]
+pub fn flush_db() -> Result<(), String> {
+    DB_INSTANCE
+        .get()
+        .ok_or_else(|| "DB not initialized".to_string())?
+        .flush()
+        .map(|_| ())
+        .map_err(|e| e.to_string())
 }

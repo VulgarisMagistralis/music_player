@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart' show Locale;
 import 'package:music_player/utilities/settings_data.dart' show SharedPreferenceWithCacheHandler;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'setting_switches.g.dart';
@@ -92,5 +93,40 @@ class FastForwardIntervalInSeconds extends _$FastForwardIntervalInSeconds {
     if (newValue < _minimum || newValue > _maximum) return;
     await SharedPreferenceWithCacheHandler.instance.saveInteger(_sharedPrefKey, newValue);
     state = newValue;
+  }
+}
+
+@Riverpod(keepAlive: true)
+class IgnoredDurationThreshold extends _$IgnoredDurationThreshold {
+  static const int _defaultState = 0;
+  static const String _sharedPrefKey = 'behaviour.filter.ignored_duration_threshold_seconds';
+  @override
+  int build() => SharedPreferenceWithCacheHandler.instance.loadInteger(_sharedPrefKey) ?? _defaultState;
+  Future<void> update(int newValue) async {
+    await SharedPreferenceWithCacheHandler.instance.saveInteger(_sharedPrefKey, newValue);
+    state = newValue;
+  }
+}
+
+@Riverpod(keepAlive: true)
+class CurrentLocale extends _$CurrentLocale {
+  static const String _sharedPrefKey = 'app.locale.language_tag';
+  static const Locale _defaultState = Locale('en');
+
+  @override
+  Locale build() => _loadLocale() ?? _defaultState;
+
+  Locale? _loadLocale() {
+    final String? code = SharedPreferenceWithCacheHandler.instance.loadString(_sharedPrefKey);
+    if (code == null || code.isEmpty) return null;
+    final List<String> parts = code.split('_');
+    if (parts.isEmpty) return null;
+    return parts.length == 1 ? Locale(parts[0]) : Locale(parts[0], parts[1]);
+  }
+
+  Future<void> setLocale(Locale locale) async {
+    final String code = locale.countryCode != null ? '${locale.languageCode}_${locale.countryCode}' : locale.languageCode;
+    await SharedPreferenceWithCacheHandler.instance.saveString(_sharedPrefKey, code);
+    state = locale;
   }
 }

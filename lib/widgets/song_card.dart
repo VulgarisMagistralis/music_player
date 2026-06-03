@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/data/position.dart';
 import 'package:music_player/widgets/seek_bar.dart';
 import 'package:music_player/utilities/providers.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/common/control_buttons.dart';
 import 'package:music_player/src/rust/api/data/song.dart';
+import 'package:music_player/utilities/audio_handler.dart';
 import 'package:music_player/widgets/album_art_widget.dart';
 import 'package:music_player/widgets/favourites_button.dart';
 import 'package:music_player/common/animated_overflow_text.dart';
@@ -16,7 +17,7 @@ class NowPlaying extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final audioHandler = ref.watch(audioHandlerProvider);
+    final PlayerAudioHandler audioHandler = ref.watch(audioHandlerSyncProvider);
     final BigInt? songIdOrNull = ref.watch(audioSessionManagerProvider.select((s) => s.songId));
     final AsyncValue<Song?> currentSongOrNullAsync = ref.watch(getSongOrNullProvider(songId: songIdOrNull));
     return songIdOrNull == null

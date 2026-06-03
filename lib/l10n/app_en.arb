@@ -1,0 +1,140 @@
+{
+  "@@locale": "en",
+
+  "button_settings": "Settings",
+  "button_play": "Play",
+  "error_loading_library": "Failed to load library",
+  "playlist_create_title": "Create Playlist",
+  "settings_folder_error": "Failed to load folders",
+  "menu_add_to_playlist": "Add to playlist",
+  "menu_ignore_song": "Ignore song",
+  "menu_details": "Details",
+  "toast_audio_start_failed": "Failed to start audio services",
+  "toast_favourite_unknown": "Favourite status is unknown",
+  "toast_folder_load_error": "Encountered loading error from this folder. Reloading...",
+  "toast_playlist_deleted": "Deleted {name}",
+  "@toast_playlist_deleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_delete_failed": "Failed to delete {name}",
+  "@toast_playlist_delete_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_load_songs_failed": "Failed to load songs",
+  "toast_playlist_created": "Created {name}",
+  "@toast_playlist_created": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_create_failed": "Failed to create {name}",
+  "@toast_playlist_create_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_added_to_playlist": "Added to {name}",
+  "@toast_added_to_playlist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_add_to_playlist_failed": "Failed to add song to {name}",
+  "@toast_add_to_playlist_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_skipped_not_found": "Skipped {title}\nFile not found",
+  "@toast_skipped_not_found": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_audio_session_failed": "Could not activate audio session",
+  "toast_audio_play_error": "Error playing audio: {error}",
+  "@toast_audio_play_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_could_not_open_settings": "Could not open settings",
+  "toast_album_art_failed": "Couldn't fetch Album Art",
+  "settings_page_title": "Player",
+  "settings_behaviour_title": "Behaviour",
+  "settings_behaviour_play_on_launch": "Auto-play on launch",
+  "settings_behaviour_play_on_connect": "Auto-play on device connect",
+  "settings_behaviour_resume_after_disconnect": "Resume after device disconnect",
+  "settings_behaviour_paused_on_hidden": "Pause on app hidden",
+  "settings_behaviour_paused_when_muted": "Pause when device muted",
+  "settings_playback_title": "Playback",
+  "settings_appearance_title": "Appearance",
+  "settings_appearance_theme_mode": "Theme mode",
+  "settings_appearance_theme_color": "Theme color",
+  "settings_appearance_language": "Language",
+  "dialog_playlist_new_name": "New Playlist Name",
+  "dialog_save": "Save",
+  "dialog_cancel": "Cancel",
+  "error_lost_beat": "We lost the beat...",
+  "button_exit": "Exit",
+  "button_open_settings": "Open Settings",
+  "permission_required_title": "Permission required to continue",
+  "permission_required_body": "It seems you've denied access. You can go to settings to grant the necessary permissions.",
+  "loading_version": "Reading version information",
+  "loading_new_version": "New Version Available: {version}",
+  "@loading_new_version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "search_hint": "Search songs...",
+  "search_placeholder": "Type to search by title, artist, or album",
+  "search_error": "Error searching",
+  "search_no_results": "No songs found",
+  "settings_folder_title": "Folders",
+  "settings_version_title": "Version",
+  "settings_appearance_background_color": "Background Color",
+  "settings_appearance_main_text_color": "Main Text Color",
+  "settings_appearance_accent_color": "Accent Color",
+  "settings_appearance_font_size": "Font Size",
+  "settings_appearance_icon_size": "Icon Size",
+  "settings_behaviour_show_song_icons": "Show song icons on lists",
+  "settings_behaviour_play_on_launch": "Play on launch",
+  "settings_behaviour_play_on_connect": "Play when connected",
+  "settings_behaviour_pause_when_muted": "Pause when muted",
+  "settings_behaviour_pause_when_hidden": "Pause when hidden",
+  "settings_behaviour_resume_after_disconnect": "Resume after disconnected",
+  "settings_behaviour_ignored_duration_threshold": "Ignore short tracks",
+  "settings_behaviour_show_nav_buttons": "Show navigation buttons",
+  "settings_playback_rewind_interval": "Rewind Interval",
+  "settings_playback_fast_forward_interval": "Fast Forward Interval",
+  "songs_no_music_title": "Couldn't find any music",
+  "songs_no_music_action": "Settings",
+  "playlists_create_title": "Create Playlist",
+  "playlists_new_default_name": "New Playlist Name",
+  "playlists_failed_title": "Failed!!!",
+  "loading_still_loading": "still loading",
+  "settings_folder_loading":"Trying to read folder"
+}

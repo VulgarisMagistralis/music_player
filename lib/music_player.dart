@@ -7,8 +7,12 @@ import 'package:music_player/pages/playlists.dart';
 import 'package:music_player/pages/favourites.dart';
 import 'package:music_player/pages/loading_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_player/l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:music_player/pages/error_pages/generic_error_page.dart';
 import 'package:music_player/providers/theme_colors.dart' show playerThemeProvider;
+import 'package:music_player/generated/supported_locales.g.dart' show supportedLocales;
+import 'package:music_player/providers/setting_switches.dart' show currentLocaleProvider;
 
 class MusicPlayer extends ConsumerStatefulWidget {
   const MusicPlayer({super.key});
@@ -21,6 +25,9 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
   @override
   Widget build(BuildContext context) => MaterialApp(
     theme: ref.watch(playerThemeProvider),
+    locale: ref.watch(currentLocaleProvider),
+    localizationsDelegates: const [GeneratedLocalization.delegate, GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
+    supportedLocales: supportedLocales,
     debugShowCheckedModeBanner: false,
     home: switch (ref.watch(playerRouteProvider)) {
       PlayerPageEnum.songs => const SongsPage(),

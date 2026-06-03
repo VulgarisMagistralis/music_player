@@ -22,6 +22,9 @@ Future<List<Song>> getAllSongsFromCollection() =>
 Future<List<Song>> getSortedSongs({required SortBy sort}) =>
     RustLib.instance.api.crateApiSongCollectionGetSortedSongs(sort: sort);
 
+String getSongAlbumArtFilePath({required BigInt id}) =>
+    RustLib.instance.api.crateApiSongCollectionGetSongAlbumArtFilePath(id: id);
+
 Future<Uint8List?> getSongAlbumArt({required BigInt id}) =>
     RustLib.instance.api.crateApiSongCollectionGetSongAlbumArt(id: id);
 

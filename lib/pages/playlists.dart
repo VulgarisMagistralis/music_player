@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music_player/common/toast.dart';
+import 'package:music_player/l10n/app_localizations.dart';
 import 'package:music_player/menu/nav_bar.dart';
 import 'package:music_player/utilities/song_row.dart';
 import 'package:music_player/widgets/header.dart';
@@ -53,10 +54,10 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
           padding: const EdgeInsets.fromLTRB(15, 15, 10, 0),
           child: Column(
             children: [
-              const PlayerHeader(),
+              const PlayerHeader(showRescan: true),
               Expanded(
                 child: switch (playlists) {
-                  AsyncError<List<Playlist>>() => const Text('Failed!!!'),
+                  AsyncError<List<Playlist>>() => Text(GeneratedLocalization.of(context).error_loading_library),
                   AsyncLoading<List<Playlist>>() => const WaveformLoading(),
                   AsyncData<List<Playlist>>() => Column(
                     children: [
@@ -76,9 +77,13 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
                                   onTap: () async {
                                     try {
                                       await ref.read(deletePlaylistFromCollectionProvider(playlistId: playlist.id).future);
-                                      ToastManager().showInfoToast('Deleted ${playlist.name}');
+                                      if (context.mounted) {
+                                        ToastManager().showInfoToast(GeneratedLocalization.of(context).toast_playlist_deleted(playlist.name));
+                                      }
                                     } catch (e) {
-                                      ToastManager().showErrorToast('Failed to delete ${playlist.name}');
+                                      if (context.mounted) {
+                                        ToastManager().showErrorToast(GeneratedLocalization.of(context).toast_add_to_playlist_failed(playlist.name));
+                                      }
                                     }
                                     ref.invalidate(playlistCollectionProvider);
                                   },
@@ -93,12 +98,12 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
                                             (songMap) => SongRow(
                                               song: songMap.value,
                                               index: songMap.key,
-                                              onTap: (int i) async => await ref.read(audioHandlerProvider).setPlaylist('songs', songList, index: i),
+                                              onTap: (int i) async => await ref.read(audioHandlerSyncProvider).setPlaylist('songs', songList, index: i),
                                             ),
                                           )
                                           .toList(),
-                                      error: (_, __) {
-                                        ToastManager().showErrorToast('Failed to load songs');
+                                      error: (_, _) {
+                                        ToastManager().showErrorToast(GeneratedLocalization.of(context).toast_load_songs_failed);
                                         return [const SizedBox.shrink()];
                                       },
                                       loading: () => [const CircularProgressIndicator()],
@@ -107,7 +112,7 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
                             ),
                             const Divider(),
                             ExpansionTile(
-                              title: const Text('Create Playlist'),
+                              title: Text(GeneratedLocalization.of(context).playlist_create_title),
                               children: [
                                 Padding(
                                   padding: const EdgeInsetsGeometry.only(right: 15),
@@ -118,9 +123,13 @@ class _PlaylistPageState extends ConsumerState<PlaylistPage> with WidgetsBinding
                                       if (newPlaylistName.isEmpty) newPlaylistName = placeholderPlaylistName;
                                       try {
                                         await ref.read(addPlaylistProvider(newPlaylistName: newPlaylistName).future);
-                                        ToastManager().showInfoToast('Created $newPlaylistName');
+                                        if (context.mounted) {
+                                          ToastManager().showInfoToast(GeneratedLocalization.of(context).toast_playlist_created(newPlaylistName));
+                                        }
                                       } catch (e) {
-                                        ToastManager().showErrorToast('Failed to create $newPlaylistName');
+                                        if (context.mounted) {
+                                          ToastManager().showErrorToast(GeneratedLocalization.of(context).toast_playlist_create_failed(newPlaylistName));
+                                        }
                                       }
                                       ref.invalidate(playlistCollectionProvider);
                                     },

@@ -1,0 +1,129 @@
+{
+  "button_settings": "Impostazioni",
+  "button_play": "Riproduci",
+  "error_loading_library": "Caricamento libreria fallito",
+  "playlist_create_title": "Crea playlist",
+  "settings_folder_error": "Caricamento cartelle fallito",
+  "menu_add_to_playlist": "Aggiungi alla playlist",
+  "menu_ignore_song": "Ignora canzone",
+  "menu_details": "Dettagli",
+  "toast_audio_start_failed": "Avvio dei servizi audio non riuscito",
+  "toast_favourite_unknown": "Lo stato dei preferiti è sconosciuto",
+  "toast_folder_load_error": "Errore nel caricamento di questa cartella. Ricaricamento...",
+  "toast_playlist_deleted": "Cancellata {name}",
+  "@toast_playlist_deleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_delete_failed": "Impossibile eliminare {name}",
+  "@toast_playlist_delete_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_load_songs_failed": "Impossibile caricare le canzoni",
+  "toast_playlist_created": "Creata {name}",
+  "@toast_playlist_created": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_create_failed": "Impossibile creare {name}",
+  "@toast_playlist_create_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_added_to_playlist": "Aggiunta a {name}",
+  "@toast_added_to_playlist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_add_to_playlist_failed": "Impossibile aggiungere la canzone a {name}",
+  "@toast_add_to_playlist_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_skipped_not_found": "Saltata {title}\nFile non trovato",
+  "@toast_skipped_not_found": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_audio_session_failed": "Impossibile attivare la sessione audio",
+  "toast_audio_play_error": "Errore in riproduzione: {error}",
+  "@toast_audio_play_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_could_not_open_settings": "Impossibile aprire le impostazioni",
+  "toast_album_art_failed": "Impossibile ottenere la copertina dell'album",
+  "settings_page_title": "Lettore",
+  "settings_behaviour_title": "Comportamento",
+  "settings_behaviour_play_on_launch": "Riproduzione automatica all'avvio",
+  "settings_behaviour_play_on_connect": "Riproduzione automatica alla connessione",
+  "settings_behaviour_resume_after_disconnect": "Riprendere dopo la disconnessione",
+  "settings_behaviour_paused_on_hidden": "Pausa quando l'app è nascosta",
+  "settings_behaviour_paused_when_muted": "Pausa in caso di disattivazione audio",
+  "settings_playback_title": "Riproduzione",
+  "settings_appearance_title": "Aspetto",
+  "settings_appearance_theme_mode": "Modalità tema",
+  "settings_appearance_theme_color": "Colore del tema",
+  "settings_appearance_language": "Lingua",
+  "dialog_playlist_new_name": "Nome della playlist",
+  "dialog_save": "Salva",
+  "dialog_cancel": "Annulla",
+  "error_lost_beat": "Abbiamo perso il ritmo...",
+  "button_exit": "Esci",
+  "button_open_settings": "Apri impostazioni",
+  "permission_required_title": "Autorizzazione richiesta per continuare",
+  "permission_required_body": "Sembra che l'accesso sia stato negato. Puoi andare nelle impostazioni per concedere le autorizzazioni necessarie.",
+  "loading_version": "Lettura informazioni versione",
+  "loading_new_version": "Nuova versione disponibile: {version}",
+  "search_hint": "Cerca canzoni...",
+  "search_placeholder": "Digita per cercare per titolo, artista o album",
+  "search_error": "Errore nella ricerca",
+  "search_no_results": "Nessuna canzone trovata",
+  "settings_folder_title": "Cartelle",
+  "settings_version_title": "Versione",
+  "settings_appearance_background_color": "Colore di sfondo",
+  "settings_appearance_main_text_color": "Colore del testo",
+  "settings_appearance_accent_color": "Colore dell'accento",
+  "settings_appearance_font_size": "Dimensione del font",
+  "settings_appearance_icon_size": "Dimensione dell'icona",
+  "settings_behaviour_show_song_icons": "Mostra icone canzoni",
+  "settings_behaviour_pause_when_muted": "Pausa quando muto",
+  "settings_behaviour_pause_when_hidden": "Pausa quando nascosto",
+  "settings_behaviour_ignored_duration_threshold": "Ignora tracce brevi",
+  "settings_behaviour_show_nav_buttons": "Mostra pulsanti di navigazione",
+  "settings_playback_rewind_interval": "Intervalo di riavvolgimento",
+  "settings_playback_fast_forward_interval": "Intervalo di avanzamento veloce",
+  "songs_no_music_title": "Nessuna musica trovata",
+  "songs_no_music_action": "Impostazioni",
+  "playlists_create_title": "Crea playlist",
+  "playlists_new_default_name": "Nome della playlist",
+  "playlists_failed_title": "Errore!",
+  "loading_still_loading": "caricamento in corso",
+  "settings_folder_loading": "Tentativo di lettura cartella",
+  "@@locale": "it"
+}

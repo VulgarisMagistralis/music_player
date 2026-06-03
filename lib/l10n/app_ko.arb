@@ -1,0 +1,129 @@
+{
+  "button_settings": "설정",
+  "button_play": "재생",
+  "error_loading_library": "라이브러리 로드 실패",
+  "playlist_create_title": "재생 목록 만들기",
+  "settings_folder_error": "폴더 로드 실패",
+  "menu_add_to_playlist": "재생 목록에 추가",
+  "menu_ignore_song": "노래 무시",
+  "menu_details": "자세히",
+  "toast_audio_start_failed": "오디오 서비스 시작 실패",
+  "toast_favourite_unknown": "즐겨찾기 상태가 알 수 없습니다",
+  "toast_folder_load_error": "이 폴더 로딩 중 오류가 발생했습니다. 다시 로딩 중...",
+  "toast_playlist_deleted": "{name}(이)가 삭제되었습니다",
+  "@toast_playlist_deleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_delete_failed": "{name}(이)를 삭제하지 못했습니다",
+  "@toast_playlist_delete_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_load_songs_failed": "노래 로딩 실패",
+  "toast_playlist_created": "{name}(이)가 생성되었습니다",
+  "@toast_playlist_created": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_playlist_create_failed": "{name}(이)를 생성하지 못했습니다",
+  "@toast_playlist_create_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_added_to_playlist": "{name}(이)에 추가되었습니다",
+  "@toast_added_to_playlist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_add_to_playlist_failed": "{name}(이)에 노래를 추가하지 못했습니다",
+  "@toast_add_to_playlist_failed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_skipped_not_found": "{title}(이)가 건너뛰었습니다\n파일을 찾을 수 없습니다",
+  "@toast_skipped_not_found": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_audio_session_failed": "오디오 세션을 활성화할 수 없습니다",
+  "toast_audio_play_error": "재생 중 오류: {error}",
+  "@toast_audio_play_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "toast_could_not_open_settings": "설정을 열 수 없습니다",
+  "toast_album_art_failed": "앨범 아트를 가져올 수 없습니다",
+  "settings_page_title": "플레이어",
+  "settings_behaviour_title": "동작",
+  "settings_behaviour_play_on_launch": "시작 시 자동 재생",
+  "settings_behaviour_play_on_connect": "장치 연결 시 자동 재생",
+  "settings_behaviour_resume_after_disconnect": "장치 연결 해제 후 계속하기",
+  "settings_behaviour_paused_on_hidden": "앱 숨겨질 때 일시 중지",
+  "settings_behaviour_paused_when_muted": "음소거될 때 일시 중지",
+  "settings_playback_title": "재생",
+  "settings_appearance_title": "표현",
+  "settings_appearance_theme_mode": "테마 모드",
+  "settings_appearance_theme_color": "테마 색상",
+  "settings_appearance_language": "언어",
+  "dialog_playlist_new_name": "재생 목록 이름",
+  "dialog_save": "저장",
+  "dialog_cancel": "취소",
+  "error_lost_beat": "음악이 끊겼습니다...",
+  "button_exit": "나가기",
+  "button_open_settings": "설정 열기",
+  "permission_required_title": "계속하려면 권한이 필요합니다",
+  "permission_required_body": "접근이 거부되었습니다. 설정에서 필요한 권한을 부여할 수 있습니다.",
+  "loading_version": "버전 정보 읽는 중",
+  "loading_new_version": "새 버전 사용 가능: {version}",
+  "search_hint": "노래 검색...",
+  "search_placeholder": "제목, 아티스트 또는 앨범으로 검색",
+  "search_error": "검색 오류",
+  "search_no_results": "노래를 찾을 수 없습니다",
+  "settings_folder_title": "폴더",
+  "settings_version_title": "버전",
+  "settings_appearance_background_color": "배경색",
+  "settings_appearance_main_text_color": "텍스트 색상",
+  "settings_appearance_accent_color": "강조 색상",
+  "settings_appearance_font_size": "글꼴 크기",
+  "settings_appearance_icon_size": "아이콘 크기",
+  "settings_behaviour_show_song_icons": "목록에 노래 아이콘 표시",
+  "settings_behaviour_pause_when_muted": "음소거 시 일시 중단",
+  "settings_behaviour_pause_when_hidden": "숨겨진 시 일시 중단",
+  "settings_behaviour_ignored_duration_threshold": "짧은 트랙 무시",
+  "settings_behaviour_show_nav_buttons": "네비게이션 버튼 표시",
+  "settings_playback_rewind_interval": "되감기 간격",
+  "settings_playback_fast_forward_interval": "빨리 감기 간격",
+  "songs_no_music_title": "음악을 찾을 수 없습니다",
+  "songs_no_music_action": "설정",
+  "playlists_create_title": "재생 목록 만들기",
+  "playlists_new_default_name": "새 재생 목록 이름",
+  "playlists_failed_title": "실패!",
+  "loading_still_loading": "로드 중",
+  "settings_folder_loading": "폴더 읽는 중",
+  "@@locale": "ko"
+}

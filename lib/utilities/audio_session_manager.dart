@@ -20,14 +20,11 @@ class AudioSessionManager extends Notifier<AudioSessionState> {
       assert(s.songId != null, 'Ready state without songId');
       assert(s.asMediaItem != null, 'Ready state without MediaItem');
     }
-
-    if (s.isPlaying) {
-      assert(s.file != null, 'Playing without file');
-    }
   }
 
   void updateFromMediaItem(MediaItem mediaItem, int index) async {
-    state = state.copyWith(songId: BigInt.parse(mediaItem.id), title: mediaItem.title, songIndexInPlaylist: index, asMediaItem: mediaItem, isReady: true);
+    final songId = BigInt.tryParse(mediaItem.extras?['songId'] as String? ?? '');
+    state = state.copyWith(songId: songId, title: mediaItem.title, songIndexInPlaylist: index, asMediaItem: mediaItem, isReady: true);
     await saveState();
   }
 
@@ -44,20 +41,19 @@ class AudioSessionManager extends Notifier<AudioSessionState> {
     MediaItem? asMediaItem,
     int? favouritePlaylistIndexOrNull,
   }) async {
-    final nextState = base.copyWith(
-      playlistId: playlistId ?? base.playlistId,
-      songId: songId ?? base.songId,
-      file: file,
-      title: title,
-      songIndexInPlaylist: songIndexInPlaylist ?? base.songIndexInPlaylist,
-      isPlaying: isPlaying ?? base.isPlaying,
-      isReady: isReady ?? base.isReady,
-      playlistScrollOffset: playlistScrollOffset ?? base.playlistScrollOffset,
-      albumArt: albumArt,
-      asMediaItem: asMediaItem,
-      favouritePlaylistIndexOrNull: favouritePlaylistIndexOrNull,
+    final nextState = state.copyWith(
+      playlistId: playlistId ?? state.playlistId,
+      songId: songId ?? state.songId,
+      file: file ?? state.file,
+      title: title ?? state.title,
+      songIndexInPlaylist: songIndexInPlaylist ?? state.songIndexInPlaylist,
+      isPlaying: isPlaying ?? state.isPlaying,
+      isReady: isReady ?? state.isReady,
+      playlistScrollOffset: playlistScrollOffset ?? state.playlistScrollOffset,
+      albumArt: albumArt ?? state.albumArt,
+      asMediaItem: asMediaItem ?? state.asMediaItem,
+      favouritePlaylistIndexOrNull: favouritePlaylistIndexOrNull ?? state.favouritePlaylistIndexOrNull,
     );
-
     _validate(nextState);
     state = nextState;
     await saveState();

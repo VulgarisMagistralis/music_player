@@ -1,0 +1,8 @@
+builders:
+  locale_generator:
+    import: "package:music_player/tools/build/locale_generator_builder.dart"
+    builder_factories: ["localeGeneratorBuilder"]
+    build_extensions: {".arb": [".locales.dart"]}
+    auto_apply: root_package
+    runs_before: ["flutter_gen|gen_l10n"]
+    build_to: source

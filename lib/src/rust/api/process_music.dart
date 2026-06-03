@@ -8,5 +8,9 @@ import 'package:music_player/src/rust/api/data/song.dart';
 import 'package:music_player/src/rust/api/data/stream_event.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Stream<StreamEvent> readMusicFiles() =>
-    RustLib.instance.api.crateApiProcessMusicReadMusicFiles();
+// These functions are ignored because they are not marked as `pub`: `process_file`
+
+Stream<StreamEvent> readMusicFiles({required int minDurationS}) => RustLib
+    .instance
+    .api
+    .crateApiProcessMusicReadMusicFiles(minDurationS: minDurationS);
