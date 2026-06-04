@@ -91,6 +91,3 @@ app_localizations**
 mempalace.yaml
 entities.json
 opencode.json
-
-# locale generator 
-!lib/tools/build/
