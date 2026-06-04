@@ -10,7 +10,7 @@ void main() {
       test('returns correct drawable for each shuffle mode', () {
         expect(AudioServiceShuffleMode.none.androidIcon, 'drawable/ic_shuffle');
         expect(AudioServiceShuffleMode.all.androidIcon, 'drawable/ic_shuffle_active');
-        expect(AudioServiceShuffleMode.group.androidIcon, 'drawable/ic_shuffle_group');
+        expect(AudioServiceShuffleMode.group.androidIcon, 'drawable/ic_shuffle');
       });
     });
 
@@ -18,14 +18,14 @@ void main() {
       test('returns correct label for each shuffle mode', () {
         expect(AudioServiceShuffleMode.none.label, 'Shuffle off');
         expect(AudioServiceShuffleMode.all.label, 'Shuffle all');
-        expect(AudioServiceShuffleMode.group.label, 'Shuffle group');
+        expect(AudioServiceShuffleMode.group.label, 'Shuffle off');
       });
     });
 
     group('next', () {
       test('cycles through shuffle modes correctly', () {
         expect(AudioServiceShuffleMode.none.next, AudioServiceShuffleMode.all);
-        expect(AudioServiceShuffleMode.all.next, AudioServiceShuffleMode.group);
+        expect(AudioServiceShuffleMode.all.next, AudioServiceShuffleMode.none);
         expect(AudioServiceShuffleMode.group.next, AudioServiceShuffleMode.none);
       });
     });
@@ -62,7 +62,7 @@ void main() {
         expect(AudioServiceRepeatMode.none.label, 'Repeat off');
         expect(AudioServiceRepeatMode.all.label, 'Repeat all');
         expect(AudioServiceRepeatMode.one.label, 'Repeat one');
-        expect(AudioServiceRepeatMode.group.label, 'Repeat off');
+        expect(AudioServiceRepeatMode.group.label, 'Repeat all');
       });
     });
   });

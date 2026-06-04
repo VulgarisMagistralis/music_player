@@ -2,7 +2,7 @@ name: music_player
 description: Basic mp3 player
 publish_to: 'none'
 
-version: 0.0.7+13
+version: 0.1.0
 
 environment:
   sdk: ">=3.10.0 <4.0.0"
@@ -56,6 +56,8 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   mockito: ^5.6.4
+  image: ^4.8.0
+  shared_preferences_platform_interface: ^2.4.2
 
 flutter_launcher_icons:
   image_path_android: "assets/icons/note_2.png"

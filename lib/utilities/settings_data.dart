@@ -37,4 +37,6 @@ class SharedPreferenceWithCacheHandler {
 
   Future<void> saveString(String key, String value) async => await _sharedPreferences.setString(key, value);
   String? loadString(String key) => _sharedPreferences.getString(key);
+
+  Future<void> removeInteger(String key) async => await _sharedPreferences.remove(key);
 }
