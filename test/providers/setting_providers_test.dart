@@ -6,10 +6,19 @@ import 'package:music_player/providers/setting_switches.dart';
 import 'package:music_player/providers/ui_elements.dart';
 import 'package:music_player/providers/theme_colors.dart';
 import 'package:music_player/utilities/providers.dart';
+import 'package:music_player/utilities/settings_data.dart';
 import 'package:music_player/src/rust/api/utils/sort_modes.dart' show SortBy;
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 void main() {
   late ProviderContainer container;
+
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+    await SharedPreferenceWithCacheHandler.instance.init();
+  });
 
   setUp(() {
     container = ProviderContainer();
@@ -74,15 +83,19 @@ void main() {
 
     test('update respects minimum bound', () async {
       final notifier = container.read(rewindIntervalInSecondsProvider.notifier);
+      await SharedPreferenceWithCacheHandler.instance.saveInteger('behaviour.playback.rewind_interval_in_seconds', 3);
+      notifier.state = 3;
       await notifier.update(-2); // 3 - 2 = 1 -> ok
       expect(container.read(rewindIntervalInSecondsProvider), 1);
-      
+
       await notifier.update(-3); // 1 - 3 = -2 -> blocked (< 1)
       expect(container.read(rewindIntervalInSecondsProvider), 1);
     });
 
     test('update respects maximum bound', () async {
       final notifier = container.read(rewindIntervalInSecondsProvider.notifier);
+      await SharedPreferenceWithCacheHandler.instance.saveInteger('behaviour.playback.rewind_interval_in_seconds', 3);
+      notifier.state = 3;
       await notifier.update(8); // 3 + 8 = 11 -> blocked (> 10)
       expect(container.read(rewindIntervalInSecondsProvider), 3);
     });
@@ -125,15 +138,19 @@ void main() {
 
     test('update respects minimum bound of -5', () async {
       final notifier = container.read(fontSizeAdjustmentProvider.notifier);
+      await SharedPreferenceWithCacheHandler.instance.saveInteger('behaviour.ui.font_size_adjustment', 0);
+      notifier.state = 0;
       await notifier.update(-5); // 0 - 5 = -5
       expect(container.read(fontSizeAdjustmentProvider), -5);
-      
+
       await notifier.update(-1); // -5 - 1 = -6 -> blocked
       expect(container.read(fontSizeAdjustmentProvider), -5);
     });
 
     test('update respects maximum bound of 5', () async {
       final notifier = container.read(fontSizeAdjustmentProvider.notifier);
+      await SharedPreferenceWithCacheHandler.instance.saveInteger('behaviour.ui.font_size_adjustment', 0);
+      notifier.state = 0;
       await notifier.update(6); // 0 + 6 = 6 -> blocked
       expect(container.read(fontSizeAdjustmentProvider), 0);
     });
@@ -156,7 +173,6 @@ void main() {
       expect(container.read(repeatModeProvider), equals(AudioServiceRepeatMode.none));
     });
   });
-
 
   group('PrimaryTextColorProvider', () {
     test('returns default white', () {
