@@ -33,8 +33,8 @@ jobs:
 
       - name: Commit and push version bump
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
           git add pubspec.yaml
           git commit -m "Bump version code"
           git push
