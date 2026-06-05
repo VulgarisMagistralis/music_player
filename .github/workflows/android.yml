@@ -19,7 +19,6 @@ jobs:
 
   bump-version:
     needs: checkout
-    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -41,7 +40,6 @@ jobs:
 
   build-and-deploy:
     needs: [checkout,bump-version]
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.merged) }}
     runs-on: ubuntu-latest
     steps:
       - name: Install FVM
