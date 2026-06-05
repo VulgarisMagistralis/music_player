@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+  pull_request:
+      types: [closed]
+      branches:
+        - main
 
 jobs:
   build:
@@ -12,7 +16,33 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
+  bump-version:
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Bump Version
+        run: |
+          chmod +x bump_version.sh
+          ./bump_version.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and push version bump
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add pubspec.yaml
+          git commit -m "Bump version code"
+          git push
+
+  build-and-deploy:
+    needs: [bump-version]
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.merged) }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Install FVM
         run: |
           curl -fsSL https://fvm.app/install.sh | bash
