@@ -1,10 +1,10 @@
 #!/bin/bash
 PUBSPEC_FILE="pubspec.yaml"
-VERSION_CODE=$(sed -n 's/.*+[[:space:]]*\([0-9]\+\).*/\1/p' $PUBSPEC_FILE |  tr -d '\n')
-if [ -z "$VERSION_CODE" ]; then
-  echo "Error: Could not find version code"
-  exit 1
+OLD_NUM=$(grep '^version:' $PUBSPEC_FILE | grep -oP '(?<=\+)[[:digit:]]+')
+if [ -z "$OLD_NUM" ]; then
+  NEW_NUM=1
+else
+  NEW_NUM=$((OLD_NUM + 1))
 fi
-NEW_VERSION=$((VERSION_CODE + 1))
-sed -i "s|+$VERSION_CODE/+$NEW_VERSION/" $PUBSPEC_FILE
-echo "Version bumped from $VERSION_CODE to $NEW_VERSION"
+sed -i "/^version:/s/+\($OLD_NUM\)/+$NEW_NUM/" $PUBSPEC_FILE
+echo "Version code updated to $NEW_NUM"
