@@ -4,7 +4,6 @@ import 'package:music_player/src/rust/api/utils/sort_modes.dart';
 import 'package:music_player/utilities/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:music_player/utilities/song_sorting.dart';
-
 part 'songs_loading_provider.g.dart';
 
 class SongsLoading {
@@ -16,12 +15,7 @@ class SongsLoading {
   SongsLoading({this.songs = const [], this.scanning = true, this.error, this.hasScanned = false});
 
   SongsLoading copyWith({List<Song>? songs, bool? scanning, String? error, bool? hasScanned}) {
-    return SongsLoading(
-      songs: songs ?? this.songs,
-      scanning: scanning ?? this.scanning,
-      error: error,
-      hasScanned: hasScanned ?? this.hasScanned,
-    );
+    return SongsLoading(songs: songs ?? this.songs, scanning: scanning ?? this.scanning, error: error, hasScanned: hasScanned ?? this.hasScanned);
   }
 }
 
@@ -43,9 +37,16 @@ class SongsLoadingNotifier extends _$SongsLoadingNotifier {
     });
 
     // Listen to processMusicFilesProvider stream
-    ref.listen(processMusicFilesProvider, (_, next) {
-      // Reset state when the stream source rebuilds (e.g. threshold change)
-      state = state.copyWith(songs: [], scanning: true, error: null, hasScanned: false);
+    ref.listen(processMusicFilesProvider, (prev, next) {
+      // Skip the initial eager fire — only react on actual changes
+      if (prev == null) return;
+
+      // Reset state when the stream source rebuilds (e.g. threshold change or manual rescan).
+      // We detect this by watching for a transition from AsyncData/AsyncError back to new data,
+      // or simply by tracking whether scanning was previously complete.
+      if (state.hasScanned) {
+        state = state.copyWith(songs: [], scanning: true, error: null, hasScanned: false);
+      }
 
       next.whenData((event) {
         if (event is StreamEvent_Song) {

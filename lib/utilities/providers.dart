@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart' show compute;
+import 'package:flutter/services.dart' show MethodChannel;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/providers/setting_switches.dart';
 import 'package:music_player/src/rust/api/playlist_collection.dart';
@@ -163,3 +164,6 @@ class FavouriteSongs extends _$FavouriteSongs {
     }
   }
 }
+
+@riverpod
+Future<bool> isAutomotiveOS(Ref ref) async => await const MethodChannel('com.cenkt.music_player/platform').invokeMethod<bool>('isAutomotive') ?? false;

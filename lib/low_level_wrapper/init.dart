@@ -17,9 +17,25 @@ class LowLevelInitializer {
       final dataSource = LowLevelFolderDataSource();
       final folders = await dataSource.loadFolders();
       if (folders.isEmpty) {
-        await dataSource.saveFolders(folderList: ['/storage/emulated/0/Music']);
+        final musicPath = await _getMusicDirectory();
+        await dataSource.saveFolders(folderList: [musicPath]);
       }
     } catch (_) {}
     _initialized = true;
+  }
+
+  static Future<String> _getMusicDirectory() async {
+    try {
+      final cacheDir = (await getExternalCacheDirectories())?.first.path;
+      if (cacheDir != null) {
+        final parts = cacheDir.split('/');
+        final emulatedIndex = parts.indexOf('emulated');
+        if (emulatedIndex >= 0 && emulatedIndex + 2 < parts.length) {
+          final userRoot = '/${parts.sublist(1, emulatedIndex + 2).join('/')}';
+          return '$userRoot/Music';
+        }
+      }
+    } catch (_) {}
+    return '/storage/emulated/0/Music';
   }
 }
