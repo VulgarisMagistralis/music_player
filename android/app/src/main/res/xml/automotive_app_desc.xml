@@ -2,4 +2,5 @@
 <automotiveApp>
     <uses name="media" />
     <uses name="app" />
+    <uses name="template" />
 </automotiveApp>

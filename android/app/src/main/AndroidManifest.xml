@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.cenkt.music_player">
 
+    <!-- Permissions needed on both platforms -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -15,13 +16,15 @@
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">
 
+        <!-- Flutter embedding -->
         <meta-data android:name="flutterEmbedding" android:value="2" />
+
+        <!-- AudioService notification icon -->
         <meta-data
             android:name="com.ryanheise.audioservice.notification_icon"
             android:resource="@drawable/ic_stat_name" />
-        <meta-data
-            android:name="com.google.android.gms.car.application"
-            android:resource="@xml/automotive_app_desc" />
+
+        <!-- FileProvider -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.cenkt.music_player.fileprovider"
@@ -31,6 +34,8 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Main activity (common to both) -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -53,6 +58,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- AudioService (media playback) -->
         <service
             android:name="com.ryanheise.audioservice.AudioService"
             android:foregroundServiceType="mediaPlayback"
@@ -64,6 +71,8 @@
                 <category android:name="android.media.category.MEDIA" />
             </intent-filter>
         </service>
+
+        <!-- Car‑specific service – compiled in both flavors (runtime checks guard usage) -->
         <service
             android:name="com.cenkt.music_player.car.MusicCarService"
             android:exported="true">
@@ -71,6 +80,8 @@
                 <action android:name="androidx.car.app.CarAppService" />
             </intent-filter>
         </service>
+
+        <!-- Media button receiver -->
         <receiver
             android:name="com.ryanheise.audioservice.MediaButtonReceiver"
             android:exported="true"
@@ -79,5 +90,6 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+
     </application>
 </manifest>
