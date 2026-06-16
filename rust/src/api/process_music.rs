@@ -10,6 +10,7 @@ use lofty::file::AudioFile;
 use lofty::file::TaggedFileExt;
 use lofty::probe::Probe;
 use lofty::tag::Accessor;
+use log::info;
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fs;
@@ -51,25 +52,33 @@ pub async fn read_music_files(sink: StreamSink<StreamEvent>, min_duration_s: u32
         let mut all_paths: Vec<PathBuf> = Vec::new();
         for folder in &folders {
             let dir = PathBuf::from(folder);
+            info!("SCAN CHECK: {} exists={} is_dir={}", dir.display(), dir.exists(), dir.is_dir());
             if !dir.exists() || !dir.is_dir() {
+                let _ = sink.add(StreamEvent::Error(format!("Folder not found: {}", folder)));
                 continue;
             }
             if let Ok(entries) = fs::read_dir(&dir) {
+                let mut entry_count = 0u32;
                 for entry in entries.flatten() {
+                    entry_count += 1;
                     let path = entry.path();
+                    info!("SCAN ENTRY #{}: {} is_file={}", entry_count, path.display(), path.is_file());
                     if path.is_file() {
                         if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
                             if matches!(ext.to_lowercase().as_str(), "mp3" | "flac" | "wav" | "m4a")
                             {
+                                info!("SCAN FOUND: {}", path.display());
                                 all_paths.push(path);
                             }
                         }
                     }
                 }
+                info!("SCAN DIR TOTAL: {} entries", entry_count);
             } else {
                 let _ = sink.add(StreamEvent::Error("Failed to read directory".into()));
             }
         }
+        info!("SCAN RESULT: {} music files found", all_paths.len());
         let mut futures: futures::stream::FuturesUnordered<_> = all_paths
             .into_iter()
             .map(|path| {

@@ -73,17 +73,3 @@ class MainActivity : AudioServiceActivity(){
         }
     }
 }
-
-class ArtworkProvider : ContentProvider() {
-    override fun openFile(uri: Uri, mode: String): ParcelFileDescriptor? {
-        val filePath = uri.path ?: return null
-        val file = File(filePath)
-        return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
-    }
-    override fun getType(uri: Uri) = "image/jpeg"
-    override fun onCreate() = true
-    override fun query(uri: Uri, p: Array<String>?, s: String?, sA: Array<String>?, so: String?) = null
-    override fun insert(uri: Uri, values: ContentValues?) = null
-    override fun delete(uri: Uri, s: String?, sA: Array<String>?) = 0
-    override fun update(uri: Uri, v: ContentValues?, s: String?, sA: Array<String>?) = 0
-}
