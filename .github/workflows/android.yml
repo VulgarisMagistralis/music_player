@@ -1,6 +1,7 @@
 name: Music Player Android Test, Build & Store
 
 on:
+  workflow_dispatch:
   pull_request:
     types: [closed]
     branches:
