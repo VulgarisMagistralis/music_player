@@ -22,10 +22,12 @@ class _FavouritesPageState extends ConsumerState<FavouritesPage> {
   Widget build(BuildContext context) {
     final List<Song> songList = ref.watch(favouriteSongsProvider);
     ref.listen(favouriteSongsProvider, (_, next) => next.isEmpty ? ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.songs) : null);
+    final isAutomotive = ref.watch(isAutomotiveOSProvider).value ?? false;
     return Scaffold(
       bottomNavigationBar: const PlayerNavigationBar(),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
+        right: !isAutomotive,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(15, 15, 10, 0),
           child: Column(

@@ -32,8 +32,9 @@ class _ControlButtonState extends ConsumerState<ControlButtons> {
   @override
   Widget build(BuildContext context) {
     final PlayerAudioHandler audioHandler = ref.watch(audioHandlerSyncProvider);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      runAlignment: WrapAlignment.center,
       children: [
         IconButton(icon: Icon(ref.watch(repeatModeProvider).appIcon), onPressed: () async => await _repeat(audioHandler)),
         IconButton(icon: const Icon(Icons.fast_rewind), onPressed: () async => audioHandler.rewind()),

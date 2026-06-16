@@ -36,6 +36,7 @@ class CustomAppTheme {
       collapsedIconColor: primaryTextColor,
       childrenPadding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
     ),
+    cardTheme: CardThemeData(color: mainBackgroundColor),
     dividerColor: Colors.transparent,
     dividerTheme: DividerThemeData(color: accentColor),
     listTileTheme: ListTileThemeData(

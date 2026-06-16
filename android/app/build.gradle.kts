@@ -12,6 +12,10 @@ plugins {
 }
 dependencies {
     implementation("androidx.media:media:1.7.0")
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    // Android For Cars (Automotive OS)
+    implementation("androidx.car.app:app:1.7.0")
+    implementation("androidx.car.app:app-automotive:1.7.0")
 }
 
 android {
@@ -32,7 +36,7 @@ android {
         applicationId = "com.cenkt.music_player"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 29
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

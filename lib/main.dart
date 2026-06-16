@@ -9,7 +9,7 @@ import 'package:music_player/providers/ui_elements.dart';
 import 'package:music_player/utilities/audio_handler.dart';
 import 'package:music_player/utilities/settings_data.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:music_player/utilities/providers.dart' show audioHandlerProvider, appReadyProvider;
+import 'package:music_player/utilities/providers.dart' show appReadyProvider, audioHandlerProvider;
 import 'package:flutter/services.dart' show SystemChannels, SystemChrome, SystemUiMode, SystemUiOverlay;
 
 void main() async {
