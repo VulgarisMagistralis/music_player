@@ -2,14 +2,13 @@ name: Music Player Android Test, Build & Store
 
 on:
   pull_request:
-      types: [closed]
-      branches:
-        - main
+    types: [closed]
+    branches:
+      - main
 
 jobs:
   checkout:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -20,6 +19,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Fetch latest main and rebase
+        run: |
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
+          git fetch origin main
+          git reset --hard origin/main
+
       - name: Bump Version
         run: |
           chmod +x bump_version.sh
@@ -29,12 +36,13 @@ jobs:
 
       - name: Commit and push version bump
         run: |
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git config --global user.name "${{ github.actor }}"
-          git pull --rebase
           git add pubspec.yaml
-          git commit -m "Bump version code"
-          git push
+          git diff --cached --quiet || {
+            git commit -m "Bump version code"
+            git push || echo "Push failed, another run may have pushed first"
+          }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-and-deploy:
     needs: [checkout,bump-version]
@@ -94,7 +102,7 @@ jobs:
       #     releaseFiles: build/app/outputs/bundle/release/app-release.aab
       #     track: internal
       #     status: draft
-      
+
       - name: Upload to Google Play (Alpha Testing Track)
         uses: r0adkll/upload-google-play@v1
         with:
