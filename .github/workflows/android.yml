@@ -79,6 +79,24 @@ jobs:
           distribution: jetbrains
           java-version: 21
 
+      - name: Set build type flag
+        run: echo "BUILD_TYPE=release" >> $GITHUB_ENV
+
+      - name: Cache Gradle wrapper, dependencies and Flutter pub packages (release only)
+        if: env.BUILD_TYPE == 'release'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.pub-cache
+          key: |
+            gradle-${{ hashFiles('android/gradle/wrapper/gradle-wrapper.properties', 'android/build.gradle*', 'android/app/build.gradle*') }}
+            flutter-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
+          restore-keys: |
+            gradle-
+            flutter-
+
       - name: Decode Keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
