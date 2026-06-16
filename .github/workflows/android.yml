@@ -1,9 +1,6 @@
 name: Music Player Android Test, Build & Store
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
       types: [closed]
       branches:
