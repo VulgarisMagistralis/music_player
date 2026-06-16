@@ -71,10 +71,10 @@ jobs:
         run: fvm flutter test
 
       - name: Set up Java (required for Play upload + Gradle)
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
-          java-version: 21
+          distribution: 'temurin'
+          java-version: '25'
 
       - name: Decode Keystore
         run: |
