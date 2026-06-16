@@ -73,11 +73,11 @@ jobs:
       - name: Run tests
         run: fvm flutter test
 
-      - name: Set up Java
+      - name: Set up Java (JetBrains JDK for KGP toolchain)
         uses: actions/setup-java@v5
         with:
-          distribution: temurin
-          java-version: 25
+          distribution: jetbrains
+          java-version: 21
 
       - name: Decode Keystore
         env:
