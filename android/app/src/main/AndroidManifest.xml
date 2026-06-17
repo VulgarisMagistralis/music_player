@@ -3,7 +3,6 @@
     package="com.cenkt.music_player">
 
     <!-- Permissions needed on both platforms -->
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
@@ -69,15 +68,6 @@
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
                 <category android:name="android.media.category.MEDIA" />
-            </intent-filter>
-        </service>
-
-        <!-- Car‑specific service – compiled in both flavors (runtime checks guard usage) -->
-        <service
-            android:name="com.cenkt.music_player.car.MusicCarService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="androidx.car.app.CarAppService" />
             </intent-filter>
         </service>
 

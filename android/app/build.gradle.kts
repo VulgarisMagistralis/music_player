@@ -5,16 +5,22 @@ val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
+
 plugins {
     id("com.android.application")
     id("dev.flutter.flutter-gradle-plugin")
 }
+
 dependencies {
     implementation("androidx.media:media:1.7.0")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    // Android For Cars (Automotive OS)
-    implementation("androidx.car.app:app:1.7.0")
-    implementation("androidx.car.app:app-automotive:1.7.0")
+}
+
+afterEvaluate {
+    dependencies {
+        add("automotiveImplementation", "androidx.car.app:app:1.7.0")
+        add("automotiveImplementation", "androidx.car.app:app-automotive:1.7.0")
+    }
 }
 
 android {
@@ -61,9 +67,6 @@ android {
         // ----- Android Auto (Google Play Auto) -----
         create("auto") {
             dimension = "car"
-            // No automotive‑OS hardware feature – keep Google‑Auto metadata only.
-            // Anything you need specifically for the Auto flavor can be added here
-            // (e.g., versionNameSuffix = "-auto").
         }
 
         // ----- Android Automotive OS (stand‑alone) -----
@@ -71,6 +74,7 @@ android {
             dimension = "car"
             // The automotive feature is added via the flavor‑specific manifest,
             // not here. You can still customize version codes, resources, etc.
+            applicationIdSuffix = ".automotive"
         }
     }
 
