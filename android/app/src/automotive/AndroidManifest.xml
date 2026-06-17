@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cenkt.music_player.automotive">
+    package="com.cenkt.music_player">
 
     <!-- Declare the app runs on Android Automotive OS devices -->
     <uses-feature
