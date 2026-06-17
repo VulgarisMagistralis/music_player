@@ -136,16 +136,16 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.cenkt.music_player
           releaseFiles: build/app/outputs/bundle/autoRelease/app-auto-release.aab
-          track: beta
+          tracks: '[{"name": "beta"}]'
           status: draft
 
       - name: Upload Automotive-OS bundle to Google Play (Alpha)
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
-          packageName: com.cenkt.music_player
+          packageName: com.cenkt.music_player.automotive
           releaseFiles: build/app/outputs/bundle/automotiveRelease/app-automotive-release.aab
-          track: alpha
+          tracks: '[{"name": "alpha"}]'
           status: draft
 
       - name: Upload auto flavor AAB artifact

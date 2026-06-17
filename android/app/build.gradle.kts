@@ -67,10 +67,6 @@ android {
         // ----- Android Auto (Google Play Auto) -----
         create("auto") {
             dimension = "car"
-            // No automotive‑OS hardware feature – keep Google‑Auto metadata only.
-            // Anything you need specifically for the Auto flavor can be added here
-            // (e.g., versionNameSuffix = "-auto").
-            applicationIdSuffix = ".auto"
         }
 
         // ----- Android Automotive OS (stand‑alone) -----
