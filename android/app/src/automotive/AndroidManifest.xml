@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cenkt.music_player">
+    package="com.cenkt.music_player.automotive">
 
     <!-- Declare the app runs on Android Automotive OS devices -->
     <uses-feature
@@ -7,7 +7,8 @@
         android:required="true" />
 
     <application>
-        <!-- AAOS CarAppService – only in automotive flavor to avoid Play Store mutual-exclusion error -->
+        <!-- AAOS CarAppService – only in automotive flavor to avoid Play Store mutual-exclusion
+        error -->
         <service
             android:name="com.cenkt.music_player.car.MusicCarService"
             android:exported="true">
