@@ -13,8 +13,8 @@ dependencies {
     implementation("androidx.media:media:1.7.0")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     // Android For Cars (Automotive OS)
-    implementation("androidx.car.app:app:1.7.0")
-    implementation("androidx.car.app:app-automotive:1.7.0")
+    automotiveImplementation("androidx.car.app:app:1.7.0")
+    automotiveImplementation("androidx.car.app:app-automotive:1.7.0")
 }
 
 android {

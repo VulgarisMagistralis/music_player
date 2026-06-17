@@ -7,6 +7,13 @@
         android:required="true" />
 
     <application>
-        <!-- No com.google.android.gms.car.application entry here -->
+        <!-- AAOS CarAppService – only in automotive flavor to avoid Play Store mutual-exclusion error -->
+        <service
+            android:name="com.cenkt.music_player.car.MusicCarService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.car.app.CarAppService" />
+            </intent-filter>
+        </service>
     </application>
 </manifest>

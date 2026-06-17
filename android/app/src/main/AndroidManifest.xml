@@ -72,15 +72,6 @@
             </intent-filter>
         </service>
 
-        <!-- Car‑specific service – compiled in both flavors (runtime checks guard usage) -->
-        <service
-            android:name="com.cenkt.music_player.car.MusicCarService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="androidx.car.app.CarAppService" />
-            </intent-filter>
-        </service>
-
         <!-- Media button receiver -->
         <receiver
             android:name="com.ryanheise.audioservice.MediaButtonReceiver"

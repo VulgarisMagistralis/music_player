@@ -143,8 +143,14 @@ jobs:
           track: beta
           status: draft
 
-      - name: Upload AAB artifact
+      - name: Upload auto flavor AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-aab
-          path: build/app/outputs/bundle/release/app-release.aab
+          name: app-auto-release-aab
+          path: build/app/outputs/bundle/autoRelease/app-auto-release.aab
+
+      - name: Upload automotive flavor AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-automotive-release-aab
+          path: build/app/outputs/bundle/automotiveRelease/app-automotive-release.aab
