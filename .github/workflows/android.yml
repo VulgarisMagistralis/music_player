@@ -117,9 +117,9 @@ jobs:
           fvm flutter build appbundle \
             --release \
             --flavor auto \
-            -t lib/main.dart   # adjust if you use a different entrypoint
+            -t lib/main.dart
 
-      - name: Build Android App Bundle – Automotive OS (automotive flavor)
+      - name: Build Android App Bundle - Automotive OS (automotive flavor)
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
@@ -128,24 +128,24 @@ jobs:
           fvm flutter build appbundle \
             --release \
             --flavor automotive \
-            -t lib/main.dart   # adjust if you use a different entrypoint
+            -t lib/main.dart
 
-      - name: Upload Android Auto bundle to Google Play (Alpha)
+      - name: Upload Android Auto bundle to Google Play (Beta)
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.cenkt.music_player
           releaseFiles: build/app/outputs/bundle/autoRelease/app-auto-release.aab
-          track: alpha
+          track: beta
           status: draft
 
-      - name: Upload Automotive‑OS bundle to Google Play (Beta)
+      - name: Upload Automotive-OS bundle to Google Play (Alpha)
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.cenkt.music_player
           releaseFiles: build/app/outputs/bundle/automotiveRelease/app-automotive-release.aab
-          track: beta
+          track: alpha
           status: draft
 
       - name: Upload auto flavor AAB artifact
