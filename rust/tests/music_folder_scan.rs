@@ -78,6 +78,11 @@ fn music_folder_scan() {
             continue;
         }
 
+        let path_str = path.to_string_lossy().to_string();
+        if path_str.is_empty() || !path.exists() {
+            continue;
+        }
+
         let ext = match path
             .extension()
             .and_then(|e| e.to_str())
@@ -131,7 +136,7 @@ fn music_folder_scan() {
             albums_set.insert(album.clone());
 
             if let Some(tag_genre) = tag.genre().map(String::from) {
-                *genres.entry(tag_genre).and_modify(|c| *c += 1).or_insert(1);
+                let _ = *genres.entry(tag_genre).and_modify(|c| *c += 1).or_insert(1);
             }
 
             let song_id = xxhash_rust::xxh64::xxh64(path_s.as_bytes(), 0);
@@ -199,8 +204,7 @@ fn music_folder_scan() {
     {
         let mut ac: HashMap<&str, u32> = HashMap::new();
         for s in &tracks {
-            let mut counter = ac.entry(s.artist.as_str())
-                .or_insert(0);
+            let counter = ac.entry(s.artist.as_str()).or_insert(0);
             *counter += 1;
         }
         let mut av: Vec<_> = ac.into_iter().collect();
