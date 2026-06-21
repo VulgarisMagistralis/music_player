@@ -7,7 +7,7 @@ import 'package:music_player/src/rust/api/song_collection.dart';
 class SongMediaItemFactory {
   static Future<MediaItem> fromSong(Song song) async {
     final path = (await getExternalCacheDirectories())?.first.path;
-    final relativePath = await getSongAlbumArtFilePath(id: song.id);
+    final relativePath = getSongAlbumArtFilePath(id: song.id);
     final artPath = '$path/$relativePath';
     return MediaItem(
       id: Uri.file(song.path).toString(),
@@ -21,6 +21,19 @@ class SongMediaItemFactory {
   }
 
   static Future<List<MediaItem>> fromSongs(List<Song> songs) async {
-    return await Future.wait(songs.map(fromSong).toList());
+    final cachePath = (await getExternalCacheDirectories())?.first.path ?? '';
+    return songs.map((song) {
+      final relativePath = getSongAlbumArtFilePath(id: song.id);
+      final artPath = '$cachePath/$relativePath';
+      return MediaItem(
+        id: Uri.file(song.path).toString(),
+        title: song.title,
+        artist: song.artist,
+        album: song.album,
+        duration: song.duration != null ? Duration(seconds: song.duration!) : null,
+        artUri: Uri.parse(getThumbnailUri(artPath)),
+        extras: {'songId': song.id.toString()},
+      );
+    }).toList();
   }
 }

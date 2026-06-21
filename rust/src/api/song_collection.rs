@@ -74,6 +74,16 @@ pub fn get_song_list(id_list: Vec<u64>) -> Vec<Song> {
         .collect()
 }
 
+/// Batch-get album art file paths for multiple songs in a single FFI call.
+#[flutter_rust_bridge::frb(sync)]
+pub fn get_song_album_art_file_batch(ids: Vec<u64>) -> HashMap<u64, String> {
+    let song_collection = locked_song_collection();
+    ids.into_iter()
+        .filter_map(|id| song_collection.get_song(id))
+        .filter_map(|s| s.album_art_id.map(|art_id| (s.id, format!("thumbnails/art_{}.jpg", art_id))))
+        .collect()
+}
+
 impl SongCollection {
     pub fn new() -> Result<Self, CustomError> {
         // CHANGE: art_map starts empty — art is loaded lazily on first request.

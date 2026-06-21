@@ -8,7 +8,7 @@ import 'package:music_player/src/rust/api/error/custom_error.dart';
 import 'package:music_player/src/rust/api/utils/sort_modes.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `borrow_decode`, `borrow_decode`, `clone`, `clone`, `decode`, `decode`, `encode`, `encode`, `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `borrow_decode`, `borrow_decode`, `clone`, `clone`, `decode`, `decode`, `encode`, `encode`, `eq`, `fmt`, `fmt`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SongCollection>>
 abstract class SongCollection implements RustOpaqueInterface {
