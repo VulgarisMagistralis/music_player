@@ -96,3 +96,5 @@ opencode.json
 !lib/tools/build/
 
 screenshots/
+
+*.env
