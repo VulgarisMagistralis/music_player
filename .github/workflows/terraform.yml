@@ -1,0 +1,47 @@
+name: Terraform Infrastructure Deployment
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'terraflow/**'
+  workflow_dispatch: # Allows manual execution from GitHub UI
+
+jobs:
+  terraform:
+    runs-on: android
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashcorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        env:
+          TF_VAR_github_pat: ${{ secrets.TF_VAR_github_pat }}
+        run: |
+          cd terraflow
+          terraform init
+
+      - name: Terraform Plan
+        env:
+          TF_VAR_github_pat: ${{ secrets.TF_VAR_github_pat }}
+        run: |
+          cd terraflow
+          terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        env:
+          TF_VAR_github_pat: ${{ secrets.TF_VAR_github_pat }}
+        run: |
+          cd terraflow
+          terraform apply tfplan
