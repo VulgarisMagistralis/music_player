@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:music_player/l10n/app_localizations.dart';
 import 'package:music_player/menu/nav_bar.dart';
 import 'package:music_player/route/routes.dart';
-import 'package:music_player/src/rust/api/data/stream_event.dart';
 import 'package:music_player/widgets/header.dart';
 import 'package:music_player/widgets/song_card.dart';
 import 'package:music_player/widgets/song_details_panel.dart';
@@ -12,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/src/rust/api/data/song.dart';
 import 'package:music_player/widgets/loading_animation.dart';
 import 'package:music_player/pages/error_pages/generic_error_page.dart';
+import 'package:music_player/utilities/songs_loading_provider.dart' show songsLoadingProvider;
 
 class SongsPageScale extends InheritedWidget {
   final double scaleFactor;
@@ -54,21 +54,86 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
     super.dispose();
   }
 
+  Widget _buildSongList(List<Song> sortedSongList, bool isWidescreen) {
+    return Padding(
+      padding: const EdgeInsetsGeometry.fromLTRB(10, 10, 10, 0),
+      child: isWidescreen
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    children: [
+                      const PlayerHeader(showExtraButtons: true, showRescan: true),
+                      const SizedBox(height: 10),
+                      Expanded(
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: sortedSongList.length,
+                          itemBuilder: (_, index) => SongRow(
+                            key: ValueKey(sortedSongList[index].id),
+                            song: sortedSongList[index],
+                            index: index,
+                            onTap: (int i) async => await ref.read(audioHandlerSyncProvider).setPlaylist('songs', sortedSongList, index: i),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  flex: 2,
+                  child: Column(
+                    children: [
+                      Expanded(child: SongDetailsPanel()),
+                      SizedBox(height: 10),
+                      NowPlaying(),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : Column(
+              children: [
+                const PlayerHeader(showExtraButtons: true, showRescan: true),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    itemCount: sortedSongList.length,
+                    itemBuilder: (_, index) => SongRow(
+                      key: ValueKey(sortedSongList[index].id),
+                      song: sortedSongList[index],
+                      index: index,
+                      onTap: (int i) async => await ref.read(audioHandlerSyncProvider).setPlaylist('songs', sortedSongList, index: i),
+                    ),
+                  ),
+                ),
+                const NowPlaying(),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return GenericErrorPage(
+      message: 'Couldn\'t find any music',
+      actionWidget: ElevatedButton.icon(
+        onPressed: () => ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.settings),
+        icon: const Icon(Icons.settings),
+        label: Text(GeneratedLocalization.of(context).button_settings),
+        style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
+      ),
+      showNavigation: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    ref.listen(processMusicFilesProvider, (_, next) {
-      next.whenData((event) async {
-        if (event is StreamEvent_Done) {
-          ref.invalidate(playlistSortedByProvider);
-          ref.invalidate(sortedSongListProvider);
-          // final songs = await ref.read(sortedSongListProvider.future);
-          // if (songs.isNotEmpty) {
-          //   await ref.read(audioHandlerSyncProvider).setPlaylist('songs', songs, index: 0);
-          // }
-        }
-      });
-    });
     final isAutomotive = ref.watch(isAutomotiveOSProvider).value ?? false;
+    final songsState = ref.watch(songsLoadingProvider);
     return Scaffold(
       bottomNavigationBar: const PlayerNavigationBar(),
       resizeToAvoidBottomInset: true,
@@ -78,103 +143,24 @@ class _SongsPageState extends ConsumerState<SongsPage> with WidgetsBindingObserv
             final double maxWidth = constraints.maxWidth;
             final double scaleFactor = maxWidth < 400 ? (maxWidth / 380) : (maxWidth > 700 ? 1.3 : 1.0);
             final bool isWidescreen = maxWidth > 900;
+
+            Widget content;
+            if (songsState.songs.isNotEmpty) {
+              content = _buildSongList(songsState.songs, isWidescreen);
+            } else if (songsState.scanning) {
+              content = const Center(child: WaveformLoading());
+            } else if (songsState.error != null || songsState.hasScanned) {
+              content = _buildEmptyState();
+            } else {
+              content = const Center(child: WaveformLoading());
+            }
             return MediaQuery(
               data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(scaleFactor)),
               child: SafeArea(
                 right: !isAutomotive,
                 child: IconTheme(
                   data: IconTheme.of(context).copyWith(size: 24 * scaleFactor),
-                  child: SongsPageScale(
-                    scaleFactor: scaleFactor,
-                    child: ref.watch(processMusicFilesProvider).isLoading || ref.watch(allSongsProvider).isLoading || ref.watch(sortedSongListProvider).isLoading
-                        ? const Center(child: WaveformLoading())
-                        : ref
-                              .watch(sortedSongListProvider)
-                              .when(
-                                data: (List<Song> sortedSongList) => sortedSongList.isEmpty
-                                    ? GenericErrorPage(
-                                        message: 'Couldn\'t find any music',
-                                        actionWidget: ElevatedButton.icon(
-                                          onPressed: () => ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.settings),
-                                          icon: const Icon(Icons.settings),
-                                          label: Text(GeneratedLocalization.of(context).button_settings),
-                                          style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
-                                        ),
-                                        showNavigation: true,
-                                      )
-                                    : Padding(
-                                        padding: const EdgeInsetsGeometry.fromLTRB(10, 10, 10, 0),
-                                        child: isWidescreen
-                                            ? Row(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Expanded(
-                                                    flex: 3,
-                                                    child: Column(
-                                                      children: [
-                                                        const PlayerHeader(showExtraButtons: true, showRescan: true),
-                                                        const SizedBox(height: 10),
-                                                        Expanded(
-                                                          child: ListView.builder(
-                                                            controller: _scrollController,
-                                                            itemCount: sortedSongList.length,
-                                                            itemBuilder: (_, index) => SongRow(
-                                                              key: ValueKey(sortedSongList[index].id),
-                                                              song: sortedSongList[index],
-                                                              index: index,
-                                                              onTap: (int i) async => await ref.read(audioHandlerSyncProvider).setPlaylist('songs', sortedSongList, index: i),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 10),
-                                                  const Expanded(
-                                                    flex: 2,
-                                                    child: Column(
-                                                      children: [
-                                                        Expanded(child: SongDetailsPanel()),
-                                                        SizedBox(height: 10),
-                                                        NowPlaying(),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              )
-                                            : Column(
-                                                children: [
-                                                  const PlayerHeader(showExtraButtons: true, showRescan: true),
-                                                  const SizedBox(height: 10),
-                                                  Expanded(
-                                                    child: ListView.builder(
-                                                      controller: _scrollController,
-                                                      itemCount: sortedSongList.length,
-                                                      itemBuilder: (_, index) => SongRow(
-                                                        key: ValueKey(sortedSongList[index].id),
-                                                        song: sortedSongList[index],
-                                                        index: index,
-                                                        onTap: (int i) async => await ref.read(audioHandlerSyncProvider).setPlaylist('songs', sortedSongList, index: i),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const NowPlaying(),
-                                                ],
-                                              ),
-                                      ),
-                                error: (error, stackTrace) => GenericErrorPage(
-                                  message: 'Couldn\'t find any music',
-                                  actionWidget: ElevatedButton.icon(
-                                    onPressed: () => ref.read(playerRouteProvider.notifier).updateRoute(PlayerPageEnum.settings),
-                                    icon: const Icon(Icons.settings),
-                                    label: Text(GeneratedLocalization.of(context).button_settings),
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
-                                  ),
-                                  showNavigation: true,
-                                ),
-                                loading: () => const Center(child: WaveformLoading()),
-                              ),
-                  ),
+                  child: SongsPageScale(scaleFactor: scaleFactor, child: content),
                 ),
               ),
             );

@@ -100,7 +100,7 @@ Future<List<Song>> getPlaylistSongs(Ref ref, {required Playlist playlist}) async
 @Riverpod(keepAlive: true)
 Future<Playlist> getFavouritesPlaylist(Ref ref) async => await getFavouritesFromCollection();
 
-@Riverpod(keepAlive: false)
+@Riverpod(keepAlive: true)
 Future<bool> isInFavouritesPlaylist(Ref ref, {required BigInt songId}) async => await isInFavourites(songId: songId);
 
 @Riverpod(keepAlive: false)

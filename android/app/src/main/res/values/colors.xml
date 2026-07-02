@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>    <color name="userSetColor">#FF98dd</color> 
+<resources>
+    <color name="userSetColor">#FF98dd</color>
+    <color name="launch_background_color">#2196F3</color>
+    <color name="launch_background_color_dark">#1a3c5e</color>
 </resources>

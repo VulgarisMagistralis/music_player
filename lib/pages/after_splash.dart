@@ -49,8 +49,9 @@ class _AfterSplashState extends ConsumerState<AfterSplash> with WidgetsBindingOb
                 if (!isReady) return const LoadingPage();
                 return const MusicPlayer();
               case PermissionStatus.denied:
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  ref.read(permissionProvider.notifier).requestPermission();
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  await ref.read(permissionProvider.notifier).requestPermission();
+                  setState(() {});
                 });
                 return const LoadingPage();
               default:
