@@ -41,7 +41,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -142562973;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 955971140;
 
 // Section: executor
 
@@ -2537,6 +2537,38 @@ fn wire__crate__api__song_collection__get_song_album_art_impl(
         },
     )
 }
+fn wire__crate__api__song_collection__get_song_album_art_file_batch_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "get_song_album_art_file_batch",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_ids = <Vec<u64>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, ()>((move || {
+                let output_ok = Result::<_, ()>::Ok(
+                    crate::api::song_collection::get_song_album_art_file_batch(api_ids),
+                )?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__crate__api__song_collection__get_song_album_art_file_path_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -3100,6 +3132,14 @@ impl SseDecode for std::collections::HashMap<u64, Playlist> {
     }
 }
 
+impl SseDecode for std::collections::HashMap<u64, String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <Vec<(u64, String)>>::sse_decode(deserializer);
+        return inner.into_iter().collect();
+    }
+}
+
 impl SseDecode for std::collections::HashMap<u64, crate::api::data::song::Song> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3335,6 +3375,18 @@ impl SseDecode for Vec<(u64, crate::api::data::song::Song)> {
     }
 }
 
+impl SseDecode for Vec<(u64, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<(u64, String)>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::api::data::song::Song> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3405,6 +3457,15 @@ impl SseDecode for (u64, crate::api::data::song::Song) {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_field0 = <u64>::sse_decode(deserializer);
         let mut var_field1 = <crate::api::data::song::Song>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
+impl SseDecode for (u64, String) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_field0 = <u64>::sse_decode(deserializer);
+        let mut var_field1 = <String>::sse_decode(deserializer);
         return (var_field0, var_field1);
     }
 }
@@ -3737,65 +3798,65 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        55 => {
+        56 => {
             wire__crate__api__song_collection__get_song_list_impl(port, ptr, rust_vec_len, data_len)
         }
-        56 => wire__crate__api__song_collection__get_sorted_songs_impl(
+        57 => wire__crate__api__song_collection__get_sorted_songs_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        57 => wire__crate__api__music_folder__get_thumbnails_dir_impl(
+        58 => wire__crate__api__music_folder__get_thumbnails_dir_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        58 => wire__crate__api__init__init_app_impl(port, ptr, rust_vec_len, data_len),
-        59 => wire__crate__api__utils__logger__init_rust_logger_impl(
+        59 => wire__crate__api__init__init_app_impl(port, ptr, rust_vec_len, data_len),
+        60 => wire__crate__api__utils__logger__init_rust_logger_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        60 => wire__crate__api__playlist_collection__is_in_favourites_impl(
+        61 => wire__crate__api__playlist_collection__is_in_favourites_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        61 => wire__crate__api__process_music__read_music_files_impl(
+        62 => wire__crate__api__process_music__read_music_files_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        62 => wire__crate__api__playlist_collection__remove_song_from_favourites_impl(
+        63 => wire__crate__api__playlist_collection__remove_song_from_favourites_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        63 => wire__crate__api__playlist_collection__remove_song_from_playlist_impl(
+        64 => wire__crate__api__playlist_collection__remove_song_from_playlist_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        64 => wire__crate__api__playlist_collection__rename_playlist_impl(
+        65 => wire__crate__api__playlist_collection__rename_playlist_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        65 => wire__crate__api__music_folder__save_music_folder_list_impl(
+        66 => wire__crate__api__music_folder__save_music_folder_list_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        66 => wire__crate__api__music_folder__set_app_directory_impl(
+        67 => wire__crate__api__music_folder__set_app_directory_impl(
             port,
             ptr,
             rust_vec_len,
@@ -3827,7 +3888,8 @@ fn pde_ffi_dispatcher_sync_impl(
 28 => wire__crate__api__data__playlist__Playlist_auto_accessor_set_song_id_list_impl(ptr, rust_vec_len, data_len),
 30 => wire__crate__api__data__song__SongCollection_auto_accessor_get_song_map_impl(ptr, rust_vec_len, data_len),
 31 => wire__crate__api__data__song__SongCollection_auto_accessor_set_song_map_impl(ptr, rust_vec_len, data_len),
-54 => wire__crate__api__song_collection__get_song_album_art_file_path_impl(ptr, rust_vec_len, data_len),
+54 => wire__crate__api__song_collection__get_song_album_art_file_batch_impl(ptr, rust_vec_len, data_len),
+55 => wire__crate__api__song_collection__get_song_album_art_file_path_impl(ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }
@@ -4091,6 +4153,13 @@ impl SseEncode for std::collections::HashMap<u64, Playlist> {
     }
 }
 
+impl SseEncode for std::collections::HashMap<u64, String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<(u64, String)>>::sse_encode(self.into_iter().collect(), serializer);
+    }
+}
+
 impl SseEncode for std::collections::HashMap<u64, crate::api::data::song::Song> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4311,6 +4380,16 @@ impl SseEncode for Vec<(u64, crate::api::data::song::Song)> {
     }
 }
 
+impl SseEncode for Vec<(u64, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(u64, String)>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::api::data::song::Song> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4374,6 +4453,14 @@ impl SseEncode for (u64, crate::api::data::song::Song) {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <u64>::sse_encode(self.0, serializer);
         <crate::api::data::song::Song>::sse_encode(self.1, serializer);
+    }
+}
+
+impl SseEncode for (u64, String) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u64>::sse_encode(self.0, serializer);
+        <String>::sse_encode(self.1, serializer);
     }
 }
 

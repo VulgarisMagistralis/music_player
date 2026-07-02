@@ -15,7 +15,7 @@ class FavouritesButton extends ConsumerWidget {
       await ref.read(addSongToFavouritesPlaylistProvider(songId: songId).future);
     }
     ref.invalidate(getFavouritesPlaylistProvider);
-    ref.invalidate(isInFavouritesPlaylistProvider);
+    ref.invalidate(isInFavouritesPlaylistProvider(songId: songId));
     ref.invalidate(favouriteSongsBootstrapProvider);
     ref.invalidate(getPlaylistSongsProvider);
   }

@@ -98,3 +98,15 @@ opencode.json
 screenshots/
 
 *.env
+
+# Terraform
+.terraform
+*.hcl
+*.backup
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+terraflow/*.tfvars
+terraflow/terraform.tfstate*
+setup.sh

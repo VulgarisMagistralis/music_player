@@ -133,6 +133,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  Map<BigInt, String> dco_decode_Map_u_64_String_None(raw);
+
+  @protected
   Map<BigInt, Song> dco_decode_Map_u_64_song_None(raw);
 
   @protected
@@ -220,6 +223,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<(BigInt, Song)> dco_decode_list_record_u_64_song(raw);
 
   @protected
+  List<(BigInt, String)> dco_decode_list_record_u_64_string(raw);
+
+  @protected
   List<Song> dco_decode_list_song(raw);
 
   @protected
@@ -242,6 +248,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   (BigInt, Song) dco_decode_record_u_64_song(raw);
+
+  @protected
+  (BigInt, String) dco_decode_record_u_64_string(raw);
 
   @protected
   Song dco_decode_song(raw);
@@ -349,6 +358,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  Map<BigInt, String> sse_decode_Map_u_64_String_None(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   Map<BigInt, Song> sse_decode_Map_u_64_song_None(SseDeserializer deserializer);
 
   @protected
@@ -440,6 +454,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<(BigInt, String)> sse_decode_list_record_u_64_string(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<Song> sse_decode_list_song(SseDeserializer deserializer);
 
   @protected
@@ -462,6 +481,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   (BigInt, Song) sse_decode_record_u_64_song(SseDeserializer deserializer);
+
+  @protected
+  (BigInt, String) sse_decode_record_u_64_string(SseDeserializer deserializer);
 
   @protected
   Song sse_decode_song(SseDeserializer deserializer);
@@ -585,6 +607,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_Map_u_64_String_None(
+    Map<BigInt, String> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_Map_u_64_song_None(
     Map<BigInt, Song> self,
     SseSerializer serializer,
@@ -694,6 +722,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_record_u_64_string(
+    List<(BigInt, String)> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_song(List<Song> self, SseSerializer serializer);
 
   @protected
@@ -721,6 +755,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_record_u_64_song(
     (BigInt, Song) self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_record_u_64_string(
+    (BigInt, String) self,
     SseSerializer serializer,
   );
 

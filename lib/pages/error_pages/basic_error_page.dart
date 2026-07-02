@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/l10n/app_localizations.dart';
+import 'package:music_player/providers/setting_switches.dart';
 import 'package:music_player/providers/theme_colors.dart' show playerThemeProvider;
 
 abstract class BasicErrorPage extends ConsumerStatefulWidget {
@@ -15,6 +17,8 @@ class BasicErrorPageState<T extends BasicErrorPage> extends ConsumerState<T> {
   @override
   Widget build(BuildContext context) => MaterialApp(
     theme: ref.watch(playerThemeProvider),
+    locale: ref.watch(currentLocaleProvider),
+    localizationsDelegates: const [GeneratedLocalization.delegate, GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
     debugShowCheckedModeBanner: false,
     home: Scaffold(
       body: SafeArea(

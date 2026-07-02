@@ -33,3 +33,9 @@ Future<Song?> getSong({required BigInt id}) =>
 
 Future<List<Song>> getSongList({required Uint64List idList}) =>
     RustLib.instance.api.crateApiSongCollectionGetSongList(idList: idList);
+
+/// Batch-get album art file paths for multiple songs in a single FFI call.
+Map<BigInt, String> getSongAlbumArtFileBatch({required Uint64List ids}) =>
+    RustLib.instance.api.crateApiSongCollectionGetSongAlbumArtFileBatch(
+      ids: ids,
+    );

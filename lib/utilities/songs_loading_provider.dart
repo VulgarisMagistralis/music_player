@@ -12,7 +12,7 @@ class SongsLoading {
   final String? error;
   final bool hasScanned;
 
-  SongsLoading({this.songs = const [], this.scanning = true, this.error, this.hasScanned = false});
+  SongsLoading({this.songs = const [], this.scanning = false, this.error, this.hasScanned = false});
 
   SongsLoading copyWith({List<Song>? songs, bool? scanning, String? error, bool? hasScanned}) {
     return SongsLoading(songs: songs ?? this.songs, scanning: scanning ?? this.scanning, error: error, hasScanned: hasScanned ?? this.hasScanned);
@@ -45,7 +45,7 @@ class SongsLoadingNotifier extends _$SongsLoadingNotifier {
       // We detect this by watching for a transition from AsyncData/AsyncError back to new data,
       // or simply by tracking whether scanning was previously complete.
       if (state.hasScanned) {
-        state = state.copyWith(songs: [], scanning: true, error: null, hasScanned: false);
+        state = state.copyWith(songs: [], scanning: false, hasScanned: false);
       }
 
       next.whenData((event) {
