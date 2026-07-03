@@ -11,7 +11,7 @@ on:
 
 jobs:
   terraform:
-    runs-on: local-k8-runner
+    runs-on: self-hosted
     permissions:
       contents: read
       pull-requests: write
@@ -39,7 +39,7 @@ jobs:
         run: |
           cd terraflow
           terraform plan -out=tfplan
-                                
+
       - name: Terraform Apply
         env:
           TF_VAR_GITHUB_PAT: ${{ secrets.TF_VAR_github_pat }}
