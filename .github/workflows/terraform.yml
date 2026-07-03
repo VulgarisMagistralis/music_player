@@ -32,9 +32,9 @@ jobs:
           terraform fmt -check
 
       - name: Setup TFLint
-        uses: terraform-linters/setup-tfs@v1
+        uses: terraform-linters/setup-tflint@v3
         with:
-          tflint_version: latest
+           tflint_version: latest
 
       - name: Run TFLint
         run: |
