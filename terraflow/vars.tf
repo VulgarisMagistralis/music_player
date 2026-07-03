@@ -4,12 +4,6 @@ variable "github_repo" {
   default     = "VulgarisMagistralis/music_player"
 }
 
-variable "runner_label" {
-  description = "Custom label for the self‑hosted runner"
-  type        = string
-  default     = "local-k8-runner"
-}
-
 variable "kubeconfig_path" {
   description = "Path to the kubeconfig file"
   type        = string
