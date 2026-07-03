@@ -11,7 +11,7 @@ on:
 
 jobs:
   terraform:
-    runs-on: android
+    runs-on: local-k8-runner
     permissions:
       contents: read
       pull-requests: write

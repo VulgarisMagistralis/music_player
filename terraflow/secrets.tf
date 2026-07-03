@@ -1,25 +1,14 @@
 resource "kubernetes_secret" "github_runner_token" {
   metadata {
-    name      = "github-runner-token-${random_pet.token_name.id}"
-    namespace = "github-runners"
+    name      = "github-runner-secret"
+    namespace = "arc-runners"
   }
-
   data = {
-    token = jsondecode(data.http.runner_token.response_body).token
+    github_token = var.github_pat
   }
-
   type = "Opaque"
-}
 
-resource "kubernetes_secret" "controller_manager" {
-  metadata {
-    name      = "controller-manager"
-    namespace = "github-runners"
-  }
-
-  data = {
-    github_token = jsondecode(data.http.runner_token.response_body).token
-  }
-
-  type = "Opaque"
+  depends_on = [
+    helm_release.arc_runner_set # waits for the namespace to be created
+  ]
 }
