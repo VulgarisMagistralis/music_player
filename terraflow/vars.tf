@@ -9,3 +9,8 @@ variable "runner_label" {
   type        = string
   default     = "local-k8-runner"
 }
+
+variable "kubeconfig_path" {
+  description = "Path to the kubeconfig file"
+  type        = string
+}

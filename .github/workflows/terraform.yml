@@ -35,13 +35,15 @@ jobs:
       - name: Terraform Plan
         env:
           TF_VAR_github_pat: ${{ secrets.TF_VAR_github_pat }}
+          TF_VAR_kubeconfig_path: "/home/cnek/kubeconfig/kubeconfig.yaml"
         run: |
           cd terraflow
           terraform plan -out=tfplan
-
+                                
       - name: Terraform Apply
         env:
-          TF_VAR_github_pat: ${{ secrets.TF_VAR_github_pat }}
+          TF_VAR_GITHUB_PAT: ${{ secrets.TF_VAR_github_pat }}
+          TF_VAR_kubeconfig_path: "/home/cnek/kubeconfig/kubeconfig.yaml"
         run: |
           cd terraflow
           terraform apply tfplan
