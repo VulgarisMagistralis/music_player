@@ -7,6 +7,12 @@ on:
       - develop
     paths:
       - 'terraflow/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'terraflow/**'
   workflow_dispatch: # Allows manual execution from GitHub UI
 
 jobs:
@@ -19,6 +25,22 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Terraform Format Check
+        run: |
+          cd terraflow
+          terraform fmt -check
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tfs@v1
+        with:
+          tflint_version: latest
+
+      - name: Run TFLint
+        run: |
+          cd terraflow
+          tflint --init
+          tflint
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -35,15 +57,19 @@ jobs:
       - name: Terraform Plan
         env:
           TF_VAR_github_pat: ${{ secrets.TF_VAR_github_pat }}
-          TF_VAR_kubeconfig_path: "/home/cnek/kubeconfig/kubeconfig.yaml"
+          TF_VAR_kubeconfig_path: ${{secrets.TF_VAR_kubeconfig_path}}
         run: |
           cd terraflow
           terraform plan -out=tfplan
 
+      - name: Stay alive for debugging
+        run: sleep 300
+
       - name: Terraform Apply
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
         env:
           TF_VAR_GITHUB_PAT: ${{ secrets.TF_VAR_github_pat }}
-          TF_VAR_kubeconfig_path: "/home/cnek/kubeconfig/kubeconfig.yaml"
+          TF_VAR_kubeconfig_path: ${{secrets.TF_VAR_kubeconfig_path}}
         run: |
           cd terraflow
           terraform apply tfplan
