@@ -7,5 +7,5 @@ variable "github_repo" {
 variable "runner_label" {
   description = "Custom label for the self‑hosted runner"
   type        = string
-  default     = "android"
+  default     = "local-k8-runner"
 }

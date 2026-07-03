@@ -5,12 +5,3 @@ variable "github_pat" {
   type        = string
   sensitive   = true
 }
-
-data "http" "runner_token" {
-  url    = "https://api.github.com/repos/${var.github_repo}/actions/runners/registration-token"
-  method = "POST"
-  request_headers = {
-    Authorization = "Bearer ${var.github_pat}"
-    Accept        = "application/vnd.github+json"
-  }
-}

@@ -11,7 +11,7 @@ on:
 
 jobs:
   terraform:
-    runs-on: android
+    runs-on: local-k8-runner
     permissions:
       contents: read
       pull-requests: write
@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Terraform
-        uses: hashcorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
 
