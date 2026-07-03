@@ -15,7 +15,7 @@ resource "helm_release" "arc_runner_set" {
   set = [
     { name = "githubConfigUrl", value = "https://github.com/${var.github_repo}" },
     { name = "githubConfigSecret", value = "github-runner-secret" },
-    { name = "runnerScaleSetName", value = var.runner_label }
+    { name = "runnerScaleSetName", value = "local-k8-runner" }
   ]
   depends_on = [helm_release.arc_controller]
 }
