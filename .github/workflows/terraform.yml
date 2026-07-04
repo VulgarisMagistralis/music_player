@@ -31,10 +31,8 @@ jobs:
           cd terraflow
           terraform fmt -check
 
-      - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v3
-        with:
-           tflint_version: latest
+      - name: Add Go Bin to PATH
+        run: echo "$HOME/go/bin" >> $GITHUB_PATH
 
       - name: Run TFLint
         run: |
