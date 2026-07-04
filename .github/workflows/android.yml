@@ -145,6 +145,8 @@ jobs:
   cleanup_resources:
     needs: [build-and-deploy]
     runs-on: self-hosted
+    permissions:
+      contents: read
     if: always()
     steps:
       - name: Cleanup Helm Releases and Secrets
