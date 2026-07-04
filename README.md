@@ -115,6 +115,21 @@ Built with performance in mind and powered by Flutter and Rust.
                  └────────────────────┘
 ```
 
+## 🏗 Infrastructure & DevOps
+
+### Local GitHub Actions Runner
+This project uses a self-hosted runner for CI/CD pipelines.
+- **Start Runner**: Navigate to `../actions-runner` and run `./run.sh`.
+- **Terraform Workflow**: Managed via `.github/workflows/terraform.yml`. It triggers on changes in the `terraflow/` directory.
+- **Linting**: Uses `tflint` installed via Go (`~/go/bin`).
+
+### Kubernetes (K3s)
+Infrastructure is deployed to a local K3s cluster.
+- **Kubeconfig**: Located at `**/kubeconfig/kubeconfig.yaml`.
+- **Namespace**: Core runner components reside in the `arc-runners` namespace.
+
+---
+
 A lightweight, offline MP3 player for Android.
 Built with performance in mind and powered by Flutter and Rust.
 
