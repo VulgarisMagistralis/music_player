@@ -3,6 +3,7 @@ use crate::api::data::stream_event::StreamEvent;
 use crate::api::music_folder::get_music_folder_list;
 use crate::api::music_folder::get_thumbnails_dir;
 use crate::api::song_collection::locked_song_collection;
+use crate::api::utils::database_ops::flush_db;
 use crate::api::utils::hash::hash_string;
 use crate::frb_generated::StreamSink;
 use futures::StreamExt;
@@ -79,8 +80,11 @@ pub async fn read_music_files(sink: StreamSink<StreamEvent>, min_duration_s: u32
             }
         }
         info!("SCAN RESULT: {} music files found", all_paths.len());
-        let mut futures: futures::stream::FuturesUnordered<_> = all_paths
-            .into_iter()
+        // Bounded concurrency: previously all_paths spawned unbounded and,
+        // combined with the song collection mutex, serialized every task on
+        // DB I/O. Cap in-flight tag reads at 8 — keeps disk busy without
+        // stacking lock waiters.
+        let mut futures = futures::stream::iter(all_paths)
             .map(|path| {
                 process_file(
                     path,
@@ -90,26 +94,53 @@ pub async fn read_music_files(sink: StreamSink<StreamEvent>, min_duration_s: u32
                     min_duration_s,
                 )
             })
-            .collect();
+            .buffer_unordered(8);
 
         let mut results: Vec<(Song, Option<Vec<u8>>)> = Vec::new();
+        let mut removals: Vec<u64> = Vec::new();
 
-        while let Some(res) = futures.next().await {
-            if let Some(val) = res {
-                results.push(val);
+        while let Some(outcome) = futures.next().await {
+            match outcome {
+                ScanOutcome::Cached => {}
+                ScanOutcome::Changed(song, art) => results.push((song, art)),
+                ScanOutcome::Remove(id) => removals.push(id),
             }
         }
-        if !results.is_empty() {
+
+        let wrote_db = !removals.is_empty() || !results.is_empty();
+        // Mutating DB work happens here, sequentially, in at most two lock
+        // acquisitions — process_file no longer touches the collection.
+        if wrote_db {
             let mut collection = locked_song_collection();
+            for id in removals {
+                if let Err(e) = collection.remove_song(id) {
+                    let _ = sink.add(StreamEvent::Error(e.to_string()));
+                }
+            }
             for (song, art) in results {
                 if let Err(e) = collection.add_song(song, art) {
                     let _ = sink.add(StreamEvent::Error(e.to_string()));
                 }
             }
+            drop(collection);
+            // Bug fix: per-song writes don't flush and save_songs_to_db_bulk
+            // (the old single-flush path) is no longer called — without this
+            // the whole scan relied on the Dart paused lifecycle hook, so
+            // Android killing the process before that lost all new songs+art.
+            let _ = flush_db();
         }
 
         let _ = sink.add(StreamEvent::Done);
     });
+}
+
+enum ScanOutcome {
+    /// File unchanged and cached song re-emitted (or pruned).
+    Cached,
+    /// File is new/modified; song + art must be persisted.
+    Changed(Song, Option<Vec<u8>>),
+    /// File no longer qualifies; song id must be removed.
+    Remove(u64),
 }
 
 async fn process_file(
@@ -118,7 +149,7 @@ async fn process_file(
     thumbnails_dir: PathBuf,
     sink: StreamSink<StreamEvent>,
     min_duration_s: u32,
-) -> Option<(Song, Option<Vec<u8>>)> {
+) -> ScanOutcome {
     let path_string = path.to_string_lossy().to_string();
     let song_id = hash_string(&path_string);
     let last_modified = fs::metadata(&path)
@@ -129,54 +160,72 @@ async fn process_file(
         .unwrap_or(0);
 
     if existing.get(&song_id) == Some(&last_modified) {
-        if let Some(cached) = locked_song_collection().get_song(song_id) {
-            // Only emit cached song if it meets the duration threshold
-            let duration_ok = cached.duration.unwrap_or(0) >= min_duration_s;
-            if duration_ok {
+        match locked_song_collection().get_song(song_id) {
+            Some(cached) if cached.duration.unwrap_or(0) >= min_duration_s => {
                 let _ = sink.add(StreamEvent::Song(cached));
-            } else {
-                // Song is now too short; remove it from collection
-                let _ = locked_song_collection().remove_song(song_id);
+                ScanOutcome::Cached
             }
+            Some(_) => ScanOutcome::Remove(song_id),
+            None => ScanOutcome::Cached,
         }
-        return None;
+    } else {
+        process_changed_file(path_string, path, song_id, last_modified, thumbnails_dir, sink, min_duration_s).await
     }
+}
 
+async fn process_changed_file(
+    path_string: String,
+    path: PathBuf,
+    song_id: u64,
+    last_modified: i64,
+    thumbnails_dir: PathBuf,
+    sink: StreamSink<StreamEvent>,
+    min_duration_s: u32,
+) -> ScanOutcome {
     let path_clone = path.clone();
     let result =
         tokio::task::spawn_blocking(move || Probe::open(&path_clone).and_then(|p| p.read())).await;
     let tagged_file = match result {
         Ok(Ok(t)) => t,
         Ok(Err(e)) => {
-            let _ = sink.add(StreamEvent::Error(format!(
-                "Skipping file: failed to read tags ({e})"
-            )));
-            return None;
+            let _ = sink.add(StreamEvent::Skipped {
+                path: path_string.clone(),
+                reason: format!("failed to read tags ({e})"),
+            });
+            return ScanOutcome::Remove(song_id);
         }
         Err(_) => {
             let _ = sink.add(StreamEvent::Error("Tag read task panicked".into()));
-            return None;
+            return ScanOutcome::Cached;
         }
     };
 
     let primary_tag = match tagged_file.primary_tag() {
         Some(t) => t,
-        None => return None,
+        None => {
+            let _ = sink.add(StreamEvent::Skipped {
+                path: path_string.clone(),
+                reason: "no id3/tag frame found".into(),
+            });
+            return ScanOutcome::Remove(song_id);
+        }
     };
 
     let duration = tagged_file.properties().duration().as_secs();
 
-    // Skip songs shorter than threshold
+    // Skip songs shorter than threshold; prune from collection if present.
     if duration < min_duration_s as u64 {
-        // Also remove from collection if it existed before
-        let _ = locked_song_collection().remove_song(song_id);
-        return None;
+        let _ = sink.add(StreamEvent::Skipped {
+            path: path_string.clone(),
+            reason: format!("duration {duration}s below minimum {min_duration_s}s"),
+        });
+        return ScanOutcome::Remove(song_id);
     }
 
     let artist = primary_tag.artist().unwrap_or_default().to_string();
     let album = primary_tag.album().unwrap_or_default().to_string();
     let album_art: Option<Vec<u8>> = primary_tag.pictures().first().map(|p| p.data().to_vec());
-    let album_art_id = album_art.as_ref().map(|_| hash_string(&path_string));
+    let album_art_id = album_art.as_ref().map(|_| song_id);
 
     let song = Song {
         id: song_id,
@@ -201,10 +250,15 @@ async fn process_file(
     let album_art_path = thumbnails_dir.join(format!("art_{}.jpg", song.id));
     if !album_art_path.exists() {
         if let Some(ref art_bytes) = album_art {
-            let _ = std::fs::write(&album_art_path, art_bytes);
+            if let Err(e) = std::fs::write(&album_art_path, art_bytes) {
+                let _ = sink.add(StreamEvent::Error(format!(
+                    "Failed to write album art for {}: {e}",
+                    song.id
+                )));
+            }
         }
     }
 
     let _ = sink.add(StreamEvent::Song(song.clone()));
-    Some((song, album_art))
+    ScanOutcome::Changed(song, album_art)
 }

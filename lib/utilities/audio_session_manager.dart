@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' show FileSystemEntity;
 import 'dart:typed_data' show Uint8List;
 import 'package:audio_service/audio_service.dart';
@@ -14,6 +15,9 @@ class AudioSessionManager extends Notifier<AudioSessionState> {
   AudioSessionState build() => SharedPreferenceWithCacheHandler.instance.loadSongState() ?? base;
 
   Future<void> saveState() async => await SharedPreferenceWithCacheHandler.instance.saveSongState(state);
+  static const Duration _positionFlushInterval = Duration(seconds: 3);
+  bool _positionChangePending = false;
+  StreamSubscription<Duration>? _positionSubscription;
 
   void _validate(AudioSessionState s) {
     if (s.isReady) {
@@ -22,9 +26,26 @@ class AudioSessionManager extends Notifier<AudioSessionState> {
     }
   }
 
+  void watchPosition(Stream<Duration> positionStream) {
+    _positionSubscription?.cancel();
+    _positionSubscription = positionStream.listen((Duration position) {
+      if (position <= Duration.zero) return;
+      state = state.copyWith(position: position);
+      if (!_positionChangePending) {
+        _positionChangePending = true;
+        Future.delayed(_positionFlushInterval, () async {
+          _positionChangePending = false;
+          await saveState();
+        });
+      }
+    });
+  }
+
   void updateFromMediaItem(MediaItem mediaItem, int index) async {
     final songId = BigInt.tryParse(mediaItem.extras?['songId'] as String? ?? '');
-    state = state.copyWith(songId: songId, title: mediaItem.title, songIndexInPlaylist: index, asMediaItem: mediaItem, isReady: true);
+    final nextState = state.copyWith(songId: songId, title: mediaItem.title, songIndexInPlaylist: index, asMediaItem: mediaItem, isReady: true);
+    _validate(nextState);
+    state = nextState;
     await saveState();
   }
 
@@ -40,6 +61,7 @@ class AudioSessionManager extends Notifier<AudioSessionState> {
     Uint8List? albumArt,
     MediaItem? asMediaItem,
     int? favouritePlaylistIndexOrNull,
+    Duration? position,
   }) async {
     final nextState = state.copyWith(
       playlistId: playlistId ?? state.playlistId,
@@ -53,6 +75,7 @@ class AudioSessionManager extends Notifier<AudioSessionState> {
       albumArt: albumArt ?? state.albumArt,
       asMediaItem: asMediaItem ?? state.asMediaItem,
       favouritePlaylistIndexOrNull: favouritePlaylistIndexOrNull ?? state.favouritePlaylistIndexOrNull,
+      position: position ?? state.position,
     );
     _validate(nextState);
     state = nextState;

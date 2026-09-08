@@ -23,6 +23,7 @@ abstract class AudioSessionState with _$AudioSessionState {
     @Uint8ListBase64Converter() Uint8List? albumArt,
     @MediaItemConverter() MediaItem? asMediaItem,
     int? favouritePlaylistIndexOrNull,
+    Duration? position,
   }) = _AudioSessionState;
   factory AudioSessionState.initial() => const AudioSessionState();
   factory AudioSessionState.fromJson(Map<String, dynamic> json) => _$AudioSessionStateFromJson(json);

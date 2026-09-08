@@ -3194,8 +3194,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 0:
         return StreamEvent_Song(dco_decode_box_autoadd_song(raw[1]));
       case 1:
-        return StreamEvent_Error(dco_decode_String(raw[1]));
+        return StreamEvent_Skipped(
+          path: dco_decode_String(raw[1]),
+          reason: dco_decode_String(raw[2]),
+        );
       case 2:
+        return StreamEvent_Error(dco_decode_String(raw[1]));
+      case 3:
         return const StreamEvent_Done();
       default:
         throw Exception('unreachable');
@@ -3789,9 +3794,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final var_field0 = sse_decode_box_autoadd_song(deserializer);
         return StreamEvent_Song(var_field0);
       case 1:
+        final var_path = sse_decode_String(deserializer);
+        final var_reason = sse_decode_String(deserializer);
+        return StreamEvent_Skipped(path: var_path, reason: var_reason);
+      case 2:
         final var_field0 = sse_decode_String(deserializer);
         return StreamEvent_Error(var_field0);
-      case 2:
+      case 3:
         return const StreamEvent_Done();
       default:
         throw UnimplementedError('');
@@ -4388,11 +4397,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case StreamEvent_Song(field0: final field0):
         sse_encode_i_32(0, serializer);
         sse_encode_box_autoadd_song(field0, serializer);
-      case StreamEvent_Error(field0: final field0):
+      case StreamEvent_Skipped(path: final path, reason: final reason):
         sse_encode_i_32(1, serializer);
+        sse_encode_String(path, serializer);
+        sse_encode_String(reason, serializer);
+      case StreamEvent_Error(field0: final field0):
+        sse_encode_i_32(2, serializer);
         sse_encode_String(field0, serializer);
       case StreamEvent_Done():
-        sse_encode_i_32(2, serializer);
+        sse_encode_i_32(3, serializer);
     }
   }
 

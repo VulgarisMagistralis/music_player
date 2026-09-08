@@ -29,6 +29,7 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   final Future<AudioSession> _session = AudioSession.instance;
   Stream<PlayerState> get playerStateStream => _player.playerStateStream;
   bool _pausedForInterruption = false;
+  Future<void>? _restoreInFlight;
 
   Future<void> init(ProviderContainer provider) async {
     _container = provider;
@@ -40,6 +41,7 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     _listenToInterruptions();
     _listenToNoisyEvents();
     _listenToDevicesChanged();
+    _container.read(audioSessionManagerProvider.notifier).watchPosition(_player.positionStream);
   }
 
   Future<void> _configureAudioSession() async {
@@ -150,7 +152,7 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   );
 
   void _listenToNoisyEvents() async => _subscriptionList.add(
-    (await _session).becomingNoisyEventStream.listen((_) async => !_container.read(resumeAfterDisconnectProvider) ? await _handlePlayPause(shouldPause: true) : await _handlePlayPause(shouldPause: false)),
+    (await _session).becomingNoisyEventStream.listen((_) async => !_container.read(resumeAfterDisconnectProvider) || _container.read(playOnConnectProvider) ? await _handlePlayPause(shouldPause: true) : null),
   );
 
   void _listenToSystemVolume() => _subscriptionList.add(VolumeController.instance.addListener((double v) async => v <= 0 && _container.read(pauseWhenMutedProvider) ? await _handlePlayPause(shouldPause: true) : null));
@@ -165,32 +167,66 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   );
 
   Future<void> restoreSession() async {
+    final Future<void>? inFlight = _restoreInFlight;
+    if (inFlight != null) return inFlight;
+    final Future<void> restore = _restoreSessionImpl();
+    _restoreInFlight = restore;
     try {
-      final AudioSessionState? savedAudioSession = _container.read(audioSessionManagerProvider);
-      if (savedAudioSession == null || savedAudioSession.songId == null) return;
+      return await restore;
+    } finally {
+      _restoreInFlight = null;
+    }
+  }
 
-      final String playlistId = savedAudioSession.playlistId;
-      final List<Song> songs = await _getSongsForPlaylist(playlistId);
+  Future<void> _restoreSessionImpl() async {
+    try {
+      final AudioSessionState? saved = _container.read(audioSessionManagerProvider);
+      if (saved == null || saved.songId == null) return;
 
-      // Find the actual index of the saved song in the current playlist
-      // rather than trusting the saved index (which may be stale if songs were added/removed)
-      final int songIndex = songs.indexWhere((s) => s.id == savedAudioSession.songId);
-      final int startIndex = songIndex >= 0 ? songIndex : (songs.isNotEmpty ? 0 : -1);
+      final bool shouldPlay = saved.isPlaying && _container.read(playOnLaunchProvider);
+      final Duration? savedPosition = saved.position;
+      final List<UriAudioSource> loaded = _loadedSources();
+      final int existingIndex = loaded.indexWhere((source) => _mediaSongId(source.tag) == saved.songId);
 
-      if (songs.isNotEmpty && startIndex >= 0) {
-        await setPlaylist(playlistId, songs, index: startIndex);
+      if (existingIndex >= 0) {
+        // Queue already holds the saved song (e.g. Android Auto reconnect) - resume in place instead of rebuilding
+        if (savedPosition case final Duration pos when pos > Duration.zero) await _player.seek(pos, index: existingIndex);
       } else {
-        // Fallback: play the saved song directly if playlist is empty or unavailable
-        final song = await getSong(id: savedAudioSession.songId!);
-        if (song == null) return;
-        final newMediaItem = await SongMediaItemFactory.fromSong(song);
-        await _player.setAudioSource(AudioSource.uri(Uri.file(song.path), tag: newMediaItem));
-        mediaItem.add(newMediaItem);
+        final String playlistId = saved.playlistId;
+        final List<Song> songs = await _getSongsForPlaylist(playlistId);
+
+        // Find the actual index of the saved song in the current playlist
+        // rather than trusting the saved index (which may be stale if songs were added/removed)
+        final int songIndex = songs.indexWhere((s) => s.id == saved.songId);
+        final int startIndex = songIndex >= 0 ? songIndex : 0;
+
+        if (songs.isNotEmpty) {
+          await setPlaylist(playlistId, songs, index: startIndex, shouldPlay: false);
+        } else {
+          // Fallback: play the saved song directly if playlist is empty or unavailable
+          final song = await getSong(id: saved.songId!);
+          if (song == null) return;
+          final newMediaItem = await SongMediaItemFactory.fromSong(song);
+          await _player.setAudioSource(AudioSource.uri(Uri.file(song.path), tag: newMediaItem));
+          await _container.read(audioSessionManagerProvider.notifier).updateState(playlistId: playlistId, isReady: true, asMediaItem: newMediaItem);
+          mediaItem.add(newMediaItem);
+        }
+        if (savedPosition case final Duration pos when pos > Duration.zero) await _player.seek(pos);
       }
+
+      if (shouldPlay && !_player.playing) await _player.play();
+      if (!shouldPlay && _player.playing) await _player.pause();
     } catch (e) {
       // happens on reconnect + continue
       ToastManager().showErrorToast('Error restoring previous session: $e');
     }
+  }
+
+  List<UriAudioSource> _loadedSources() => _player.sequence.whereType<UriAudioSource>().toList();
+
+  BigInt? _mediaSongId(Object? tag) {
+    if (tag is! MediaItem) return null;
+    return BigInt.tryParse(tag.extras?['songId'] as String? ?? '');
   }
 
   Future<List<Song>> _getSongsForPlaylist(String playlistId) async {
@@ -250,7 +286,7 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     }
   }
 
-  Future<void> setPlaylist(String playlistId, List<Song> songList, {int index = 0}) async {
+  Future<void> setPlaylist(String playlistId, List<Song> songList, {int index = 0, bool shouldPlay = true}) async {
     final List<AudioSource> validSources = [];
     final List<MediaItem> queueItems = [];
     for (int i = 0; i < songList.length; i++) {
@@ -269,7 +305,7 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     final safeIndex = index < validSources.length ? index : 0;
     await _player.setAudioSources(validSources, initialIndex: safeIndex);
     await updateQueue(queueItems);
-    await _handlePlayPause(shouldPause: false);
+    if (shouldPlay) await _handlePlayPause(shouldPause: false);
   }
 
   Future<bool> ensureActive() async => _player.audioSource != null ? await (await _session).setActive(true) : false;

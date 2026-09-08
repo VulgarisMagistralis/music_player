@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum StreamEvent {
     Song(Song),
+    Skipped { path: String, reason: String },
     Error(String),
     Done,
 }

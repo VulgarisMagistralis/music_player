@@ -100,25 +100,26 @@ Future<List<Song>> getPlaylistSongs(Ref ref, {required Playlist playlist}) async
 @Riverpod(keepAlive: true)
 Future<Playlist> getFavouritesPlaylist(Ref ref) async => await getFavouritesFromCollection();
 
-@Riverpod(keepAlive: true)
+/// Not Kept alive
+@riverpod
 Future<bool> isInFavouritesPlaylist(Ref ref, {required BigInt songId}) async => await isInFavourites(songId: songId);
 
-@Riverpod(keepAlive: false)
+@riverpod
 Future<void> addSongToFavouritesPlaylist(Ref ref, {required BigInt songId}) async => await addSongToFavourites(songId: songId);
 
-@Riverpod(keepAlive: false)
+@riverpod
 Future<void> removeSongFromFavouritesPlaylist(Ref ref, {required BigInt songId}) async => await removeSongFromFavourites(songId: songId);
 
-@Riverpod(keepAlive: false)
+@riverpod
 Future<void> addSongToTargetPlaylist(Ref ref, {required BigInt playlistId, required BigInt songId}) async => await addSongToPlaylist(playlistId: playlistId, songId: songId);
 
-@Riverpod(keepAlive: false)
+@riverpod
 Future<void> removeSongFromTargetPlaylist(Ref ref, {required BigInt playlistId, required BigInt songId}) async => await removeSongFromPlaylist(playlistId: playlistId, songId: songId);
 
-@Riverpod(keepAlive: false)
+@riverpod
 Future<Song?> getSongOrNull(Ref ref, {required BigInt? songId}) async => songId == null ? null : await getSong(id: songId);
 
-@Riverpod(keepAlive: false)
+@riverpod
 Future<Uint8List?> songAlbumArt(Ref ref, {required BigInt songId}) async => await getSongAlbumArt(id: songId);
 
 @Riverpod(keepAlive: true)
@@ -142,7 +143,7 @@ final favouriteSongsBootstrapProvider = FutureProvider<List<Song>>((ref) async {
   return ref.watch(getPlaylistSongsProvider(playlist: playlist).future);
 });
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: true, dependencies: [removeSongFromFavouritesPlaylist])
 class FavouriteSongs extends _$FavouriteSongs {
   @override
   List<Song> build() {

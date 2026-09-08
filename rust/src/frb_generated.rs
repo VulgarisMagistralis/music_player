@@ -3520,10 +3520,18 @@ impl SseDecode for crate::api::data::stream_event::StreamEvent {
                 return crate::api::data::stream_event::StreamEvent::Song(var_field0);
             }
             1 => {
+                let mut var_path = <String>::sse_decode(deserializer);
+                let mut var_reason = <String>::sse_decode(deserializer);
+                return crate::api::data::stream_event::StreamEvent::Skipped {
+                    path: var_path,
+                    reason: var_reason,
+                };
+            }
+            2 => {
                 let mut var_field0 = <String>::sse_decode(deserializer);
                 return crate::api::data::stream_event::StreamEvent::Error(var_field0);
             }
-            2 => {
+            3 => {
                 return crate::api::data::stream_event::StreamEvent::Done;
             }
             _ => {
@@ -4082,10 +4090,16 @@ impl flutter_rust_bridge::IntoDart for crate::api::data::stream_event::StreamEve
             crate::api::data::stream_event::StreamEvent::Song(field0) => {
                 [0.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
+            crate::api::data::stream_event::StreamEvent::Skipped { path, reason } => [
+                1.into_dart(),
+                path.into_into_dart().into_dart(),
+                reason.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
             crate::api::data::stream_event::StreamEvent::Error(field0) => {
-                [1.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+                [2.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
-            crate::api::data::stream_event::StreamEvent::Done => [2.into_dart()].into_dart(),
+            crate::api::data::stream_event::StreamEvent::Done => [3.into_dart()].into_dart(),
             _ => {
                 unimplemented!("");
             }
@@ -4506,12 +4520,17 @@ impl SseEncode for crate::api::data::stream_event::StreamEvent {
                 <i32>::sse_encode(0, serializer);
                 <crate::api::data::song::Song>::sse_encode(field0, serializer);
             }
-            crate::api::data::stream_event::StreamEvent::Error(field0) => {
+            crate::api::data::stream_event::StreamEvent::Skipped { path, reason } => {
                 <i32>::sse_encode(1, serializer);
+                <String>::sse_encode(path, serializer);
+                <String>::sse_encode(reason, serializer);
+            }
+            crate::api::data::stream_event::StreamEvent::Error(field0) => {
+                <i32>::sse_encode(2, serializer);
                 <String>::sse_encode(field0, serializer);
             }
             crate::api::data::stream_event::StreamEvent::Done => {
-                <i32>::sse_encode(2, serializer);
+                <i32>::sse_encode(3, serializer);
             }
             _ => {
                 unimplemented!("");

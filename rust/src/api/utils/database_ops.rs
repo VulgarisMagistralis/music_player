@@ -318,6 +318,18 @@ pub(crate) fn remove_song_from_db(id: u64) -> Result<(), CustomError> {
         .map_err(|e| CustomError::TreeError(e.to_string()))?
         .remove(song_key(id))
         .map_err(|e| CustomError::DbError(e.to_string()))?;
+    // Bug fix: art entry was leaking — scanned-but-short songs left art blobs on disk
+    get_song_art_tree()
+        .map_err(|e| CustomError::TreeError(e.to_string()))?
+        .remove(id.to_be_bytes())
+        .map_err(|e| CustomError::DbError(e.to_string()))?;
+    // DB-level flush so the removals outlive a scan that may not flush later
+    DB_INSTANCE
+        .get()
+        .ok_or_else(|| CustomError::DbError("DB not initialized".into()))?
+        .flush()
+        .map(|_| ())
+        .map_err(|e| CustomError::DbError(e.to_string()))?;
     Ok(())
 }
 
@@ -326,6 +338,18 @@ pub(crate) fn remove_all_songs_from_db() -> Result<(), CustomError> {
         .map_err(|e| CustomError::TreeError(e.to_string()))?
         .clear()
         .map_err(|e| CustomError::TreeError(e.to_string()))?;
+    // Bug fix: art tree was leaking — stale album art stayed on disk forever
+    get_song_art_tree()
+        .map_err(|e| CustomError::TreeError(e.to_string()))?
+        .clear()
+        .map_err(|e| CustomError::TreeError(e.to_string()))?;
+    // Both clears need a single DB-level flush to be durable
+    DB_INSTANCE
+        .get()
+        .ok_or_else(|| CustomError::DbError("DB not initialized".into()))?
+        .flush()
+        .map(|_| ())
+        .map_err(|e| CustomError::DbError(e.to_string()))?;
     Ok(())
 }
 

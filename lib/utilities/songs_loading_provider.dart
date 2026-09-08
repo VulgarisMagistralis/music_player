@@ -11,11 +11,20 @@ class SongsLoading {
   final bool scanning;
   final String? error;
   final bool hasScanned;
+  final int skippedCount;
+  final List<String> skippedPaths;
 
-  SongsLoading({this.songs = const [], this.scanning = false, this.error, this.hasScanned = false});
+  SongsLoading({this.songs = const [], this.scanning = false, this.error, this.hasScanned = false, this.skippedCount = 0, this.skippedPaths = const []});
 
-  SongsLoading copyWith({List<Song>? songs, bool? scanning, String? error, bool? hasScanned}) {
-    return SongsLoading(songs: songs ?? this.songs, scanning: scanning ?? this.scanning, error: error, hasScanned: hasScanned ?? this.hasScanned);
+  SongsLoading copyWith({List<Song>? songs, bool? scanning, String? error, bool? hasScanned, int? skippedCount, List<String>? skippedPaths}) {
+    return SongsLoading(
+      songs: songs ?? this.songs,
+      scanning: scanning ?? this.scanning,
+      error: error,
+      hasScanned: hasScanned ?? this.hasScanned,
+      skippedCount: skippedCount ?? this.skippedCount,
+      skippedPaths: skippedPaths ?? this.skippedPaths,
+    );
   }
 }
 
@@ -45,7 +54,7 @@ class SongsLoadingNotifier extends _$SongsLoadingNotifier {
       // We detect this by watching for a transition from AsyncData/AsyncError back to new data,
       // or simply by tracking whether scanning was previously complete.
       if (state.hasScanned) {
-        state = state.copyWith(songs: [], scanning: false, hasScanned: false);
+        state = SongsLoading();
       }
 
       next.whenData((event) {
@@ -55,10 +64,13 @@ class SongsLoadingNotifier extends _$SongsLoadingNotifier {
           final songs = map.values.toList();
           songs.sortBy(currentSort);
           state = state.copyWith(songs: songs);
+        } else if (event is StreamEvent_Skipped) {
+          final newSkipped = [...state.skippedPaths, event.path];
+          state = state.copyWith(skippedCount: newSkipped.length, skippedPaths: newSkipped);
         } else if (event is StreamEvent_Error) {
           state = state.copyWith(error: event.field0);
         } else if (event is StreamEvent_Done) {
-          state = state.copyWith(scanning: false, hasScanned: true);
+          state = SongsLoading(songs: state.songs, hasScanned: true, skippedCount: state.skippedCount, skippedPaths: state.skippedPaths);
           // Invalidate the favourites bootstrap so it re-queries the (now-pruned) collection
           ref.invalidate(favouriteSongsBootstrapProvider);
         }

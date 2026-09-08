@@ -8,7 +8,8 @@ import 'package:music_player/src/rust/api/data/song.dart';
 import 'package:music_player/src/rust/api/data/stream_event.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `process_file`
+// These functions are ignored because they are not marked as `pub`: `process_changed_file`, `process_file`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `ScanOutcome`
 
 Stream<StreamEvent> readMusicFiles({required int minDurationS}) => RustLib
     .instance

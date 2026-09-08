@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -192,6 +193,61 @@ void main() {
       expect(state.songId, isNull);
       expect(state.title, 'Test');
       expect(state.isReady, isTrue);
+    });
+  });
+
+  group('Position persistence', () {
+    test('watchPosition updates state on non-zero position', () async {
+      final notifier = container.read(audioSessionManagerProvider.notifier);
+      await notifier.updateState(songId: BigInt.one, title: 'Tracker');
+
+      final controller = StreamController<Duration>();
+      notifier.watchPosition(controller.stream);
+
+      controller.add(const Duration(seconds: 15));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      expect(container.read(audioSessionManagerProvider).position, const Duration(seconds: 15));
+      await controller.close();
+    });
+
+    test('watchPosition ignores zero position', () async {
+      final notifier = container.read(audioSessionManagerProvider.notifier);
+      await notifier.updateState(songId: BigInt.one, title: 'Tracker');
+
+      final controller = StreamController<Duration>();
+      notifier.watchPosition(controller.stream);
+
+      controller.add(Duration.zero);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      expect(container.read(audioSessionManagerProvider).position, isNull);
+      await controller.close();
+    });
+
+    test('watchPosition persists the latest position within the flush interval', () async {
+      final notifier = container.read(audioSessionManagerProvider.notifier);
+      await notifier.updateState(songId: BigInt.one, title: 'Tracker');
+
+      final controller = StreamController<Duration>();
+      notifier.watchPosition(controller.stream);
+
+      for (int i = 1; i <= 50; i++) {
+        controller.add(Duration(seconds: i));
+      }
+      controller.add(const Duration(seconds: 42));
+
+      // Wait for the 3s throttled flush to fire
+      await Future<void>.delayed(const Duration(seconds: 3500));
+
+      expect(container.read(audioSessionManagerProvider).position, const Duration(seconds: 42));
+      await notifier.saveState();
+
+      // A fresh read of storage must round-trip the exact final position
+      final persisted = SharedPreferenceWithCacheHandler.instance.loadSongState();
+      expect(persisted, isNotNull);
+      expect(persisted!.position, const Duration(seconds: 42));
+      await controller.close();
     });
   });
 }

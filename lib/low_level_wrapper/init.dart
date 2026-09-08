@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:music_player/low_level_wrapper/data/datasource/music_folder.dart';
 import 'package:music_player/low_level_wrapper/data/repository/folder_repo_imp.dart';
 import 'package:music_player/src/rust/frb_generated.dart';
@@ -35,7 +36,9 @@ class LowLevelInitializer {
           return '$userRoot/Music';
         }
       }
-    } catch (_) {}
-    return '/storage/emulated/0/Music';
+    } catch (_) {
+      debugPrint('Potentially no directory set yet');
+    }
+    return '';
   }
 }

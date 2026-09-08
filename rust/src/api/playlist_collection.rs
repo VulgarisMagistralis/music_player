@@ -97,7 +97,7 @@ impl PlaylistCollection {
             CustomError::PlaylistCollectionError("Failed to fetch playlists".into())
         })?;
 
-        if let Some(p) = playlists.iter().find(|p| p.name == "favourites") {
+        let favourites_playlist_id = if let Some(p) = playlists.iter().find(|p| p.name == "favourites") {
             p.id
         } else {
             let favourites = Playlist {
@@ -114,14 +114,14 @@ impl PlaylistCollection {
             playlists.into_iter().map(|p| (p.id, p)).collect();
 
         let favourites_cache = playlist_map
-            .get(&FAVOURITES_ID)
+            .get(&favourites_playlist_id)
             .map(|p| p.song_id_list.iter().copied().collect())
             .unwrap_or_default();
 
         Ok(Self {
             playlist_map,
             favourites_cache,
-            favourites_playlist_id: FAVOURITES_ID,
+            favourites_playlist_id,
         })
     }
 
@@ -216,33 +216,47 @@ impl PlaylistCollection {
     }
 
     pub fn remove_song(&mut self, playlist_id: u64, song_id: u64) -> Result<(), CustomError> {
-        let playlist = self
+        let song_existed = self
             .playlist_map
-            .get_mut(&playlist_id)
-            .ok_or(CustomError::PlaylistNotFound)?;
+            .get(&playlist_id)
+            .ok_or(CustomError::PlaylistNotFound)?
+            .song_id_list
+            .contains(&song_id);
 
-        playlist.song_id_list.retain(|&id| id != song_id);
         remove_playlist_entry_from_db(playlist_id, song_id)?;
+
+        if song_existed {
+            let playlist = self
+                .playlist_map
+                .get_mut(&playlist_id)
+                .ok_or(CustomError::PlaylistNotFound)?;
+            playlist.song_id_list.retain(|&id| id != song_id);
+        }
         Ok(())
     }
 
     pub fn rename_playlist(&mut self, playlist_id: u64, new_name: &str) -> Result<(), CustomError> {
-        let playlist = self
-            .playlist_map
-            .get_mut(&playlist_id)
-            .ok_or(CustomError::PlaylistNotFound)?;
+        if !self.playlist_map.contains_key(&playlist_id) {
+            return Err(CustomError::PlaylistNotFound);
+        }
 
-        playlist.name = new_name.to_string();
         update_playlist_name_in_db(playlist_id, new_name)?;
+
+        self.playlist_map
+            .get_mut(&playlist_id)
+            .expect("playlist existence checked above, lock held")
+            .name = new_name.to_string();
         Ok(())
     }
 
     pub fn delete_playlist(&mut self, playlist_id: u64) -> Result<(), CustomError> {
-        self.playlist_map
-            .remove(&playlist_id)
-            .ok_or(CustomError::PlaylistNotFound)?;
+        if !self.playlist_map.contains_key(&playlist_id) {
+            return Err(CustomError::PlaylistNotFound);
+        }
 
         delete_playlist_from_db(playlist_id)?;
+
+        self.playlist_map.remove(&playlist_id);
         Ok(())
     }
 }

@@ -3,6 +3,7 @@ import 'package:music_player/music_player.dart';
 import 'package:music_player/pages/loading_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/utilities/providers.dart';
+import 'package:music_player/utilities/audio_session_manager.dart' show audioSessionManagerProvider;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:music_player/utilities/permission_provider.dart';
 import 'package:music_player/src/rust/api/utils/database_ops.dart';
@@ -34,6 +35,7 @@ class _AfterSplashState extends ConsumerState<AfterSplash> with WidgetsBindingOb
     if (state == AppLifecycleState.paused) {
       ///? add another layer?
       flushDb();
+      ref.read(audioSessionManagerProvider.notifier).saveState();
     }
   }
 

@@ -16,6 +16,10 @@ sealed class StreamEvent with _$StreamEvent {
   const StreamEvent._();
 
   const factory StreamEvent.song(Song field0) = StreamEvent_Song;
+  const factory StreamEvent.skipped({
+    required String path,
+    required String reason,
+  }) = StreamEvent_Skipped;
   const factory StreamEvent.error(String field0) = StreamEvent_Error;
   const factory StreamEvent.done() = StreamEvent_Done;
 }
