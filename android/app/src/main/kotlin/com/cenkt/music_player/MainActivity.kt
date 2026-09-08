@@ -71,5 +71,35 @@ class MainActivity : AudioServiceActivity(){
                 else -> result.notImplemented()
             }
         }
+        // Home screen widget state bridge: Dart pushes {title, artist, album_art, is_playing, has_item}.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.cenkt.music_player/widget").setMethodCallHandler { call, result ->
+            if (call.method == "updateWidget") {
+                val args = call.arguments as? Map<*, *>
+                val playing = (args?.get(MusicWidgetProvider.KEY_IS_PLAYING) as? Boolean) ?: false
+                val playlist = (args?.get(MusicWidgetProvider.KEY_PLAYLIST) as? String) ?: ""
+                // Dart ints arrive as Long on the Android side — accept either.
+                val positionMs = (args?.get(MusicWidgetProvider.KEY_POSITION_MS) as? Long)
+                    ?: (args?.get(MusicWidgetProvider.KEY_POSITION_MS) as? Int)?.toLong()
+                    ?: 0L
+                val durationMs = (args?.get(MusicWidgetProvider.KEY_DURATION_MS) as? Long)
+                    ?: (args?.get(MusicWidgetProvider.KEY_DURATION_MS) as? Int)?.toLong()
+                    ?: 0L
+                val edit = getSharedPreferences(MusicWidgetProvider.PREFS, MODE_PRIVATE).edit()
+                edit.putString(MusicWidgetProvider.KEY_TITLE, (args?.get(MusicWidgetProvider.KEY_TITLE) as? String) ?: "")
+                edit.putString(MusicWidgetProvider.KEY_ARTIST, (args?.get(MusicWidgetProvider.KEY_ARTIST) as? String) ?: "")
+                edit.putString(MusicWidgetProvider.KEY_ALBUM_ART, (args?.get(MusicWidgetProvider.KEY_ALBUM_ART) as? String) ?: "")
+                edit.putBoolean(MusicWidgetProvider.KEY_IS_PLAYING, playing)
+                edit.putBoolean(MusicWidgetProvider.KEY_HAS_ITEM, (args?.get(MusicWidgetProvider.KEY_HAS_ITEM) as? Boolean) ?: false)
+                edit.putString(MusicWidgetProvider.KEY_PLAYLIST, playlist)
+                edit.putInt(MusicWidgetProvider.KEY_POSITION_MS, positionMs.toInt().coerceAtLeast(0))
+                edit.putInt(MusicWidgetProvider.KEY_DURATION_MS, durationMs.toInt().coerceAtLeast(0))
+                edit.apply()
+                MusicWidgetProvider.refreshAll(this)
+                result.success(true)
+                android.util.Log.d("MusicWidget", "state updated via channel: playing=$playing hasItem=${args?.get(MusicWidgetProvider.KEY_HAS_ITEM)} playlist='$playlist' pos=$positionMs dur=$durationMs")
+            } else {
+                result.notImplemented()
+            }
+        }
     }
 }

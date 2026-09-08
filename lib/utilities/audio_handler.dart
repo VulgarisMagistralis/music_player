@@ -19,6 +19,7 @@ import 'package:music_player/src/rust/api/song_collection.dart';
 import 'package:music_player/tools/conversion/shuffle_mode.dart';
 import 'package:music_player/utilities/audio_session_manager.dart';
 import 'package:music_player/tools/conversion/loop_mode_conversion.dart';
+import 'package:music_player/utilities/widget_bridge.dart';
 
 class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   late ProviderContainer _container;
@@ -109,11 +110,66 @@ class PlayerAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler
         _container.read(audioSessionManagerProvider.notifier).updateState(isPlaying: playerState.playing, isReady: playerState.processingState != ProcessingState.idle);
       }),
     );
+    // Push current playback state to the home-screen widget whenever the media item,
+    // the playing/paused flag, or the position changes.
+    // The widget re-render is idempotent — duplicate pushes are harmless.
+    _subscriptionList.add(
+      mediaItem.stream.listen((_) => _pushToWidget()),
+    );
+    _subscriptionList.add(
+      _player.playerStateStream.distinct().map((s) => s.playing).listen((_) => _pushToWidget()),
+    );
     _subscriptionList.add(
       _player.positionStream.listen((Duration position) {
         playbackState.add(playbackState.value.copyWith(updatePosition: position, bufferedPosition: _player.bufferedPosition));
+        _pushToWidget();
       }),
     );
+  }
+
+  /// Push the latest playback state — including playlist name, current position and
+  /// total duration — to the Android home-screen widget.
+  Future<void> _pushToWidget() async {
+    if (!Platform.isAndroid) return;
+    final item = mediaItem.value;
+    final playing = _player.playerState.playing;
+    final positionMs = _player.position.inMilliseconds;
+    final Duration? duration = _player.duration;
+    final durationMs = duration?.inMilliseconds ?? 0;
+
+    String playlistName = '';
+    final playlistId = _container.read(audioSessionManagerProvider).playlistId;
+    playlistName = await _resolvePlaylistName(playlistId);
+
+    WidgetBridge.push(item: item, isPlaying: playing, playlist: playlistName, positionMs: positionMs, durationMs: durationMs);
+  }
+
+  /// Resolve a display name for the playlist that the current session is bound to.
+  Future<String> _resolvePlaylistName(String playlistId) async {
+    try {
+      switch (playlistId) {
+        case 'songs':
+          return 'All Songs';
+        case 'favourites':
+          final favourites = await _container.read(getFavouritesPlaylistProvider.future);
+          return favourites?.name ?? 'Favourites';
+        default:
+          if (playlistId.startsWith('playlist_')) {
+            final id = BigInt.tryParse(playlistId.replaceFirst('playlist_', ''));
+            if (id != null) {
+              final playlists = await _container.read(playlistCollectionProvider.future);
+              try {
+                return playlists.firstWhere((p) => p.id == id).name;
+              } catch (_) {
+                return 'Playlist';
+              }
+            }
+          }
+          return 'Playlist';
+      }
+    } catch (_) {
+      return playlistId.isEmpty ? '' : playlistId;
+    }
   }
 
   @override

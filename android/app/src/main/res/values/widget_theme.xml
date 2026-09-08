@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_text">#FFFFFFFF</color>
+    <color name="widget_text_secondary">#B3FFFFFF</color>
+
+    <string name="widget_title_default">Music Player</string>
+    <string name="widget_art_desc">Album art</string>
+    <string name="widget_prev_desc">Previous track</string>
+    <string name="widget_play_desc">Play or pause</string>
+    <string name="widget_next_desc">Next track</string>
+</resources>
