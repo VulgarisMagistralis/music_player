@@ -111,6 +111,7 @@
   "settings_appearance_accent_color": "Color de acento",
   "settings_appearance_font_size": "Tamaño de fuente",
   "settings_appearance_icon_size": "Tamaño del icono",
+  "settings_appearance_widget_opacity": "Opacidad del fondo del widget de inicio",
   "settings_behaviour_show_song_icons": "Mostrar iconos de canciones",
   "settings_behaviour_pause_when_muted": "Pausar cuando está en silencio",
   "settings_behaviour_pause_when_hidden": "Pausar cuando está oculto",

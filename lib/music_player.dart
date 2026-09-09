@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle, SystemChrome;
 import 'package:music_player/pages/songs.dart';
 import 'package:music_player/pages/search.dart';
 import 'package:music_player/route/routes.dart';
@@ -23,20 +24,23 @@ class MusicPlayer extends ConsumerStatefulWidget {
 
 class _MusicPlayerState extends ConsumerState<MusicPlayer> {
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    theme: ref.watch(playerThemeProvider),
-    locale: ref.watch(currentLocaleProvider),
-    localizationsDelegates: const [GeneratedLocalization.delegate, GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
-    supportedLocales: supportedLocales,
-    debugShowCheckedModeBanner: false,
-    home: switch (ref.watch(playerRouteProvider)) {
-      PlayerPageEnum.songs => const SongsPage(),
-      PlayerPageEnum.search => const SearchPage(),
-      PlayerPageEnum.loading => const LoadingPage(),
-      PlayerPageEnum.settings => const SettingsPage(),
-      PlayerPageEnum.playlists => const PlaylistPage(),
-      PlayerPageEnum.error => const GenericErrorPage(),
-      PlayerPageEnum.favourites => const FavouritesPage(),
-    },
-  );
+  Widget build(BuildContext context) {
+    ref.listen(playerThemeProvider, (_, next) => SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: next.scaffoldBackgroundColor, systemNavigationBarColor: next.scaffoldBackgroundColor)));
+    return MaterialApp(
+      theme: ref.watch(playerThemeProvider),
+      locale: ref.watch(currentLocaleProvider),
+      localizationsDelegates: const [GeneratedLocalization.delegate, GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
+      supportedLocales: supportedLocales,
+      debugShowCheckedModeBanner: false,
+      home: switch (ref.watch(playerRouteProvider)) {
+        PlayerPageEnum.songs => const SongsPage(),
+        PlayerPageEnum.search => const SearchPage(),
+        PlayerPageEnum.loading => const LoadingPage(),
+        PlayerPageEnum.settings => const SettingsPage(),
+        PlayerPageEnum.playlists => const PlaylistPage(),
+        PlayerPageEnum.error => const GenericErrorPage(),
+        PlayerPageEnum.favourites => const FavouritesPage(),
+      },
+    );
+  }
 }

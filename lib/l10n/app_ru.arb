@@ -111,6 +111,7 @@
   "settings_appearance_accent_color": "Акцентный цвет",
   "settings_appearance_font_size": "Размер шрифта",
   "settings_appearance_icon_size": "Размер значка",
+  "settings_appearance_widget_opacity": "Непрозраемость фона виджета",
   "settings_behaviour_show_song_icons": "Показать значки треков",
   "settings_behaviour_pause_when_muted": "Пауза при отключении звука",
   "settings_behaviour_pause_when_hidden": "Пауза при скрытии",

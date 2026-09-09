@@ -111,6 +111,7 @@
   "settings_appearance_accent_color": "Akzentfarbe",
   "settings_appearance_font_size": "Schriftgröße",
   "settings_appearance_icon_size": "Symbolgröße",
+  "settings_appearance_widget_opacity": "Hintergrund-Deckkraft des Home-Screen-Widgets",
   "settings_behaviour_show_song_icons": "Song-Symbole in Listen anzeigen",
   "settings_behaviour_pause_when_muted": "Bei Stummschaltung pausieren",
   "settings_behaviour_pause_when_hidden": "Bei versteckter App pausieren",

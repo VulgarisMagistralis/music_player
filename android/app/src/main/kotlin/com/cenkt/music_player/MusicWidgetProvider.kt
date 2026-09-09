@@ -1,5 +1,6 @@
 package com.cenkt.music_player
 
+import android.graphics.Color
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -125,18 +126,26 @@ class MusicWidgetProvider : AppWidgetProvider() {
     }
 
     private fun decodeArt(context: Context, encoded: String): Bitmap? {
-        val uri = try {
-            Uri.parse(encoded)
+        // album_art is stored as a content:// URI (artwork authority) whose path segment
+        // is the plain file path of the cached thumbnail. The provider behind that
+        // authority is not registered, so resolve the file path and decode directly —
+        // the widget runs in the app process and can read its own cache files.
+        var path = try {
+            val uri = Uri.parse(encoded)
+            if (uri.scheme == "content" || uri.scheme == "file") uri.path else encoded
         } catch (e: Throwable) {
             return null
         }
+        if (path.isNullOrBlank()) return null
+        // The path may be percent-encoded (e.g. %20 for spaces) — decode before file IO.
+        path = Uri.decode(path) ?: path
+        val file = java.io.File(path)
+        if (!file.isFile) {
+            Log.w(LOG_TAG, "art file missing: $path")
+            return null
+        }
         return try {
-            if ("content" == uri.scheme) {
-                context.contentResolver.openInputStream(uri)?.let { BitmapFactory.decodeStream(it) }
-            } else {
-                val path = uri.encodedPath
-                if (path != null && path.isNotBlank()) BitmapFactory.decodeFile(path) else null
-            }
+            BitmapFactory.decodeFile(path)
         } catch (e: Throwable) {
             Log.w(LOG_TAG, "could not decode art: $e")
             null
@@ -185,6 +194,44 @@ class MusicWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         updateWidget(context, appWidgetManager, appWidgetIds)
+        val views = updateWidgetTheme(context)
+        for (widgetId in appWidgetIds) {
+            appWidgetManager.updateAppWidget(widgetId, views)
+        }
+    }
+
+    private fun updateWidgetTheme(context: Context): RemoteViews {
+        val preferences = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
+        val backgroundColor = Color.parseColor(
+            preferences.getString(
+                "widget_background", "#202124"
+            ) ?: "#202124"
+        )
+
+        val textColor = Color.parseColor(
+            preferences.getString(
+                "widget_text", "#FFFFFF"
+            ) ?: "#FFFFFF"
+        )
+
+        val accentColor = Color.parseColor(
+            preferences.getString(
+                "widget_accent", "#1a3c5e"
+            ) ?: "#1a3c5e"
+        )
+        val views = RemoteViews(context.packageName, R.layout.widget_music_player)
+        views.setTextViewText(R.id.widget_title, "Song title")
+        // views.setBoolean(R.id.widget_title, "setSelected", true)
+        views.setTextColor(R.id.widget_title, textColor)
+
+        views.setTextViewText(R.id.widget_artist, "Artist name")
+        views.setTextColor(R.id.widget_artist, textColor)
+
+        views.setTextColor(R.id.widget_position, textColor)
+        views.setTextColor(R.id.widget_duration, textColor)
+        views.setInt(R.id.widget_root, "setBackgroundColor", backgroundColor)
+        views.setProgressBar(R.id.widget_seek, 100, 35, false)
+        return views
     }
 
     private fun updateWidget(context: Context, mgr: AppWidgetManager, ids: IntArray) {

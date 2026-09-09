@@ -120,6 +120,7 @@
   "settings_appearance_accent_color": "Accent Color",
   "settings_appearance_font_size": "Font Size",
   "settings_appearance_icon_size": "Icon Size",
+  "settings_appearance_widget_opacity": "Home Screen Widget Background Opacity",
   "settings_behaviour_show_song_icons": "Show song icons on lists",
   "settings_behaviour_play_on_launch": "Play on launch",
   "settings_behaviour_play_on_connect": "Play when connected",

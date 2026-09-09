@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_player/providers/ui_elements.dart';
 import 'package:music_player/providers/theme_colors.dart';
 import 'package:music_player/widgets/setting_number.dart';
+import 'package:music_player/widgets/setting_slider.dart';
 import 'package:music_player/widgets/setting_switch.dart';
 import 'package:music_player/widgets/setting_locale_selector.dart';
 import 'package:music_player/widgets/setting_dropdown_selector.dart';
@@ -108,6 +109,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         const Divider(),
         Center(child: Text(GeneratedLocalization.of(context).settings_appearance_title)),
         SettingColorSelector(title: GeneratedLocalization.of(context).settings_appearance_background_color, provider: primaryBackgroundColorProvider, onUpdate: ref.read(primaryBackgroundColorProvider.notifier).update),
+        SettingSlider(label: GeneratedLocalization.of(context).settings_appearance_widget_opacity, minValue: 40, provider: widgetBackgroundAlphaProvider, onUpdate: ref.read(widgetBackgroundAlphaProvider.notifier).update),
         //needs label clip
         SettingColorSelector(title: GeneratedLocalization.of(context).settings_appearance_main_text_color, provider: primaryTextColorProvider, onUpdate: ref.read(primaryTextColorProvider.notifier).update),
         SettingColorSelector(title: GeneratedLocalization.of(context).settings_appearance_accent_color, provider: primaryAccentColorProvider, onUpdate: ref.read(primaryAccentColorProvider.notifier).update),

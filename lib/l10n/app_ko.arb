@@ -111,6 +111,7 @@
   "settings_appearance_accent_color": "강조 색상",
   "settings_appearance_font_size": "글꼴 크기",
   "settings_appearance_icon_size": "아이콘 크기",
+  "settings_appearance_widget_opacity": "홈 화면 위젯 배경 불투명도",
   "settings_behaviour_show_song_icons": "목록에 노래 아이콘 표시",
   "settings_behaviour_pause_when_muted": "음소거 시 일시 중단",
   "settings_behaviour_pause_when_hidden": "숨겨진 시 일시 중단",

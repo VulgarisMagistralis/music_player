@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="userSetColor">#FF98dd</color>
+    <color name="userSetColor">#FF3321dd</color>
     <color name="launch_background_color">#2196F3</color>
     <color name="launch_background_color_dark">#1a3c5e</color>
+    <color name="widget_background">#2196F3</color>
+    <color name="widget_accent">#1a3c5e</color>
+    <color name="widget_text">#111111</color>
+    <color name="widget_progress">#3F51B5</color>
 </resources>

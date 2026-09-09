@@ -111,6 +111,7 @@
   "settings_appearance_accent_color": "强调色",
   "settings_appearance_font_size": "字体大小",
   "settings_appearance_icon_size": "图标大小",
+  "settings_appearance_widget_opacity": "主屏幕小组件背景不透明度",
   "settings_behaviour_show_song_icons": "在列表中显示歌曲图标",
   "settings_behaviour_pause_when_muted": "静音时暂停",
   "settings_behaviour_pause_when_hidden": "隐藏时暂停",
