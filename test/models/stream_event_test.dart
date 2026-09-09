@@ -34,6 +34,8 @@ void main() {
           fail('Should be song variant');
         case StreamEvent_Done():
           fail('Should be song variant');
+        case StreamEvent_Skipped():
+          fail('Should be song variant');
       }
     });
 
@@ -47,6 +49,8 @@ void main() {
         case StreamEvent_Error():
           expect(event.field0, errorMessage);
         case StreamEvent_Done():
+          fail('Should be error variant');
+        case StreamEvent_Skipped():
           fail('Should be error variant');
       }
     });
