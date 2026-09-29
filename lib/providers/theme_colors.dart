@@ -90,3 +90,16 @@ class PrimaryAccentColor extends _$PrimaryAccentColor {
     state = newColor;
   }
 }
+
+@Riverpod(keepAlive: true)
+class HomeScreenWidgetTheme extends _$HomeScreenWidgetTheme {
+  @override
+  void build() {}
+
+  Future<void> sync() => updateHomeScreenWidgetTheme(
+    textColor: ref.read(primaryTextColorProvider),
+    backgroundColor: ref.read(primaryBackgroundColorProvider),
+    accentColor: ref.read(primaryAccentColorProvider),
+    backgroundAlpha: ref.read(widgetBackgroundAlphaProvider),
+  );
+}

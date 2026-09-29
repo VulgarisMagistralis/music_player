@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:music_player/common/toast.dart';
-import 'package:music_player/l10n/app_localizations.dart';
-import 'package:music_player/pages/after_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_player/low_level_wrapper/init.dart';
-import 'package:music_player/providers/setting_switches.dart';
+import 'package:music_player/common/toast.dart';
+import 'package:music_player/pages/after_splash.dart';
 import 'package:music_player/providers/ui_elements.dart';
+import 'package:music_player/l10n/app_localizations.dart';
+import 'package:music_player/low_level_wrapper/init.dart';
+import 'package:music_player/providers/theme_colors.dart';
 import 'package:music_player/utilities/audio_handler.dart';
 import 'package:music_player/utilities/settings_data.dart';
+import 'package:music_player/providers/setting_switches.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:music_player/utilities/providers.dart' show appReadyProvider, audioHandlerProvider;
 import 'package:flutter/services.dart' show SystemChannels, SystemChrome, SystemUiMode, SystemUiOverlay;
@@ -17,6 +18,7 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   final ProviderContainer providerContainer = ProviderContainer();
   await _initializeAudioServices(providerContainer);
+  await providerContainer.read(homeScreenWidgetThemeProvider.notifier).sync();
   providerContainer.read(appReadyProvider.notifier).setReady();
   runApp(UncontrolledProviderScope(container: providerContainer, child: const AfterSplash()));
   await Future.delayed(Duration.zero);

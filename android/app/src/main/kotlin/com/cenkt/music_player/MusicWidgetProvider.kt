@@ -38,6 +38,15 @@ class MusicWidgetProvider : AppWidgetProvider() {
         const val LOG_TAG = "MusicWidget"
         const val MEDIA_BUTTON_RECEIVER = "com.ryanheise.audioservice.MediaButtonReceiver"
 
+        /**
+         * Fallbacks used until the Dart side pushes the app's resolved theme (see applyTheme).
+         * These mirror the app's own defaults — black background, white text, amber accent —
+         * so the tile already looks like the app before the first push arrives.
+         */
+        const val DEFAULT_BACKGROUND = "#FF121212"
+        const val DEFAULT_TEXT = "#FFFFEEEE"
+        const val DEFAULT_ACCENT = "#FF03DAC5"
+
         /** Re-render all instances of the widget from persisted state. */
         fun refreshAll(context: Context) {
             val mgr = AppWidgetManager.getInstance(context)
@@ -130,12 +139,12 @@ class MusicWidgetProvider : AppWidgetProvider() {
         // is the plain file path of the cached thumbnail. The provider behind that
         // authority is not registered, so resolve the file path and decode directly —
         // the widget runs in the app process and can read its own cache files.
-        var path = try {
-            val uri = Uri.parse(encoded)
-            if (uri.scheme == "content" || uri.scheme == "file") uri.path else encoded
+        val uri = try {
+            Uri.parse(encoded)
         } catch (e: Throwable) {
             return null
         }
+        var path = if (uri.scheme == "content" || uri.scheme == "file") uri.path else encoded
         if (path.isNullOrBlank()) return null
         // The path may be percent-encoded (e.g. %20 for spaces) — decode before file IO.
         path = Uri.decode(path) ?: path
@@ -144,10 +153,14 @@ class MusicWidgetProvider : AppWidgetProvider() {
             Log.w(LOG_TAG, "art file missing: $path")
             return null
         }
+        // Prefer the resolver (correct whenever the authority IS registered), then fall back
+        // to reading the resolved path directly — which is the case this widget relies on.
         return try {
-            BitmapFactory.decodeFile(path)
+            context.contentResolver.openInputStream(uri)?.use {
+                BitmapFactory.decodeStream(it)
+            } ?: BitmapFactory.decodeFile(path)
         } catch (e: Throwable) {
-            Log.w(LOG_TAG, "could not decode art: $e")
+            Log.w(LOG_TAG, "could not decode art from URI $encoded: $e")
             null
         }
     }
@@ -194,48 +207,57 @@ class MusicWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         updateWidget(context, appWidgetManager, appWidgetIds)
-        val views = updateWidgetTheme(context)
-        for (widgetId in appWidgetIds) {
-            appWidgetManager.updateAppWidget(widgetId, views)
-        }
     }
 
-    private fun updateWidgetTheme(context: Context): RemoteViews {
+    /**
+     * Overlay the user-chosen theme colors on top of [views] (produced by [render]).
+     * Operates on the SAME RemoteViews so the transport PendingIntents and the real
+     * song text / seek progress are preserved — only colors are overridden.
+     * Colors come from the `HomeWidgetPreferences` prefs written by the home_widget
+     * plugin (same keys saveWidgetData uses: widget_background / widget_text / widget_accent).
+     */
+    private fun applyTheme(context: Context, views: RemoteViews): RemoteViews {
         val preferences = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
-        val backgroundColor = Color.parseColor(
-            preferences.getString(
-                "widget_background", "#202124"
-            ) ?: "#202124"
-        )
+        val backgroundColor = readColor(preferences.getString("widget_background", null), DEFAULT_BACKGROUND)
+        val textColor = readColor(preferences.getString("widget_text", null), DEFAULT_TEXT)
+        val accentColor = readColor(preferences.getString("widget_accent", null), DEFAULT_ACCENT)
 
-        val textColor = Color.parseColor(
-            preferences.getString(
-                "widget_text", "#FFFFFF"
-            ) ?: "#FFFFFF"
-        )
-
-        val accentColor = Color.parseColor(
-            preferences.getString(
-                "widget_accent", "#1a3c5e"
-            ) ?: "#1a3c5e"
-        )
-        val views = RemoteViews(context.packageName, R.layout.widget_music_player)
-        views.setTextViewText(R.id.widget_title, "Song title")
-        // views.setBoolean(R.id.widget_title, "setSelected", true)
         views.setTextColor(R.id.widget_title, textColor)
-
-        views.setTextViewText(R.id.widget_artist, "Artist name")
         views.setTextColor(R.id.widget_artist, textColor)
-
         views.setTextColor(R.id.widget_position, textColor)
         views.setTextColor(R.id.widget_duration, textColor)
         views.setInt(R.id.widget_root, "setBackgroundColor", backgroundColor)
-        views.setProgressBar(R.id.widget_seek, 100, 35, false)
+        // Transport icons are vector drawables with a fixed white fill, so they would keep
+        // rendering white no matter which theme the user picked. ImageView#setColorFilter(int)
+        // is public, so RemoteViews' setInt reflection can reach it. Every render re-sets
+        // these buttons to a drawable (never a bitmap), so the filter is always reapplied and
+        // never goes stale.
+        views.setInt(R.id.widget_btn_prev, "setColorFilter", accentColor)
+        views.setInt(R.id.widget_btn_play, "setColorFilter", accentColor)
+        views.setInt(R.id.widget_btn_next, "setColorFilter", accentColor)
+        // Seek-bar accent is intentionally NOT set here: every RemoteViews API that recolors
+        // a ProgressBar's fill (setProgressTintList, setProgressDrawable,
+        // setProgressBackgroundTintList) is @hide / framework-internal, so stock Android
+        // offers no public way to tint the fill at runtime. It stays static via
+        // android:progressTint in widget_music_player.xml (@color/widget_accent).
         return views
     }
 
+    /** Parse a color written by the Dart side, falling back to [fallback] on a malformed value. */
+    private fun readColor(raw: String?, fallback: String): Int = try {
+        Color.parseColor(raw ?: fallback)
+    } catch (e: IllegalArgumentException) {
+        Log.w(LOG_TAG, "unparseable widget color '$raw', falling back to $fallback")
+        Color.parseColor(fallback)
+    }
+
+    /**
+     * Single render path: the song state from [render] and the theme from [applyTheme] are
+     * always published in the SAME RemoteViews, so the two can never disagree (a separate
+     * unthemed update would also decode the album art twice per change).
+     */
     private fun updateWidget(context: Context, mgr: AppWidgetManager, ids: IntArray) {
-        val views = render(context)
+        val views = applyTheme(context, render(context))
         mgr.updateAppWidget(ids, views)
         Log.d(
             LOG_TAG,

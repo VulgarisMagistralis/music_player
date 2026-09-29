@@ -24,7 +24,7 @@ Built with performance in mind and powered by Flutter and Rust.
 - [x] Folder selection for scanning
 - [x] Sorting (title, artist, album, date added)
 - [x] Manual rescan (header icon on songs & playlist pages)
-- [ ] Support more formats
+- [x] Support more formats
 - [ ] Quick scan (recent changes only)
 - [ ] Filtering (duration, file size, extension)
 - [ ] Large library performance optimizations
@@ -41,7 +41,7 @@ Built with performance in mind and powered by Flutter and Rust.
 - [x] Create playlists
 - [x] Delete playlists
 - [ ] Edit / reorder playlists
-- [ ] Add/remove songs from playlists
+- [x] Add/remove songs from playlists
 - [ ] Smart playlists (recently added, most played)
 
 ### 🎨 UI & Customization
@@ -54,7 +54,7 @@ Built with performance in mind and powered by Flutter and Rust.
 - [x] Bottom navigation bar (songs, favourites, playlists, search, settings)
 - [x] Skeleton loading states
 - [x] Song info sheet
-- [ ] Optional immersive mode (system nav / notch handling)
+- [x] Optional immersive mode (system nav / notch handling)
 
 ### 🌐 Localization
 
@@ -167,14 +167,14 @@ Built with performance in mind and powered by Flutter and Rust.
 
 ### 🧪 Testing & Quality
 
-- [ ] Unit tests
-- [ ] Media edge case handling
+- [x] Unit tests
+- [x] Media edge case handling
 - [x] Android Auto DHU testing
 - [ ] Large library stress tests
 
 ### 🧩 Planned
 
-- [ ] Home screen widget
+- [x] Home screen widget
 - [ ] Metadata editing
 - [ ] Crash recovery handling
 
