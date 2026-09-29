@@ -6,6 +6,7 @@ import 'package:music_player/utilities/settings_data.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:music_player/theme/theme_data.dart' show CustomAppTheme;
 part 'theme_colors.g.dart';
+
 //TODO
 // SystemChrome.setSystemUIOverlayStyle(
 // SystemUiOverlayStyle(

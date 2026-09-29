@@ -25,7 +25,7 @@ afterEvaluate {
 
 android {
     namespace = "com.cenkt.music_player"
-    compileSdk = 36
+    compileSdk = 37
     ndkVersion = "28.2.13676358"
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
