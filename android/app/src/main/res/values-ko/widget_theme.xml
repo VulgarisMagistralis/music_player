@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title_default">음악 플레이어</string>
+    <string name="widget_art_desc">앨범 아트</string>
+    <string name="widget_prev_desc">이전 트랙</string>
+    <string name="widget_play_desc">재생 또는 일시 중지</string>
+    <string name="widget_next_desc">다음 트랙</string>
+</resources>

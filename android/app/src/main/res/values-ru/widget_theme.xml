@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title_default">Музыкальный плеер</string>
+    <string name="widget_art_desc">Обложка альбома</string>
+    <string name="widget_prev_desc">Предыдущий трек</string>
+    <string name="widget_play_desc">Воспроизвести или поставить на паузу</string>
+    <string name="widget_next_desc">Следующий трек</string>
+</resources>

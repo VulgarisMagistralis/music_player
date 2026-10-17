@@ -61,7 +61,7 @@ fvm flutter analyze --no-fatal-infos --no-fatal-warnings && fvm dart run build_r
 - Same regenerate command as Riverpod above
 
 ### Flutter Rust Bridge
-- FFI bridge via `flutter_rust_bridge 2.11.1`. Regenerate after any Rust source or `#[frb()]` annotation change.
+- FFI bridge via `flutter_rust_bridge 2.13.0`. Regenerate after any Rust source or `#[frb()]` annotation change.
 
 ## Testing Infrastructure
 - 24 test files in `test/` (models/providers/utils/conversions) using mocktail + mockito

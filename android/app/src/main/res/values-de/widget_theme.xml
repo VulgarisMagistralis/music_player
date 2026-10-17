@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title_default">Musik-Player</string>
+    <string name="widget_art_desc">Albumcover</string>
+    <string name="widget_prev_desc">Vorheriger Titel</string>
+    <string name="widget_play_desc">Abspielen oder Pause</string>
+    <string name="widget_next_desc">Nächster Titel</string>
+</resources>

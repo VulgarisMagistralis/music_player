@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title_default">音乐播放器</string>
+    <string name="widget_art_desc">专辑封面</string>
+    <string name="widget_prev_desc">上一曲</string>
+    <string name="widget_play_desc">播放或暂停</string>
+    <string name="widget_next_desc">下一曲</string>
+</resources>

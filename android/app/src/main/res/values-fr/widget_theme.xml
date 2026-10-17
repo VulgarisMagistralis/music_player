@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title_default">Lecteur musical</string>
+    <string name="widget_art_desc">Pochette d\'album</string>
+    <string name="widget_prev_desc">Piste précédente</string>
+    <string name="widget_play_desc">Lecture ou pause</string>
+    <string name="widget_next_desc">Piste suivante</string>
+</resources>

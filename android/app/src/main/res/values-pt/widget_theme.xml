@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title_default">Reprodutor de música</string>
+    <string name="widget_art_desc">Capa do álbum</string>
+    <string name="widget_prev_desc">Faixa anterior</string>
+    <string name="widget_play_desc">Reproduzir ou pausar</string>
+    <string name="widget_next_desc">Próxima faixa</string>
+</resources>

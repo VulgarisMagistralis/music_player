@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title_default">音楽プレイヤー</string>
+    <string name="widget_art_desc">アルバムアートワーク</string>
+    <string name="widget_prev_desc">前のトラック</string>
+    <string name="widget_play_desc">再生または一時停止</string>
+    <string name="widget_next_desc">次のトラック</string>
+</resources>

@@ -134,7 +134,7 @@ A lightweight, offline MP3 player for Android.
 Built with performance in mind and powered by Flutter and Rust.
 
 - **Flutter (Riverpod for state management)**: Reactive, scalable state management for playback, library, and settings.
-- **Rust core via FFI (`flutter_rust_bridge 2.11.1`)**: High-performance file indexing, metadata extraction, and playlist persistence.
+- **Rust core via FFI (`flutter_rust_bridge 2.13.0`)**: High-performance file indexing, metadata extraction, and playlist persistence.
 - **Just Audio / Audio Service**: Foreground media session, background playback, interrupt handling, and Android Auto / notification controls.
 - **Shared preferences with caching**: Fast, low-latency setting access with a singleton cache wrapper.
 - **Optimistic UI updates**: Instant feedback for playlist/favourites changes with rollback on failure.

@@ -3,8 +3,9 @@
     <color name="userSetColor">#FF3321dd</color>
     <color name="launch_background_color">#2196F3</color>
     <color name="launch_background_color_dark">#1a3c5e</color>
-    <color name="widget_background">#2196F3</color>
-    <color name="widget_accent">#1a3c5e</color>
-    <color name="widget_text">#111111</color>
-    <color name="widget_progress">#3F51B5</color>
+    <!-- Widget defaults mirror the app's theme (MusicWidgetProvider.DEFAULT_*):
+         black background, near-white text, teal accent. -->
+    <color name="widget_background">#FF121212</color>
+    <color name="widget_accent">#FF03DAC5</color>
+    <color name="widget_text">#FFFFEEEE</color>
 </resources>

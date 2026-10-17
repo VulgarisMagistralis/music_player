@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title_default">Reproductor de música</string>
+    <string name="widget_art_desc">Carátula del álbum</string>
+    <string name="widget_prev_desc">Pista anterior</string>
+    <string name="widget_play_desc">Reproducir o pausar</string>
+    <string name="widget_next_desc">Pista siguiente</string>
+</resources>
